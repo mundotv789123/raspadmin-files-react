@@ -1,0 +1,12 @@
+a {
+    color: white;
+    text-decoration: none;
+}
+html, body {
+    background: rgb(12, 75, 112);
+    color: white;
+}
+body {
+    background-size: cover;
+    background-position: center;
+}
