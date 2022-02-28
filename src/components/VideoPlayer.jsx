@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFastForward, faPlay, faVolumeUp, faExpand, faAngleLeft } from "@fortawesome/free-solid-svg-icons";
+import { faFastForward, faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from "@fortawesome/free-solid-svg-icons";
 import styled, { keyframes } from "styled-components";
+import { useEffect, useState } from "react";
 
 const VideoCont = styled.div`
     display: flex;
@@ -85,34 +86,115 @@ const VideoButton = styled.button`
     }
 `
 
-const VideoProgressBar = styled.div`
+const VideoCloseButton = styled.a`
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 13pt;
+    font-size: 20px;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 10px 15px; 
+    &:hover {
+        color: lightgray;
+        transform: translateY(-1px);
+    }
+`
+
+const VideoProgress = styled.div`
     width: 100%;
     margin: auto 5px;
     background: rgb(100,100,100);
     height: 7px;
     border-radius: 5px;
+    overflow: hidden;
+`
+
+const VideoProgressBar = styled.div`
+    background-color: white;
+    height: 100%;
 `
 
 export default function VideoPlayer(props) {
-    if (!props.src) {
+    useEffect(() => {
+        /* video events */
+        var video = document.getElementById('video');
+        if (video === null) {
+            return;
+        }
+        video.oncanplay = () => {
+            loading.style.display = 'none';
+        }
+        video.ontimeupdate = () => {
+            let percent = (video.currentTime * 100 / video.duration).toFixed(3);
+            progress.style.width = percent+'%';
+        }
+
+        /* progress events */
+        var progressMain = document.getElementById('progressMain');
+        var progress = document.getElementById('progress');
+        progressMain.onclick = (e) => {
+            let rect = progressMain.getBoundingClientRect();
+            let percent = ((e.x - rect.left) * 100 / (rect.right - rect.left)).toFixed(2);
+            video.currentTime = (video.duration / 100 * percent);
+            progress.style.width = percent+'%';
+        }
+
+        /* controls events */
+        var playButton = document.getElementById('playButton');
+        var pauseButton = document.getElementById('pauseButton');
+        video.onplay = () => {
+            playButton.style.display = 'none';
+            pauseButton.style.display = '';
+        }
+        video.onpause = () => {
+            playButton.style.display = '';
+            pauseButton.style.display = 'none';
+        }
+        pauseButton.style.display = 'none';
+        
+        /* buttons event */
+        playButton.onclick = () => {
+            video.play();
+        }
+        pauseButton.onclick = () => {
+            video.pause();
+        }
+
+        var videoCenter = document.getElementById('videoCenter');
+        videoCenter.onclick = () => {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+    })
+
+    if (!props.video) {
         return <></>
     }
-    const srcSplited = props.src.split("/")
+
+    let srcSplited = props.video.src.split("/")
     const fileName = srcSplited[srcSplited.length - 1];
+
     return (
         <VideoCont>
-            <Video src={props.src} controls={false}></Video>
+            <Video src={props.video.src} controls={false} id={"video"}></Video>
             <VideoMain>
                 <VideoTop>
                     <VideoTitle>{fileName}</VideoTitle>
-                    <VideoButton style={{ position: 'absolute', top: 0, left: 0, margin: '10px 15px' }}><FontAwesomeIcon icon={faAngleLeft}/></VideoButton>
+                    <VideoCloseButton style={{ display: (props.video.backUrl ? '' : 'none') }} href={props.video.backUrl}><FontAwesomeIcon icon={faAngleLeft}/></VideoCloseButton>
                 </VideoTop>
-                <VideoCenter>
-                    <VideoLoading/>
+                <VideoCenter id={"videoCenter"}>
+                    <VideoLoading id={"loading"}/>
                 </VideoCenter>
                 <VideoBottom>
-                    <VideoButton><FontAwesomeIcon icon={faPlay}/></VideoButton>
-                    <VideoProgressBar />
+                    <VideoButton id={"playButton"}><FontAwesomeIcon icon={faPlay}/></VideoButton>
+                    <VideoButton id={"pauseButton"}><FontAwesomeIcon icon={faPause}/></VideoButton>
+                    <VideoProgress id={"progressMain"}><VideoProgressBar id={"progress"}/></VideoProgress>
                     <VideoButton><FontAwesomeIcon icon={faVolumeUp}/></VideoButton>
                     <VideoButton><FontAwesomeIcon icon={faFastForward}/></VideoButton>
                     <VideoButton><FontAwesomeIcon icon={faExpand}/></VideoButton>

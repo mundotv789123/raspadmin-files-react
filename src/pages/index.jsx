@@ -46,13 +46,10 @@ const Aside = styled.aside`
 `
 
 function AppFunction() {
-    /* componentes */
-    var [tabFiles, setTabFiles] = useState([{url: '#teste123', dir: true}, {url: '#teste123.mp4', dir: false}])
+    var [tabFiles, setTabFiles] = useState(null)
     var [files, setFiles] = useState(null)
-    /* páginas */
     var [login, setLogin] = useState(false)
-    var [videoUrl, setVideoURL] = useState(null)
-    
+    var [video, setVideo] = useState(null)
 
     function updateTabFiles() {
         axios.get('https://arquivos.raspadmin.tk/api').then((response) => {
@@ -77,12 +74,15 @@ function AppFunction() {
             let type = response.headers['content-type'];
             if (type !== 'application/json') {
                 if (type.split('/')[0] === 'video') {
-                    setVideoURL('https://arquivos.raspadmin.tk/api'+hash.substring(1));
+                    setVideo({
+                        src: 'https://arquivos.raspadmin.tk/api'+hash.substring(1),
+                        backUrl: '#'
+                    });
                 }
                 return;
             }
 
-            setVideoURL(null);
+            setVideo(null);
             let data = response.data;
             let rFiles = Object.values(data.files);
             let files = [];
@@ -98,7 +98,6 @@ function AppFunction() {
     useEffect(() => {
         updateTabFiles()
         window.onhashchange = () => {
-            console.log(location.hash)
             updateFiles(location.hash)
         }
         updateFiles(location.hash)
@@ -117,7 +116,7 @@ function AppFunction() {
                 <FilesBlocks files={files}/>
             </Aside>
             <LoginMenu do={login}/>
-            <VideoPlayer src={videoUrl}/>
+            <VideoPlayer video={video}/>
         </Container>
     )
 }
