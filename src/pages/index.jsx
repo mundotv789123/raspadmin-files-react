@@ -46,21 +46,23 @@ const Aside = styled.aside`
 `
 
 function AppFunction() {
-    var [tabFiles, setTabFiles] = useState(null)
-    var [files, setFiles] = useState(null)
-    var [login, setLogin] = useState(false)
-    var [video, setVideo] = useState(null)
+    const [tabFiles, setTabFiles] = useState(null)
+    const [files, setFiles] = useState(null)
+    const [login, setLogin] = useState(false)
+    const [video, setVideo] = useState(null)
+
+    useEffect(() => {
+        updateTabFiles()
+        window.onhashchange = () => {
+            updateFiles(location.hash)
+        }
+        updateFiles(location.hash)
+    }, [])
 
     function updateTabFiles() {
         axios.get('https://arquivos.raspadmin.tk/api').then((response) => {
-            let files = [];
-            let rFiles = Object.values(response.data.files);
-            rFiles.map((file => {
-                if (file.is_dir) {
-                    files.push({url: ('#/'+file.name), is_dir: file.is_dir})
-                }
-            }))
-            setTabFiles(files)
+            let lfiles = Object.values(response.data.files).filter(file => {return file.is_dir}).map(file => {return {url: `#/${file.name}`, is_dir: file.is_dir}});
+            setTabFiles(lfiles)
         }).catch((error) => {
             console.error(error);
         })
@@ -70,38 +72,25 @@ function AppFunction() {
         if (!hash || hash === '') 
             hash = '#'
         setFiles(null);
-        axios.get('https://arquivos.raspadmin.tk/api'+hash.substring(1)).then((response) => {
+        axios.get(`https://arquivos.raspadmin.tk/api${hash.substring(1)}`).then((response) => {
             let type = response.headers['content-type'];
             if (type !== 'application/json') {
                 if (type.split('/')[0] === 'video') {
+                    let src_splited = hash.split('/');
                     setVideo({
-                        src: 'https://arquivos.raspadmin.tk/api'+hash.substring(1),
-                        backUrl: '#'
+                        src: `https://arquivos.raspadmin.tk/api${hash.substring(1)}`,
+                        backUrl: hash.substring(0, hash.length - src_splited[src_splited.length - 1].length)
                     });
                 }
                 return;
             }
 
             setVideo(null);
-            let data = response.data;
-            let rFiles = Object.values(data.files);
-            let files = [];
-            rFiles.map((file => {
-                files.push({url: (hash+'/'+file.name), is_dir: file.is_dir})
-            }))
-            setFiles(files)
+            setFiles(Object.values(response.data.files).map(file => {return {url: (`${hash}/${file.name}`), is_dir: file.is_dir}}))
         }).catch((error) => {
             console.error(error);
         })
     }
-
-    useEffect(() => {
-        updateTabFiles()
-        window.onhashchange = () => {
-            updateFiles(location.hash)
-        }
-        updateFiles(location.hash)
-    }, [])
 
     return (
         <Container>

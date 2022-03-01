@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFastForward, faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from "@fortawesome/free-solid-svg-icons";
 import styled, { keyframes } from "styled-components";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const VideoCont = styled.div`
     display: flex;
@@ -117,59 +117,67 @@ const VideoProgressBar = styled.div`
     height: 100%;
 `
 
-export default function VideoPlayer(props) {
-    useEffect(() => {
-        /* video events */
-        var video = document.getElementById('video');
-        if (video === null) {
-            return;
-        }
-        video.oncanplay = () => {
-            loading.style.display = 'none';
-        }
-        video.ontimeupdate = () => {
-            let percent = (video.currentTime * 100 / video.duration).toFixed(3);
-            progress.style.width = percent+'%';
-        }
+function registerControlsEvents(video, videoCenter, playButton, pauseButton) {
+    /* video events */
+    video.oncanplay = () => {
+        loading.style.display = 'none';
+    }
 
-        /* progress events */
-        var progressMain = document.getElementById('progressMain');
-        var progress = document.getElementById('progress');
-        progressMain.onclick = (e) => {
-            let rect = progressMain.getBoundingClientRect();
-            let percent = ((e.x - rect.left) * 100 / (rect.right - rect.left)).toFixed(2);
-            video.currentTime = (video.duration / 100 * percent);
-            progress.style.width = percent+'%';
-        }
-
-        /* controls events */
-        var playButton = document.getElementById('playButton');
-        var pauseButton = document.getElementById('pauseButton');
-        video.onplay = () => {
-            playButton.style.display = 'none';
-            pauseButton.style.display = '';
-        }
-        video.onpause = () => {
-            playButton.style.display = '';
-            pauseButton.style.display = 'none';
-        }
+    /* play events */
+    video.onplay = () => {
+        playButton.style.display = 'none';
+        pauseButton.style.display = '';
+    }
+    video.onpause = () => {
+        playButton.style.display = '';
         pauseButton.style.display = 'none';
-        
-        /* buttons event */
-        playButton.onclick = () => {
+    }
+    pauseButton.style.display = 'none';
+    
+    /* buttons event */
+    playButton.onclick = () => {
+        video.play();
+    }
+    pauseButton.onclick = () => {
+        video.pause();
+    }
+    videoCenter.onclick = () => {
+        if (video.paused) {
             video.play();
-        }
-        pauseButton.onclick = () => {
+        } else {
             video.pause();
         }
+    }
+}
 
-        var videoCenter = document.getElementById('videoCenter');
-        videoCenter.onclick = () => {
-            if (video.paused) {
-                video.play();
-            } else {
-                video.pause();
-            }
+function registerProgressEvents(video, progressMain, progress) {
+    progressMain.onclick = (e) => {
+        let rect = progressMain.getBoundingClientRect();
+        let percent = ((e.x - rect.left) * 100 / (rect.right - rect.left)).toFixed(2);
+        video.currentTime = (video.duration / 100 * percent);
+        progress.style.width = percent+'%';
+    }
+    video.ontimeupdate = () => {
+        let percent = (video.currentTime * 100 / video.duration).toFixed(3);
+        progress.style.width = percent+'%';
+    }
+}
+
+export default function VideoPlayer(props) {
+    useEffect(() => {
+        var video = document.getElementById('video');
+        if (video !== null) {
+            registerControlsEvents(
+                video,
+                document.getElementById('videoCenter'),
+                document.getElementById('playButton'),
+                document.getElementById('pauseButton')
+            )
+            registerProgressEvents(
+                video,
+                document.getElementById('progressMain'),
+                document.getElementById('progress')
+            )
         }
     })
 

@@ -8,7 +8,7 @@ const Column = styled.div`
 
 export default function FilesList(props) {
     if (props.files) {
-        const c = 0;
+        let c = 0;
         return (
             <Column>
                 {props.files.map((file) => {
