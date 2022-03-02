@@ -48,8 +48,11 @@ const Aside = styled.aside`
 function AppFunction() {
     const [tabFiles, setTabFiles] = useState(null)
     const [files, setFiles] = useState(null)
-    const [login, setLogin] = useState(false)
     const [video, setVideo] = useState(null)
+    const [login, setLogin] = useState(false)
+    const [loginError, setLoginError] = useState(null)
+
+    const api_url = process.env.NEXT_PUBLIC_API_URL;
 
     useEffect(() => {
         updateTabFiles()
@@ -60,11 +63,15 @@ function AppFunction() {
     }, [])
 
     function updateTabFiles() {
-        axios.get('https://arquivos.raspadmin.tk/api').then((response) => {
+        axios.get(api_url).then((response) => {
             let lfiles = Object.values(response.data.files).filter(file => {return file.is_dir}).map(file => {return {url: `#/${file.name}`, is_dir: file.is_dir}});
             setTabFiles(lfiles)
         }).catch((error) => {
-            console.error(error);
+            switch (error.toJSON().status) {
+                case 401:
+                    setLogin(true);
+                    break;
+            }
         })
     }
 
@@ -72,22 +79,21 @@ function AppFunction() {
         if (!hash || hash === '') 
             hash = '#'
         setFiles(null);
-        axios.get(`https://arquivos.raspadmin.tk/api${hash.substring(1)}`).then((response) => {
+        axios.get(`${api_url}${hash.substring(1)}`).then((response) => {
             let type = response.headers['content-type'];
             if (type !== 'application/json') {
                 if (!open)
                     return
                 let src_splited = hash.split('/');
-                let parent_src = hash.substring(0, hash.length - src_splited[src_splited.length - 1].length);
+                let parent_src = hash.substring(0, (hash.length - src_splited[src_splited.length - 1].length) - 1);
                 if (type.split('/')[0] === 'video') {
                     setVideo({
-                        src: `https://arquivos.raspadmin.tk/api${hash.substring(1)}`,
+                        src: `${api_url}${hash.substring(1)}`,
                         backUrl: parent_src
                     });
                 } else {
-                    location.href = `https://arquivos.raspadmin.tk/api${hash.substring(1)}`;
+                    location.href = `${api_url}${hash.substring(1)}`;
                 }
-                console.log(parent_src)
                 updateFiles(parent_src, false)
                 return;
             }
@@ -96,7 +102,39 @@ function AppFunction() {
 
             setFiles(Object.values(response.data.files).map(file => {return {url: (`${hash}/${file.name}`), is_dir: file.is_dir}}))
         }).catch((error) => {
-            console.error(error);
+            //code
+        })
+    }
+
+    const doLogin = event => {
+        event.preventDefault();
+        let username = event.target.username.value;
+        let password = event.target.password.value;
+        if (username === '' || password === '') {
+            setLoginError('Preencha todos os campos');
+            return;
+        }
+        axios.post(api_url, {
+            username: username,
+            password: password
+        }).then(() => {
+            setLogin(false)
+            setLoginError(null)
+            updateTabFiles()
+            updateFiles(location.hash)
+        }).catch((error) => {
+            let data = null;
+            try {
+                data = JSON.parse(error.request.response);
+            } catch {
+                setLoginError('Erro interno ao processar requisição')
+                return;
+            }
+            if (data.message) {
+                setLoginError(data.message)
+            } else {
+                setLoginError('Erro interno ao processar requisição')
+            }
         })
     }
 
@@ -112,8 +150,8 @@ function AppFunction() {
             <Aside>
                 <FilesBlocks files={files}/>
             </Aside>
-            <LoginMenu do={login}/>
             <VideoPlayer video={video}/>
+            <LoginMenu do={login} error={loginError} onSubmit={doLogin}/>
         </Container>
     )
 }

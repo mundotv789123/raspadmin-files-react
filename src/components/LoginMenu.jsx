@@ -1,3 +1,4 @@
+import axios from "axios";
 import styled from "styled-components";
 import { keyframes } from "styled-components";
 
@@ -45,7 +46,7 @@ const Input = styled.input`
     display: block;
     background: rgb(50, 50, 50);
     border: solid 1px gray;
-    margin: 10px;
+    margin: 10px auto;
     padding: 5px;
     color: white;
     text-align: center;
@@ -54,6 +55,15 @@ const Input = styled.input`
         border: solid 1px white;
         outline: none;
     }
+`
+
+const ErrorArea = styled.div`
+    background-color: red;
+    text-align: center;
+    width: 220px;
+    border-radius: 5px;
+    padding: 3px;
+    transition: 0.5s;
 `
 
 const Button = styled.button`
@@ -78,13 +88,15 @@ export default function LoginMenu(props) {
     if (!props.do) {
         return <></>
     }
+
     return(
         <LoginCont>
-            <LoginForm>
+            <LoginForm onSubmit={props.onSubmit}>
                 <Title>Login</Title>
-                <Input placeholder={"Username"}/>
-                <Input placeholder={"Password"}/>
-                <Button type={"button"}>Login</Button>
+                <Input placeholder={"Username"} id={'username'}/>
+                <Input placeholder={"Password"} id={'password'}/>
+                <ErrorArea style={{opacity: (props.error ? '100' : '0')}}><p>{props.error}</p></ErrorArea>
+                <Button>Login</Button>
             </LoginForm>
         </LoginCont>
     )
