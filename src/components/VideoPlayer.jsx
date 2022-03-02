@@ -30,6 +30,14 @@ const VideoMain = styled.div`
     display: flex;
     flex-direction: column;
     transition: 0.5s;
+    opacity: 0;
+    transition-delay: 3s;
+    cursor: none;
+    &:hover {
+        transition-delay: 0s;
+        opacity: 100;
+        cursor: default;
+    }
 `
 
 const VideoTop = styled.div`

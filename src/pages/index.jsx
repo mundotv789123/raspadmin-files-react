@@ -68,24 +68,32 @@ function AppFunction() {
         })
     }
 
-    function updateFiles(hash = null) {
+    function updateFiles(hash = null, open = true) {
         if (!hash || hash === '') 
             hash = '#'
         setFiles(null);
         axios.get(`https://arquivos.raspadmin.tk/api${hash.substring(1)}`).then((response) => {
             let type = response.headers['content-type'];
             if (type !== 'application/json') {
+                if (!open)
+                    return
+                let src_splited = hash.split('/');
+                let parent_src = hash.substring(0, hash.length - src_splited[src_splited.length - 1].length);
                 if (type.split('/')[0] === 'video') {
-                    let src_splited = hash.split('/');
                     setVideo({
                         src: `https://arquivos.raspadmin.tk/api${hash.substring(1)}`,
-                        backUrl: hash.substring(0, hash.length - src_splited[src_splited.length - 1].length)
+                        backUrl: parent_src
                     });
+                } else {
+                    location.href = `https://arquivos.raspadmin.tk/api${hash.substring(1)}`;
                 }
+                console.log(parent_src)
+                updateFiles(parent_src, false)
                 return;
             }
+            if (open)
+                setVideo(null);
 
-            setVideo(null);
             setFiles(Object.values(response.data.files).map(file => {return {url: (`${hash}/${file.name}`), is_dir: file.is_dir}}))
         }).catch((error) => {
             console.error(error);
