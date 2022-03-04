@@ -54,14 +54,6 @@ function AppFunction() {
 
     const api_url = process.env.NEXT_PUBLIC_API_URL;
 
-    useEffect(() => {
-        updateTabFiles()
-        window.onhashchange = () => {
-            updateFiles(location.hash)
-        }
-        updateFiles(location.hash)
-    }, [])
-
     function updateTabFiles() {
         axios.get(api_url).then((response) => {
             let lfiles = Object.values(response.data.files).filter(file => {return file.is_dir}).map(file => {return {url: `#/${file.name}`, is_dir: file.is_dir}});
@@ -137,6 +129,14 @@ function AppFunction() {
             }
         })
     }
+
+    useEffect(() => {
+        updateTabFiles()
+        window.onhashchange = () => {
+            updateFiles(location.hash)
+        }
+        updateFiles(location.hash)
+    }, [])
 
     return (
         <Container>

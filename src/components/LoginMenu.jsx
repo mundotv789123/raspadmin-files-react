@@ -1,4 +1,3 @@
-import axios from "axios";
 import styled from "styled-components";
 import { keyframes } from "styled-components";
 
@@ -93,8 +92,8 @@ export default function LoginMenu(props) {
         <LoginCont>
             <LoginForm onSubmit={props.onSubmit}>
                 <Title>Login</Title>
-                <Input placeholder={"Username"} id={'username'}/>
-                <Input placeholder={"Password"} id={'password'}/>
+                <Input placeholder={"Username"} id={'username'} required/>
+                <Input placeholder={"Password"} id={'password'} required/>
                 <ErrorArea style={{opacity: (props.error ? '100' : '0')}}><p>{props.error}</p></ErrorArea>
                 <Button>Login</Button>
             </LoginForm>
