@@ -80,7 +80,7 @@ function AppFunction() {
                 let parent_src = hash.substring(0, (hash.length - src_splited[src_splited.length - 1].length) - 1);
                 if (type.split('/')[0] === 'video') {
                     setVideo({
-                        src: `${api_url}${hash.substring(1)}`,
+                        src: `${api_url}/files?path=${hash.substring(1)}`,
                         backUrl: parent_src
                     });
                 } else {
