@@ -187,6 +187,13 @@ export default function VideoPlayer(props) {
         setProgressPercent(percent);
     }
 
+    function resetVideo() {
+        video_element.current.src = null;
+        setButtonPlayIcon(faPlay);
+        setProgressPercent(0);
+        setLoading(true);
+    }
+
     if (props.src == null) {
         return <></>
     }
@@ -197,11 +204,11 @@ export default function VideoPlayer(props) {
 
     return (
         <VideoCont ref={main_element}>
-            <VideoElement onPlay={togglePauseButton} onPause={togglePauseButton} onTimeUpdate={updateProgress} onCanPlay={() => setLoading(false)} src={props.src} controls={false} ref={video_element}></VideoElement>
+            <VideoElement onStop={resetVideo} onPlay={togglePauseButton} onPause={togglePauseButton} onTimeUpdate={updateProgress} onCanPlay={() => setLoading(false)} src={props.src} autoPlay={true} controls={false} ref={video_element}></VideoElement>
             <VideoMain>
                 <VideoTop>
                     <VideoTitle>{fileName}</VideoTitle>
-                    <VideoCloseButton style={{ display: (props.backUrl ? '' : 'none') }} href={props.backUrl}><FontAwesomeIcon icon={faAngleLeft} /></VideoCloseButton>
+                    <VideoCloseButton style={{ display: (props.backUrl ? '' : 'none') }} href={props.backUrl} onClick={resetVideo}><FontAwesomeIcon icon={faAngleLeft} /></VideoCloseButton>
                 </VideoTop>
                 <VideoCenter onClick={togglePauseVideo}>
                     <VideoLoading style={{ display: (loading ? '' : 'none') }} />
