@@ -30,7 +30,20 @@ const Panel = styled.div`
     }
 `
 
+const Text = styled.h1`
+    color: white;
+    text-align: center;
+    width: 100%;
+`
+
 export default function FilesBlock(props) {
+    if (props.text) {
+        return(
+            <Panel>
+                <Text>{props.text}</Text>
+            </Panel>
+        )
+    }
     if (props.files === null) {
         return (
             <Panel>

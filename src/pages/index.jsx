@@ -45,12 +45,13 @@ const Aside = styled.aside`
     background: rgba(9, 9, 9, 0.3);
 `
 
-function AppFunction() {
+export default () => {
     const [tabFiles, setTabFiles] = useState(null)
     const [files, setFiles] = useState(null)
     const [video, setVideo] = useState(null)
     const [login, setLogin] = useState(false)
     const [loginError, setLoginError] = useState(null)
+    const [text, setText] = useState(null)
 
     const api_url = process.env.NEXT_PUBLIC_API_URL;
 
@@ -71,6 +72,7 @@ function AppFunction() {
         if (!hash || hash === '') 
             hash = '#'
         setFiles(null);
+        setText(null);
         axios.get(`${api_url}/files?path=${hash.substring(1)}`).then((response) => {
             let type = response.headers['content-type'];
             if (!type.startsWith('application/json')) {
@@ -94,6 +96,13 @@ function AppFunction() {
 
             setFiles(Object.values(response.data.files).map(file => {return {url: (`${hash}/${file.name}`), is_dir: file.is_dir}}))
         }).catch((error) => {
+            switch (error.toJSON().status) {
+                case 401:
+                    setLogin(true);
+                    break;
+                case 404:
+                    setText('Arquivo ou diretório não encontrado!')
+            }
             //code
         })
     }
@@ -148,12 +157,10 @@ function AppFunction() {
                 <FilesList files={tabFiles}/>
             </Main>
             <Aside>
-                <FilesBlocks files={files}/>
+                <FilesBlocks files={files} text={text}/>
             </Aside>
             <VideoPlayer video={video}/>
             <LoginMenu do={login} error={loginError} onSubmit={doLogin}/>
         </Container>
     )
 }
-
-export default AppFunction;

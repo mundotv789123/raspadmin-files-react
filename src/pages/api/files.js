@@ -8,6 +8,7 @@ export default function handler(req, res) {
         return;
     }
 
+    /* pegando e validando caminho do arquivo */
     let url_path = process.env.API_DIR + (req.query.path ? req.query.path : '/');
     if (!fs.existsSync(url_path)) {
         res.status(404).send();
@@ -19,6 +20,7 @@ export default function handler(req, res) {
         return;
     }
 
+    /* verificando se arquivo é diretório */
     let file = fs.lstatSync(url_path);
     if (file.isDirectory()) {
         let files = fs.readdirSync(url_path).filter(file => { return (!file.startsWith('.') && !file.startsWith('_')) });
@@ -30,6 +32,8 @@ export default function handler(req, res) {
         })});
         return;
     }
+
+    /* eviando arquivo */
     let file_path = path.resolve(url_path)
     let file_buffer = fs.readFileSync(file_path)
 
