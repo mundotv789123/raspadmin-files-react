@@ -62,7 +62,9 @@ export default function App() {
 
     function updateTabFiles() {
         api.get('files').then((response) => {
-            let lfiles = Object.values(response.data.files).filter(file => { return file.is_dir }).map(file => { return { url: `#/${file.name}`, is_dir: file.is_dir } });
+            let lfiles = Object.values(response.data.files).filter(file => { return file.is_dir })
+            lfiles = lfiles.sort(((a,b) => ("" + a.name).localeCompare(b.name, undefined, {numeric: true})))
+            lfiles = lfiles.map(file => { return { url: `#/${file.name}`, is_dir: file.is_dir } });
             setTabFiles(lfiles)
         }).catch((error) => {
             switch (error.toJSON().status) {
@@ -102,14 +104,16 @@ export default function App() {
             }
             if (open)
                 setVideo(null);
-
-            setFiles(Object.values(response.data.files).map(file => {
+            let lfiles = Object.values(response.data.files);
+            lfiles = lfiles.sort(((a,b) => ("" + a.name).localeCompare(b.name, undefined, {numeric: true})))
+            lfiles = lfiles.map(file => {
                 return {
                     url: (`${hash}/${file.name}`),
                     is_dir: file.is_dir,
                     icon: file.icon ? encodeURI(`${api_url}/files?path=${file.icon}`) : null
                 }
-            }))
+            })
+            setFiles(lfiles)
         }).catch((error) => {
             let status = null
             try {
