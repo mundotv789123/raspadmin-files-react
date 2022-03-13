@@ -2,8 +2,6 @@ import cookie from "cookie";
 import md5 from "md5";
 
 export default function handler(req, res) {
-    let c = cookie.parse(req.headers.cookie)
-    console.log(c)
     if (process.env.API_AUTH === 'true') {
         let post_auth_md5 = md5(req.body.username+'-'+req.body.password).toString();
         let api_auth_md5 =  md5(process.env.API_USERNAME+'-'+process.env.API_PASSWORD).toString();

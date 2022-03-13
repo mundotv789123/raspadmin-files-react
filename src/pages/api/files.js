@@ -31,9 +31,13 @@ export default function handler(req, res) {
         let files = fs.readdirSync(url_path).filter(file => { return (!file.startsWith('.') && !file.startsWith('_')) });
         res.status(200).json({
             files: files.map(file => {
+                let icon = url_path + '/' + file + '/_icon.png';
+                icon = fs.existsSync(icon) ? icon : url_path + '/' + file + '/_icon.jpg';
+                icon = fs.existsSync(icon) ? icon : null;
                 return {
                     name: file,
-                    is_dir: fs.lstatSync(url_path + '/' + file).isDirectory()
+                    is_dir: fs.lstatSync(url_path + '/' + file).isDirectory(),
+                    icon: icon
                 }
             })
         });
@@ -52,6 +56,11 @@ function send_file(req, res, url_path, file) {
     /* verificando range */
     let range = get_range(req.headers.range, file.size);
     if (range === null) {
+        if (file.size < (1024*4096)) {
+            let file_stream = fs.createReadStream(file_path)
+            res.status(206).send(file_stream)
+            return;
+        }
         res.setHeader('Accept-Ranges', 'bytes');
         res.status(200).send();
         return;
