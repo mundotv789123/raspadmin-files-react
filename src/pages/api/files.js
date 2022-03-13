@@ -29,6 +29,10 @@ export default function handler(req, res) {
     let file = fs.lstatSync(url_path);
     if (file.isDirectory()) {
         let files = fs.readdirSync(url_path).filter(file => { return (!file.startsWith('.') && !file.startsWith('_')) });
+        if (files.length === 0) {
+            res.status(204).send();
+            return;
+        }
         res.status(200).json({
             files: files.map(file => {
                 let icon = null;
@@ -55,15 +59,16 @@ export default function handler(req, res) {
 function send_file(req, res, url_path, file) {
     /* pegando informações do arquivo */
     let file_path = path.resolve(url_path)
-    res.setHeader('Content-Type', lookup(file_path))
+    let content_type = lookup(file_path);
+    res.setHeader('Content-Type', content_type)
 
     /* verificando range */
     let range = get_range(req.headers.range, file.size);
     if (range === null) {
-        if (file.size < (1024 * 4096)) {
+        if (content_type.split('/')[0] !== 'video') {
             let file_stream = fs.createReadStream(file_path)
-            res.status(206).send(file_stream)
-            return;
+            res.status(200).send(file_stream)
+            return
         }
         res.setHeader('Accept-Ranges', 'bytes');
         res.status(200).send();

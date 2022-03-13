@@ -79,6 +79,10 @@ export default function App() {
         setFiles(null);
         setText(null);
         api.get(`files?path=${hash.substring(1)}`).then((response) => {
+            if (response.status == 204) {
+                setText('Essa pasta está vazia!');
+                return;
+            }
             let type = response.headers['content-type'];
             if (!type.startsWith('application/json')) {
                 if (!open)
@@ -99,9 +103,22 @@ export default function App() {
             if (open)
                 setVideo(null);
 
-            setFiles(Object.values(response.data.files).map(file => { return { url: (`${hash}/${file.name}`), is_dir: file.is_dir, icon: file.icon ? `${api_url}/files?path=${file.icon}` : null } }))
+            setFiles(Object.values(response.data.files).map(file => {
+                return {
+                    url: (`${hash}/${file.name}`),
+                    is_dir: file.is_dir,
+                    icon: file.icon ? encodeURI(`${api_url}/files?path=${file.icon}`) : null
+                }
+            }))
         }).catch((error) => {
-            switch (error.toJSON().status) {
+            let status = null
+            try {
+                status = error.toJSON().status
+            } catch {
+                setText('Erro interno ao processar arquivo!')
+                return;
+            }
+            switch (status) {
                 case 401:
                     setLogin(true)
                     break
