@@ -35,7 +35,7 @@ export default function handler(req, res) {
                 let is_dir = fs.lstatSync(url_path + '/' + file).isDirectory();
                 if (is_dir) {
                     let icon_path = url_path + file + '/_icon'
-                    icon = fs.existsSync(icon_path + '.png') ? icon_path + '.png' : (fs.existsSync(icon_path + '.jpeg') ? icon_path + '.jpeg' : null);
+                    icon = fs.existsSync(icon_path + '.png') ? icon_path + '.png' : (fs.existsSync(icon_path + '.jpeg') ? icon_path + '.jpeg' : (fs.existsSync(icon_path + '.jpg') ? icon_path + '.jpg' : null));
                     icon = (icon != null) ? icon.substring(process.env.API_DIR.length) : null;
                 }
                 return {
