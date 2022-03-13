@@ -1,6 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFastForward, faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from "@fortawesome/free-solid-svg-icons";
 import styled, { keyframes } from "styled-components";
+import md5 from "md5";
+import { useRef, useState } from "react";
 
 const VideoCont = styled.div`
     display: flex;
@@ -137,10 +139,6 @@ const VideoProgressBarPin = styled.div`
 `
 
 export default function VideoPlayer(props) {
-    /* video name */
-    let srcSplited = props.src.split("/")
-    const fileName = srcSplited[srcSplited.length - 1];
-
     /* states */
     const [buttonPlayIcon, setButtonPlayIcon] = useState(faPlay)
     const [progressPercent, setProgressPercent] = useState(0)
@@ -189,9 +187,13 @@ export default function VideoPlayer(props) {
         setProgressPercent(percent);
     }
 
-    if (!props.src) {
+    if (props.src == null) {
         return <></>
     }
+
+    /* video name */
+    let srcSplited = props.src.split("/")
+    const fileName = srcSplited[srcSplited.length - 1];
 
     return (
         <VideoCont ref={main_element}>

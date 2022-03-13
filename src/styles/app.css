@@ -4,6 +4,9 @@ a {
 }
 html, body {
     background: rgb(12, 75, 112);
+    background-image: url('/img/wallpaper.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
     color: white;
 }
 body {

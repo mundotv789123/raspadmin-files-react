@@ -55,9 +55,14 @@ export default () => {
 
     const api_url = process.env.NEXT_PUBLIC_API_URL;
 
+    const api = axios.create({
+        baseURL: api_url,
+        timeout: 1000
+    })
+
     function updateTabFiles() {
-        axios.get(`${api_url}/files`).then((response) => {
-            let lfiles = Object.values(response.data.files).filter(file => {return file.is_dir}).map(file => {return {url: `#/${file.name}`, is_dir: file.is_dir}});
+        api.get('files').then((response) => {
+            let lfiles = Object.values(response.data.files).filter(file => { return file.is_dir }).map(file => { return { url: `#/${file.name}`, is_dir: file.is_dir } });
             setTabFiles(lfiles)
         }).catch((error) => {
             switch (error.toJSON().status) {
@@ -69,11 +74,11 @@ export default () => {
     }
 
     function updateFiles(hash = null, open = true) {
-        if (!hash || hash === '') 
+        if (!hash || hash === '')
             hash = '#'
         setFiles(null);
         setText(null);
-        axios.get(`${api_url}/files?path=${hash.substring(1)}`).then((response) => {
+        api.get(`files?path=${hash.substring(1)}`).then((response) => {
             let type = response.headers['content-type'];
             if (!type.startsWith('application/json')) {
                 if (!open)
@@ -94,16 +99,19 @@ export default () => {
             if (open)
                 setVideo(null);
 
-            setFiles(Object.values(response.data.files).map(file => {return {url: (`${hash}/${file.name}`), is_dir: file.is_dir}}))
+            setFiles(Object.values(response.data.files).map(file => { return { url: (`${hash}/${file.name}`), is_dir: file.is_dir } }))
         }).catch((error) => {
             switch (error.toJSON().status) {
                 case 401:
-                    setLogin(true);
-                    break;
+                    setLogin(true)
+                    break
                 case 404:
                     setText('Arquivo ou diretório não encontrado!')
+                    break
+                case 403:
+                    setText('Você não tem permissão para acessar esse arquivo ou diretório!')
+                    break
             }
-            //code
         })
     }
 
@@ -115,7 +123,7 @@ export default () => {
             setLoginError('Preencha todos os campos');
             return;
         }
-        axios.post(`${api_url}/login`, {
+        api.post(`/login`, {
             username: username,
             password: password
         }).then(() => {
@@ -152,15 +160,15 @@ export default () => {
             <Header>
                 <h2 className={"title"}><a href={"#"}>RaspAdmin</a></h2>
             </Header>
-            <Nav/>
+            <Nav />
             <Main>
-                <FilesList files={tabFiles}/>
+                <FilesList files={tabFiles} />
             </Main>
             <Aside>
-                <FilesBlocks files={files} text={text}/>
+                <FilesBlocks files={files} text={text} />
             </Aside>
-            <VideoPlayer video={video}/>
-            <LoginMenu do={login} error={loginError} onSubmit={doLogin}/>
+            <VideoPlayer src={video == null ? null : video.src} backUrl={video == null ? null : video.backUrl} />
+            <LoginMenu do={login} error={loginError} onSubmit={doLogin} />
         </Container>
     )
 }

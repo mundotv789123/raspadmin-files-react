@@ -31,12 +31,11 @@ const LoginForm = styled.form`
     background: rgb(48, 48, 48);
     padding: 15px 25px;
     display: block;
-    border: solid 1px white;
-    border-radius: 15px;
+    border-radius: 10px;
     animation: ${PopUpAnimation} 0.8s normal; 
 `
 
-const Title = styled.h1`
+const Title = styled.h2`
     text-align: center;
     margin: 15px 0;
 `
@@ -63,13 +62,16 @@ const ErrorArea = styled.div`
     border-radius: 5px;
     padding: 3px;
     transition: 0.5s;
+    & p {
+        font-size: 10pt;
+    }
 `
 
 const Button = styled.button`
     display: block;
     background: rgb(50, 50, 50);
     border: solid 1px gray;
-    margin: 15px auto;
+    margin: 5px auto;
     padding: 7px;
     color: white;
     &:focus {
@@ -93,7 +95,7 @@ export default function LoginMenu(props) {
             <LoginForm onSubmit={props.onSubmit}>
                 <Title>Login</Title>
                 <Input placeholder={"Username"} id={'username'} required/>
-                <Input placeholder={"Password"} id={'password'} required/>
+                <Input placeholder={"Password"} id={'password'} type={'password'} required/>
                 <ErrorArea style={{opacity: (props.error ? '100' : '0')}}><p>{props.error}</p></ErrorArea>
                 <Button>Login</Button>
             </LoginForm>
