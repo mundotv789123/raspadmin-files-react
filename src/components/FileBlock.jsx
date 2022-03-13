@@ -63,9 +63,9 @@ const Name = styled.p`
 export default function FileBlock(props) {
     const srcSplited = props.src.split("/");
     const fileName = srcSplited[srcSplited.length - 1];
-    return(
+    return (
         <FileCont href={props.src}>
-            <FileIcon style={{backgroundImage: 'url(' + (props.icon ? props.icon : (iconsPath+getFileIcon(fileName, props.dir))) + ')'}}/>
+            <FileIcon style={{ backgroundImage: 'url(' + (props.icon ? props.icon : (iconsPath + getFileIcon(fileName, props.dir))) + ')' }} />
             <Name>{fileName}</Name>
         </FileCont>
     )

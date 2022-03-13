@@ -31,12 +31,16 @@ export default function handler(req, res) {
         let files = fs.readdirSync(url_path).filter(file => { return (!file.startsWith('.') && !file.startsWith('_')) });
         res.status(200).json({
             files: files.map(file => {
-                let icon = url_path + '/' + file + '/_icon.png';
-                icon = fs.existsSync(icon) ? icon : url_path + '/' + file + '/_icon.jpg';
-                icon = fs.existsSync(icon) ? icon : null;
+                let icon = null;
+                let is_dir = fs.lstatSync(url_path + '/' + file).isDirectory();
+                if (is_dir) {
+                    let icon_path = url_path + file + '/_icon'
+                    icon = fs.existsSync(icon_path + '.png') ? icon_path + '.png' : (fs.existsSync(icon_path + '.jpeg') ? icon_path + '.jpeg' : null);
+                    icon = (icon != null) ? icon.substring(process.env.API_DIR.length) : null;
+                }
                 return {
                     name: file,
-                    is_dir: fs.lstatSync(url_path + '/' + file).isDirectory(),
+                    is_dir: is_dir,
                     icon: icon
                 }
             })
@@ -56,7 +60,7 @@ function send_file(req, res, url_path, file) {
     /* verificando range */
     let range = get_range(req.headers.range, file.size);
     if (range === null) {
-        if (file.size < (1024*4096)) {
+        if (file.size < (1024 * 4096)) {
             let file_stream = fs.createReadStream(file_path)
             res.status(206).send(file_stream)
             return;
@@ -68,7 +72,7 @@ function send_file(req, res, url_path, file) {
 
     /* enviando range */
     res.setHeader('Content-Range', 'bytes ' + range.Start + '-' + range.End + '/' + file.size);
-    let file_stream = fs.createReadStream(file_path, {start: range.Start, end: range.End})
+    let file_stream = fs.createReadStream(file_path, { start: range.Start, end: range.End })
     res.status(206).send(file_stream)
 }
 
@@ -81,7 +85,7 @@ function get_range(range, length) {
 
     let start = parseInt(array[1]);
     let end = parseInt(array[2]);
-    
+
     start = isNaN(start) ? 0 : start
     end = isNaN(end) ? (start + buffer) : end
 
@@ -94,5 +98,5 @@ function get_range(range, length) {
         end = buffer;
     }
 
-    return {Start: start, End: end};
+    return { Start: start, End: end };
 }

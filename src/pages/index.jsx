@@ -99,7 +99,7 @@ export default function App() {
             if (open)
                 setVideo(null);
 
-            setFiles(Object.values(response.data.files).map(file => { return { url: (`${hash}/${file.name}`), is_dir: file.is_dir } }))
+            setFiles(Object.values(response.data.files).map(file => { return { url: (`${hash}/${file.name}`), is_dir: file.is_dir, icon: file.icon ? `${api_url}/files?path=${file.icon}` : null } }))
         }).catch((error) => {
             switch (error.toJSON().status) {
                 case 401:
