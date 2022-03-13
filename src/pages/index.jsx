@@ -45,7 +45,7 @@ const Aside = styled.aside`
     background: rgba(9, 9, 9, 0.3);
 `
 
-export default () => {
+export default function App() {
     const [tabFiles, setTabFiles] = useState(null)
     const [files, setFiles] = useState(null)
     const [video, setVideo] = useState(null)
