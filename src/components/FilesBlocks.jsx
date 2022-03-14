@@ -3,7 +3,6 @@ import FileBlock from "./FileBlock"
 import Loading from "./Loading"
 
 const Panel = styled.div`
-    overflow-y: scroll;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;

@@ -42,6 +42,7 @@ const Main = styled.main`
 
 const Aside = styled.aside`
     grid-area: a;
+    overflow-y: scroll;
     background: rgba(9, 9, 9, 0.3);
 `
 

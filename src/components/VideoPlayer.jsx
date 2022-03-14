@@ -48,7 +48,7 @@ const VideoTop = styled.div`
     user-select: none;
 `
 
-const VideoTitle = styled.h1`
+const VideoTitle = styled.h2`
     text-align: center;
     margin: 0;
 `
@@ -200,14 +200,14 @@ export default function VideoPlayer(props) {
 
     /* video name */
     let srcSplited = props.src.split("/")
-    const fileName = srcSplited[srcSplited.length - 1];
+    const fileName = decodeURI(srcSplited[srcSplited.length - 1]);
 
     return (
         <VideoCont ref={main_element}>
             <VideoElement onStop={resetVideo} onPlay={togglePauseButton} onPause={togglePauseButton} onTimeUpdate={updateProgress} onCanPlay={() => setLoading(false)} src={props.src} autoPlay={true} controls={false} ref={video_element}></VideoElement>
             <VideoMain>
                 <VideoTop>
-                    <VideoTitle>{fileName}</VideoTitle>
+                    <VideoTitle>{fileName.substring(0, 32) + (fileName.length > 32 ? '...' : '')}</VideoTitle>
                     <VideoCloseButton style={{ display: (props.backUrl ? '' : 'none') }} href={props.backUrl} onClick={resetVideo}><FontAwesomeIcon icon={faAngleLeft} /></VideoCloseButton>
                 </VideoTop>
                 <VideoCenter onClick={togglePauseVideo}>
