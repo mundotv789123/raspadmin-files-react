@@ -13,7 +13,7 @@ export default function FileRow(props) {
     const fileName = srcSplited[srcSplited.length - 1];
     return (
         <Row href={props.src}>
-            {fileName}
+            {fileName.substr(0, 16)+(fileName.length > 16 ? '...' : '')}
         </Row>
     )
 }
