@@ -57,7 +57,9 @@ npm run start
 - Para acessar basta informar a seguinte url.
 - `http://127.0.0.1/3000` ou `http://(endereço ip do servidor)/3000`.
 
-# Vamos configurar um serviços para manter nossa aplicação rodando em segundo plano.
+# Vamos configurar um serviço para nossa aplicação
+
+Isso ira manter a aplicação rodando em segundo plano e fará ela iniciar autom
 
 - Para isso basta criar um arquivo chamado `raspadmin.service` na pasta `/etc/systemd/system`.
 - Nesse arquivo você ira copiar o seguinte texto.
