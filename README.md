@@ -1,34 +1,136 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Tutorial de instalação
 
-## Getting Started
+- Primeiro temos que instalar o nodejs 17.
+- Para isso basta executar os seguintes comandos.
 
-First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
+curl -sL https://deb.nodesource.com/setup_17.x | sudo -E bash -
+sudo apt install nodejs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Agora vamos clonar o repositório `raspadmin-files-react`.
+- Para isso vamos executar os seguintes comandos.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+```bash
+sudo apt install git
+cd /srv
+git clone https://github.com/mundotv789123/raspadmin-files-react.git
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- Após isso basta instalar os módulos do nodejs.
 
-## Learn More
+```bash
+cd raspadmin-files-react/
+npm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+- Vamos configurar, para isso basta renomear o arquivo `.env.example` para `.env`.
+- Após isso basta abrir o arquivo com um editor de texto configura-lo.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+#aqui não vamos editar
+NEXT_PUBLIC_API_URL='/api' 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+#configuração de autenticação, caso queira usar uma senha basta mudar o API_AUTH para true e definir um usuário/senha
+API_AUTH=false
+API_USERNAME='admin'
+API_PASSWORD='admin'
 
-## Deploy on Vercel
+#aqui vc irá definir a pasta que a aplicação irá listar os arquivos
+API_DIR='./files'
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Depois de tudo configurado vamos compilar nossa aplicação.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+npm run build
+```
+
+- Agora vamos iniciar nosso servidor.
+
+```bash
+npm run start
+```
+
+- Para acessar basta informar a seguinte url.
+- `http://127.0.0.1/3000` ou `http://(endereço ip do servidor)/3000`.
+
+# Vamos configurar um serviços para manter nossa aplicação rodando em segundo plano.
+
+- Para isso basta criar um arquivo chamado `raspadmin.service` na pasta `/etc/systemd/system`.
+- Nesse arquivo você ira copiar o seguinte texto.
+
+```service
+[Unit]
+Description=raspadmin files
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/srv/raspadmin-files-react
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- Após isso basta executar o seguinte comando
+
+```bash
+systemctl enable --now raspadmin.service
+```
+
+# Usando ssl com nginx (opicional)
+
+- Aqui vamos configurar um proxy com nginx para ativar o ssl.
+- Primeiro vamos instalar o nginx.
+
+```bash
+apt install nginx
+```
+
+- Após instalamos vamos criar um arquivo chamado `raspadmin.conf` na pasta `/etc/nginx/sites-available/`.
+- Nesse arquivo vamos informar copiar os seguintes textos, lembrando de mudar o `<dominio>` para o domínio que você deseja usar.
+
+```conf
+server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        server_name <dominio>;
+
+        location / {
+                proxy_pass http://127.0.0.1:3000;
+        }
+        
+        # informe aqui seus arquivos ssl
+        ssl_certificate /etc/nginx/certificates/certificate.cert;
+        ssl_certificate_key /etc/nginx/certificates/certificate.key;
+}
+```
+
+- Caso não queira usar certificado ssl mas deseja usar a porta padrão 80 basta copiar esse texto no lugar do texto a cima.
+
+```conf
+server {
+        listen 80;
+        listen [::]:80;
+        server_name <dominio>;
+
+        location / {
+                proxy_pass http://127.0.0.1:3000;
+        }
+}
+```
+
+- Agora vamos habilitar o site e reiniciar o nginx
+
+```bash
+ln -s /etc/nginx/sites-available/raspadmin.conf /etc/nginx/sites-enabled/raspadmin.conf
+systemctl restart nginx
+```
+
+## Pronto! seu site foi configurado e está pronto para funcionar!
