@@ -1,0 +1,18 @@
+version: '3.1'
+services:
+  raspadmin:
+    image: 'node:16.15.0'
+    working_dir: '/app'
+    ontainer_name: 'raspadmin_files'
+    command: 'sh -c "chmod 755 ./start.sh && ./start.sh"'
+    ports:
+    - '3000:3000'
+    volumes:
+    - './:/app'
+    - '/mnt/files:/mnt/files'
+    environment:
+      NEXT_PUBLIC_API_URL: '/api'
+      API_AUTH: false
+      API_USERNAME: 'admin'
+      API_PASSWORD: 'admin'
+      API_DIR: '/mnt/files'
