@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFastForward, faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from "@fortawesome/free-solid-svg-icons";
 import styled, { keyframes } from "styled-components";
-import md5 from "md5";
 import { useRef, useState } from "react";
 
 const VideoCont = styled.div`
@@ -138,6 +137,38 @@ const VideoProgressBarPin = styled.div`
     border-radius: 50%;
 `
 
+const VideoVolume = styled.div`
+    border-radius: 10px;
+    overflow: show;
+    display: flex;
+    flex-direction: column;
+    transition: 320ms;
+    & .volume {
+        height: 100%;
+        width: 10px;
+        background-color: #999;
+        margin: 0 auto;
+        border-radius: 15px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    & .volume .volume_percent {
+        width: 100%;
+        margin-top: auto;
+        background-color: white;
+        transition: all 0.2s ease 0s;
+    }
+    &:hover {
+        background-color: #444;
+        padding: 10px 0 5px 0;
+        margin-top: -105px;
+    }
+    & button {
+        margin: 0 !important; 
+    }
+`
+
 export default function VideoPlayer(props) {
     /* states */
     const [buttonPlayIcon, setButtonPlayIcon] = useState(faPlay)
@@ -148,6 +179,8 @@ export default function VideoPlayer(props) {
     const main_element = useRef(null);
     const video_element = useRef(null);
     const progress_bar = useRef(null);
+    const volume = useRef(null);
+    const volume_percent = useRef(null);
 
     /* functions */
     function togglePauseVideo() {
@@ -187,11 +220,23 @@ export default function VideoPlayer(props) {
         setProgressPercent(percent);
     }
 
+    function updateVolume(event) {
+        let rect = volume.current.getBoundingClientRect();
+        let value = ((rect.bottom - event.clientY) * 1.0 / (rect.bottom - rect.top));
+        video_element.current.volume = value;
+        volume_percent.current.style.height = (value * 100) + '%';
+    }
+
     function resetVideo() {
         video_element.current.src = null;
         setButtonPlayIcon(faPlay);
         setProgressPercent(0);
         setLoading(true);
+    }
+
+    function playVideo() {
+        volume_percent.current.style.height = (video_element.current.volume * 100) + '%';
+        setLoading(false);
     }
 
     if (props.src == null) {
@@ -204,7 +249,7 @@ export default function VideoPlayer(props) {
 
     return (
         <VideoCont ref={main_element}>
-            <VideoElement onStop={resetVideo} onPlay={togglePauseButton} onPause={togglePauseButton} onTimeUpdate={updateProgress} onCanPlay={() => setLoading(false)} src={props.src} autoPlay={true} controls={false} ref={video_element}></VideoElement>
+            <VideoElement onStop={resetVideo} onPlay={togglePauseButton} onPause={togglePauseButton} onTimeUpdate={updateProgress} onCanPlay={() => playVideo()} src={props.src} autoPlay={true} controls={false} ref={video_element}></VideoElement>
             <VideoMain>
                 <VideoTop>
                     <VideoTitle>{fileName.substring(0, 32) + (fileName.length > 32 ? '...' : '')}</VideoTitle>
@@ -216,7 +261,7 @@ export default function VideoPlayer(props) {
                 <VideoBottom>
                     <VideoButton onClick={togglePauseVideo}><FontAwesomeIcon icon={buttonPlayIcon} /></VideoButton>
                     <VideoProgress onClick={(e) => updateVideoTime(e)} ref={progress_bar}><VideoProgressBar style={{ width: `${progressPercent}%` }} /><VideoProgressBarPin /></VideoProgress>
-                    <VideoButton><FontAwesomeIcon icon={faVolumeUp} /></VideoButton>
+                    <VideoVolume><div className="volume" ref={volume} onClick={(e) => { updateVolume(e) }}><div className="volume_percent" ref={volume_percent}></div></div><VideoButton><FontAwesomeIcon icon={faVolumeUp} /></VideoButton></VideoVolume>
                     <VideoButton onClick={toggleFullScreen}><FontAwesomeIcon icon={faExpand} /></VideoButton>
                 </VideoBottom>
             </VideoMain>
