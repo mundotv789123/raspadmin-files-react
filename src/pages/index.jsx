@@ -61,19 +61,41 @@ export default function App() {
         timeout: 1000
     })
 
+    function getFiles(path, fun) {
+        if (path == '') {
+            path = null
+        }
+        api.get(`files${(path != null ? '?path=' + path : '')}`).then(fun).catch(
+            (error) => {
+                let json = null;
+                try {
+                    json = error.toJSON();
+                } catch {
+                    setText('Erro interno ao processar arquivo!');
+                    return;
+                }
+                switch (json.status) {
+                    case 401:
+                        setLogin(true)
+                        break
+                    case 404:
+                        setText('Arquivo ou diretório não encontrado!')
+                        break
+                    case 403:
+                        setText('Você não tem permissão para acessar esse arquivo ou diretório!')
+                        break
+                }
+            }
+        )
+    }
+
     function updateTabFiles() {
-        api.get('files').then((response) => {
+        getFiles(null, (response) => {
             let lfiles = Object.values(response.data.files).filter(file => { return file.is_dir })
-            lfiles = lfiles.sort(((a,b) => ("" + a.name).localeCompare(b.name, undefined, {numeric: true})))
+            lfiles = lfiles.sort(((a, b) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true })))
             lfiles = lfiles.map(file => { return { url: `#/${file.name}`, is_dir: file.is_dir } });
             setTabFiles(lfiles)
-        }).catch((error) => {
-            switch (error.toJSON().status) {
-                case 401:
-                    setLogin(true);
-                    break;
-            }
-        })
+        });
     }
 
     function updateFiles(hash = null, open = true) {
@@ -81,7 +103,7 @@ export default function App() {
             hash = '#'
         setFiles(null);
         setText(null);
-        api.get(`files?path=${hash.substring(1)}`).then((response) => {
+        getFiles(hash.substring(1), (response) => {
             if (response.status == 204) {
                 setText('Essa pasta está vazia!');
                 return;
@@ -106,7 +128,7 @@ export default function App() {
             if (open)
                 setVideo(null);
             let lfiles = Object.values(response.data.files);
-            lfiles = lfiles.sort(((a,b) => ("" + a.name).localeCompare(b.name, undefined, {numeric: true})))
+            lfiles = lfiles.sort(((a, b) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true })))
             lfiles = lfiles.map(file => {
                 return {
                     url: (`${hash}/${file.name}`),
@@ -115,26 +137,7 @@ export default function App() {
                 }
             })
             setFiles(lfiles)
-        }).catch((error) => {
-            let status = null
-            try {
-                status = error.toJSON().status
-            } catch {
-                setText('Erro interno ao processar arquivo!')
-                return;
-            }
-            switch (status) {
-                case 401:
-                    setLogin(true)
-                    break
-                case 404:
-                    setText('Arquivo ou diretório não encontrado!')
-                    break
-                case 403:
-                    setText('Você não tem permissão para acessar esse arquivo ou diretório!')
-                    break
-            }
-        })
+        });
     }
 
     const doLogin = event => {
@@ -170,11 +173,14 @@ export default function App() {
     }
 
     useEffect(() => {
-        updateTabFiles()
         window.onhashchange = () => {
             updateFiles(location.hash)
         }
-        updateFiles(location.hash)
+        let timeout = setTimeout(() => {
+            updateTabFiles()
+            updateFiles(location.hash)
+        }, 100);
+        return () => clearTimeout(timeout);
     }, [])
 
     return (
