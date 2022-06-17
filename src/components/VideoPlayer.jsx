@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from "@fortawesome/free-solid-svg-icons";
 import styled, { keyframes } from "styled-components";
 import { useRef, useState } from "react";
+import md5 from "md5";
 
 const VideoCont = styled.div`
     display: flex;
@@ -169,6 +170,26 @@ const VideoVolume = styled.div`
     }
 `
 
+export function getVideoTime(url) {
+    if (!localStorage['videos']) {
+        localStorage['videos'] = JSON.stringify({});
+        return 0;
+    }
+    let videos = JSON.parse(localStorage['videos']);
+    let uuid = md5(url);
+    return videos[uuid] ? videos[uuid] : 0;
+}
+
+export function setVideoTime(url, time) {
+    if (time <= 0) {
+        return;
+    }
+    let videos = localStorage['videos'] ? JSON.parse(localStorage['videos']) : {};
+    let uuid = md5(url);
+    videos[uuid] = parseFloat(time);
+    localStorage['videos'] = JSON.stringify(videos);
+}
+
 export default function VideoPlayer(props) {
     /* states */
     const [buttonPlayIcon, setButtonPlayIcon] = useState(faPlay)
@@ -235,8 +256,28 @@ export default function VideoPlayer(props) {
     }
 
     function playVideo() {
+        if (!loading) {
+            return;
+        }
         volume_percent.current.style.height = (video_element.current.volume * 100) + '%';
+        let videoTime = getVideoTime(video_element.current.src);
+        if (videoTime > 0 && (video_element.current.duration - 15) > videoTime) {
+            video_element.current.currentTime = videoTime;
+        }
         setLoading(false);
+        updateTime(true);
+    }
+
+    async function updateTime(loop = false) {
+        if (!video_element.current || !video_element.current.src) {
+            return;
+        }
+        setVideoTime(video_element.current.src, video_element.current.currentTime);
+        if (loop) {
+            setTimeout(() => {
+                updateTime(true)
+            }, 1000);
+        }
     }
 
     if (props.src == null) {
