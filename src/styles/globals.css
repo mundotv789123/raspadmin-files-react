@@ -1,11 +1,6 @@
 * {
   margin: 0;
   padding: 0;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-*::-webkit-scrollbar {
-  display:none;
 }
 html,
 body {
@@ -13,4 +8,23 @@ body {
   height: 100%;
   box-sizing: border-box;
   font-family: Arial,Helvetica,sans-serif;
+}
+
+/* scrollbar */
+* {
+  scrollbar-width: 4px;
+  scrollbar-color: #252525 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #252525;
+  border-radius: 3px;
 }
