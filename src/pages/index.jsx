@@ -71,19 +71,20 @@ export default function App() {
                 try {
                     json = error.toJSON();
                 } catch {
-                    setText('Erro interno ao processar arquivo!');
-                    return;
+                    json = {status: 500}
                 }
                 switch (json.status) {
                     case 401:
-                        setLogin(true)
-                        break
+                        setLogin(true);
+                        return;
                     case 404:
-                        setText('Arquivo ou diretório não encontrado!')
-                        break
+                        setText('Arquivo ou diretório não encontrado!');
+                        return;
                     case 403:
-                        setText('Você não tem permissão para acessar esse arquivo ou diretório!')
-                        break
+                        setText('Você não tem permissão para acessar esse arquivo ou diretório!');
+                        return;
+                    default:
+                        setText('Erro interno ao processar arquivo!');
                 }
             }
         )
@@ -176,11 +177,8 @@ export default function App() {
         window.onhashchange = () => {
             updateFiles(location.hash)
         }
-        let timeout = setTimeout(() => {
-            updateTabFiles()
-            updateFiles(location.hash)
-        }, 100);
-        return () => clearTimeout(timeout);
+        updateTabFiles()
+        updateFiles(location.hash)
     }, [])
 
     return (
