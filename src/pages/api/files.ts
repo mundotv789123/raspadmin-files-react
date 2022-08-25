@@ -4,8 +4,9 @@ import md5 from 'md5'
 import cookie from 'cookie'
 import { lookup } from 'mime-types'
 import { fileFormat as file } from '../../libs/api'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export default function handler(req, res: any) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if (process.env.API_AUTH === 'true') {
         if (!req.headers.cookie) {
             res.status(401).json({ message: 'auth required' });
@@ -31,7 +32,7 @@ export default function handler(req, res: any) {
     if (file.isDirectory()) {
         let files = fs.readdirSync(url_path).filter(file => { return (!file.startsWith('.') && !file.startsWith('_')) });
         if (files.length === 0) {
-            res.status(204).send();
+            res.status(204).send(null);
             return;
         }
 
@@ -58,11 +59,12 @@ export default function handler(req, res: any) {
     send_file(req, res, url_path, file)
 }
 
-function send_file(req, res, url_path, file) {
+function send_file(req: NextApiRequest, res: NextApiResponse, url_path:string, file: fs.Stats) {
     /* pegando informações do arquivo */
     let file_path = path.resolve(url_path)
     let content_type = lookup(file_path);
-    res.setHeader('Content-Type', content_type)
+    if (content_type)
+        res.setHeader('Content-Type', content_type)
 
     /* verificando range */
     let range = get_range(req.headers.range, file.size);
@@ -73,7 +75,7 @@ function send_file(req, res, url_path, file) {
             return
         }
         res.setHeader('Accept-Ranges', 'bytes');
-        res.status(200).send();
+        res.status(200).send(null);
         return;
     }
 

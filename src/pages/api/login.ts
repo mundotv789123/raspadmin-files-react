@@ -1,7 +1,8 @@
 import cookie from "cookie";
 import md5 from "md5";
+import { NextApiRequest, NextApiResponse } from "next";
 
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if (process.env.API_AUTH === 'true') {
         let post_auth_md5 = md5(req.body.username+'-'+req.body.password).toString();
         let api_auth_md5 =  md5(process.env.API_USERNAME+'-'+process.env.API_PASSWORD).toString();
