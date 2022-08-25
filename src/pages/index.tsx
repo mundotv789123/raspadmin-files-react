@@ -4,7 +4,7 @@ import FilesList from "../components/FilesList"
 import { useEffect, useState } from "react";
 import LoginMenu from "../components/LoginMenu"
 import VideoPlayer from "../components/VideoPlayer"
-import axios from "axios";
+import { api, fileFormat, getErrorMessage, getFiles } from "../libs/api";
 
 const Container = styled.div`
     display: grid;
@@ -47,97 +47,54 @@ const Aside = styled.aside`
 `
 
 export default function App() {
-    const [tabFiles, setTabFiles]: any = useState(null)
-    const [files, setFiles]: any = useState(null)
+    const [tabFiles, setTabFiles] = useState<fileFormat[]>([])
+    const [files, setFiles] = useState<fileFormat[]>(null)
     const [video, setVideo]: any = useState(null)
     const [login, setLogin]: any = useState(false)
     const [loginError, setLoginError]: any = useState(null)
     const [text, setText]: any = useState(null)
 
-    const api_url = process.env.NEXT_PUBLIC_API_URL;
-
-    const api = axios.create({
-        baseURL: api_url,
-        timeout: 1000
-    })
-
-    function getFiles(path, fun) {
-        if (path == '') {
-            path = null
+    function errorMessage(e: any) {
+        let json: { status: number };
+        try {
+            json = e.toJSON();
+        } catch {
+            json = { status: 500 }
         }
-        api.get(`files${(path != null ? '?path=' + path : '')}`).then(fun).catch(
-            (error) => {
-                let json: { status: number };
-                try {
-                    json = error.toJSON();
-                } catch {
-                    json = { status: 500 }
-                }
-                switch (json.status) {
-                    case 401:
-                        setLogin(true);
-                        return;
-                    case 404:
-                        setText('Arquivo ou diretório não encontrado!');
-                        return;
-                    case 403:
-                        setText('Você não tem permissão para acessar esse arquivo ou diretório!');
-                        return;
-                    default:
-                        setText('Erro interno ao processar arquivo!');
-                }
-            }
-        )
+        if (json.status == 401) {
+            setLogin(true);
+            return;
+        }
+        setText(getErrorMessage(json.status));
     }
 
     function updateTabFiles() {
-        getFiles(null, (response) => {
-            let lfiles = Object.values(response.data.files).filter((file: any) => { return file.is_dir })
-            lfiles = lfiles.sort(((a: any, b: any) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true })))
-            lfiles = lfiles.map((file: any) => { return { url: `#/${file.name}`, is_dir: file.is_dir } });
-            setTabFiles(lfiles)
-        });
+        getFiles('', setTabFiles, errorMessage);
     }
 
     function updateFiles(hash: (string | null) = null, open = true) {
         hash = (hash == null || hash === '') ? '#' : hash
         setFiles(null);
         setText(null);
-        getFiles(hash.substring(1), (response) => {
-            if (response.status == 204) {
-                setText('Essa pasta está vazia!');
-                return;
-            }
-            let type = response.headers['content-type'];
-            if (!type.startsWith('application/json')) {
+        getFiles(hash.substring(1), (files, file) => {
+            if (file) {
                 if (!open || hash == null)
                     return
-                let src_splited = hash.split('/');
-                let parent_src = hash.substring(0, (hash.length - src_splited[src_splited.length - 1].length) - 1);
-                if (type.split('/')[0] === 'video') {
-                    setVideo({
-                        src: `${api_url}/files?path=${hash.substring(1)}`,
-                        backUrl: parent_src
-                    });
+                if (file.type === 'video') {
+                    setVideo(file);
                 } else {
-                    location.href = `${api_url}/files?path=${hash.substring(1)}`;
+                    location.href = file.src;
                 }
-                updateFiles(parent_src, false)
+                return;
+            }
+            if (files.length === 0) {
+                setText('Essa pasta está vazia!');
                 return;
             }
             if (open)
                 setVideo(null);
-            let lfiles = Object.values(response.data.files);
-            lfiles = lfiles.sort(((a: any, b: any) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true })))
-            lfiles = lfiles.map((file: any) => {
-                return {
-                    url: (`${hash}/${file.name}`),
-                    is_dir: file.is_dir,
-                    icon: file.icon ? encodeURI(`${api_url}/files?path=${file.icon}`) : null
-                }
-            })
-            setFiles(lfiles)
-        });
+            setFiles(files)
+        }, errorMessage)
     }
 
     const doLogin = event => {
@@ -192,7 +149,7 @@ export default function App() {
             <Aside>
                 <FilesBlocks files={files} text={text} />
             </Aside>
-            <VideoPlayer src={video == null ? null : video.src} backUrl={video == null ? null : video.backUrl} />
+            <VideoPlayer src={video == null ? null : video.src} backUrl={video == null ? null : `#${video.parent}`} />
             <LoginMenu do={login} error={loginError} onSubmit={doLogin} />
         </Container>
     )

@@ -3,8 +3,9 @@ import path from 'path'
 import md5 from 'md5'
 import cookie from 'cookie'
 import { lookup } from 'mime-types'
+import { fileFormat as file } from '../../libs/api'
 
-export default function handler(req, res) {
+export default function handler(req, res: any) {
     if (process.env.API_AUTH === 'true') {
         if (!req.headers.cookie) {
             res.status(401).json({ message: 'auth required' });
@@ -33,22 +34,23 @@ export default function handler(req, res) {
             res.status(204).send();
             return;
         }
-        res.status(200).json({
-            files: files.map(file => {
-                let icon = null;
-                let is_dir = fs.lstatSync(url_path + '/' + file).isDirectory();
-                if (is_dir) {
-                    let icon_path = url_path + file + '/_icon'
-                    icon = fs.existsSync(icon_path + '.png') ? icon_path + '.png' : (fs.existsSync(icon_path + '.jpeg') ? icon_path + '.jpeg' : (fs.existsSync(icon_path + '.jpg') ? icon_path + '.jpg' : null));
-                    icon = (icon != null) ? icon.substring(process.env.API_DIR.length) : null;
-                }
-                return {
-                    name: file,
-                    is_dir: is_dir,
-                    icon: icon
-                }
-            })
-        });
+
+        let files_rest: file[] = files.map(file => {
+            let icon = null;
+            let is_dir = fs.lstatSync(url_path + '/' + file).isDirectory();
+            if (is_dir) {
+                let icon_path = url_path + file + '/_icon'
+                icon = fs.existsSync(icon_path + '.png') ? icon_path + '.png' : (fs.existsSync(icon_path + '.jpeg') ? icon_path + '.jpeg' : (fs.existsSync(icon_path + '.jpg') ? icon_path + '.jpg' : null));
+                icon = (icon != null) ? icon.substring(process.env.API_DIR.length) : null;
+            }
+            return {
+                name: file,
+                is_dir: is_dir,
+                icon: icon
+            }
+        })
+
+        res.status(200).json({ files: files_rest })
         return;
     }
 
@@ -65,7 +67,7 @@ function send_file(req, res, url_path, file) {
     /* verificando range */
     let range = get_range(req.headers.range, file.size);
     if (range === null) {
-        if (content_type.split('/')[0] !== 'video') {
+        if (content_type && content_type.split('/')[0] !== 'video') {
             let file_stream = fs.createReadStream(file_path)
             res.status(200).send(file_stream)
             return
