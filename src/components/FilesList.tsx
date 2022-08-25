@@ -11,11 +11,11 @@ export default function FilesList(props) {
         let c = 0;
         return (
             <Column>
-                {props.files.map((file) => {
-                    return <FileRow key={++c} src={file.url}/>
+                {props.files.map((file: any) => {
+                    return <FileRow key={++c} src={file.url} />
                 })}
             </Column>
         )
     }
-    return <Column/>
+    return <Column />
 }

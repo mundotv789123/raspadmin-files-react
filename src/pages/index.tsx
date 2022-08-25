@@ -47,12 +47,12 @@ const Aside = styled.aside`
 `
 
 export default function App() {
-    const [tabFiles, setTabFiles] = useState(null)
-    const [files, setFiles] = useState(null)
-    const [video, setVideo] = useState(null)
-    const [login, setLogin] = useState(false)
-    const [loginError, setLoginError] = useState(null)
-    const [text, setText] = useState(null)
+    const [tabFiles, setTabFiles]: any = useState(null)
+    const [files, setFiles]: any = useState(null)
+    const [video, setVideo]: any = useState(null)
+    const [login, setLogin]: any = useState(false)
+    const [loginError, setLoginError]: any = useState(null)
+    const [text, setText]: any = useState(null)
 
     const api_url = process.env.NEXT_PUBLIC_API_URL;
 
@@ -67,11 +67,11 @@ export default function App() {
         }
         api.get(`files${(path != null ? '?path=' + path : '')}`).then(fun).catch(
             (error) => {
-                let json = null;
+                let json: { status: number };
                 try {
                     json = error.toJSON();
                 } catch {
-                    json = {status: 500}
+                    json = { status: 500 }
                 }
                 switch (json.status) {
                     case 401:
@@ -92,16 +92,15 @@ export default function App() {
 
     function updateTabFiles() {
         getFiles(null, (response) => {
-            let lfiles = Object.values(response.data.files).filter(file => { return file.is_dir })
-            lfiles = lfiles.sort(((a, b) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true })))
-            lfiles = lfiles.map(file => { return { url: `#/${file.name}`, is_dir: file.is_dir } });
+            let lfiles = Object.values(response.data.files).filter((file: any) => { return file.is_dir })
+            lfiles = lfiles.sort(((a: any, b: any) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true })))
+            lfiles = lfiles.map((file: any) => { return { url: `#/${file.name}`, is_dir: file.is_dir } });
             setTabFiles(lfiles)
         });
     }
 
-    function updateFiles(hash = null, open = true) {
-        if (!hash || hash === '')
-            hash = '#'
+    function updateFiles(hash: (string | null) = null, open = true) {
+        hash = (hash == null || hash === '') ? '#' : hash
         setFiles(null);
         setText(null);
         getFiles(hash.substring(1), (response) => {
@@ -111,7 +110,7 @@ export default function App() {
             }
             let type = response.headers['content-type'];
             if (!type.startsWith('application/json')) {
-                if (!open)
+                if (!open || hash == null)
                     return
                 let src_splited = hash.split('/');
                 let parent_src = hash.substring(0, (hash.length - src_splited[src_splited.length - 1].length) - 1);
@@ -129,8 +128,8 @@ export default function App() {
             if (open)
                 setVideo(null);
             let lfiles = Object.values(response.data.files);
-            lfiles = lfiles.sort(((a, b) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true })))
-            lfiles = lfiles.map(file => {
+            lfiles = lfiles.sort(((a: any, b: any) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true })))
+            lfiles = lfiles.map((file: any) => {
                 return {
                     url: (`${hash}/${file.name}`),
                     is_dir: file.is_dir,
@@ -158,7 +157,7 @@ export default function App() {
             updateTabFiles()
             updateFiles(location.hash)
         }).catch((error) => {
-            let data = null;
+            let data: { message: string };
             try {
                 data = JSON.parse(error.request.response);
             } catch {

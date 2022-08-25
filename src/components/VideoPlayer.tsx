@@ -1,5 +1,5 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from '@fortawesome/free-solid-svg-icons'
 import styled, { keyframes } from "styled-components";
 import { useRef, useState } from "react";
 import md5 from "md5";
@@ -290,7 +290,7 @@ export default function VideoPlayer(props) {
 
     return (
         <VideoCont ref={main_element}>
-            <VideoElement onStop={resetVideo} onPlay={togglePauseButton} onPause={togglePauseButton} onTimeUpdate={updateProgress} onCanPlay={() => playVideo()} src={props.src} autoPlay={true} controls={false} ref={video_element}></VideoElement>
+            <VideoElement onPlay={togglePauseButton} onPause={togglePauseButton} onTimeUpdate={updateProgress} onCanPlay={() => playVideo()} src={props.src} autoPlay={true} controls={false} ref={video_element}></VideoElement>
             <VideoMain>
                 <VideoTop>
                     <VideoTitle>{fileName.substring(0, 32) + (fileName.length > 32 ? '...' : '')}</VideoTitle>

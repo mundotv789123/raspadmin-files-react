@@ -58,7 +58,7 @@ export default function FilesBlock(props) {
     let key = 0;
     return (
         <Panel>
-            {props.files.map(file => {
+            {props.files.map((file: any) => {
                 return <FileBlock key={++key} src={file.url} dir={file.is_dir} icon={file.icon}/>
             })}
         </Panel>

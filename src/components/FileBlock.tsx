@@ -2,7 +2,7 @@ import styled from "styled-components"
 
 const iconsPath = "/img/icons/";
 
-const getFileIcon = (fileName, isDir = false) => {
+const getFileIcon = (fileName: string, isDir: boolean = false): string => {
     if (isDir)
         return 'folder.png'
     let fileNameSplited = fileName.split("\.");

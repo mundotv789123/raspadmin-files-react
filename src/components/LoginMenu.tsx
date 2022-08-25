@@ -85,18 +85,18 @@ const Button = styled.button`
     }
 `
 
-export default function LoginMenu(props) {
+export default function LoginMenu(props: any) {
     if (!props.do) {
         return <></>
     }
 
-    return(
+    return (
         <LoginCont>
             <LoginForm onSubmit={props.onSubmit}>
                 <Title>Login</Title>
-                <Input placeholder={"Username"} id={'username'} required/>
-                <Input placeholder={"Password"} id={'password'} type={'password'} required/>
-                <ErrorArea style={{opacity: (props.error ? '100' : '0')}}><p>{props.error}</p></ErrorArea>
+                <Input placeholder={"Username"} id={'username'} required />
+                <Input placeholder={"Password"} id={'password'} type={'password'} required />
+                <ErrorArea style={{ opacity: (props.error ? '100' : '0') }}><p>{props.error}</p></ErrorArea>
                 <Button>Login</Button>
             </LoginForm>
         </LoginCont>
