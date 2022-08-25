@@ -1,16 +1,35 @@
 import cookie from "cookie";
+import * as jwt from 'jsonwebtoken';
 import md5 from "md5";
 import { NextApiRequest, NextApiResponse } from "next";
 
+export function verifyToken(cookies: string | null): boolean {
+    if (!process.env.API_AUTH_KEY || process.env.API_AUTH_KEY === '') {
+        return true;
+    }
+
+    if (!cookies)
+        return false;
+    let token = cookie.parse(cookies).AUTH_TOKEN;
+    if (!token)
+        return false;
+
+    try {
+        let decoded = jwt.verify(token, process.env.API_AUTH_KEY);
+        return (decoded['password'] === md5(process.env.API_PASSWORD));
+    } catch (e) { }
+
+    return false;
+}
+
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (process.env.API_AUTH === 'true') {
-        let post_auth_md5 = md5(req.body.username+'-'+req.body.password).toString();
-        let api_auth_md5 =  md5(process.env.API_USERNAME+'-'+process.env.API_PASSWORD).toString();
-        if (post_auth_md5 !== api_auth_md5) {
-            res.status(401).send({message: 'Senha ou usuário inválido'});
+    if (process.env.API_AUTH_KEY && process.env.API_AUTH_KEY !== '') {
+        if (process.env.API_USERNAME !== req.body.username || process.env.API_PASSWORD !== req.body.password) {
+            res.status(401).send({ message: 'Senha ou usuário inválido' });
             return;
         }
-        res.setHeader('Set-Cookie', cookie.serialize('RA_TOKEN', api_auth_md5, {httpOnly: true}))
+        let token = jwt.sign({ name: process.env.API_USERNAME, password: md5(process.env.API_PASSWORD) }, process.env.API_AUTH_KEY, { expiresIn: '1d' });
+        res.setHeader('Set-Cookie', cookie.serialize('AUTH_TOKEN', token, { httpOnly: true }))
     }
-    res.status(200).json({message: 'Success'});
+    res.status(200).json({ message: 'Success' });
 }

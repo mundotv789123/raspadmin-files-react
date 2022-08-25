@@ -1,23 +1,15 @@
 import fs from 'fs'
 import path from 'path'
-import md5 from 'md5'
-import cookie from 'cookie'
+import { verifyToken } from './login'
 import { lookup } from 'mime-types'
 import { fileFormat as file } from '../../libs/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (process.env.API_AUTH === 'true') {
-        if (!req.headers.cookie) {
-            res.status(401).json({ message: 'auth required' });
-            return;
-        }
-        let cookie_auth_md5 = cookie.parse(req.headers.cookie).RA_TOKEN;
-        let api_auth_md5 = md5(process.env.API_USERNAME + '-' + process.env.API_PASSWORD);
-        if (cookie_auth_md5 !== api_auth_md5) {
-            res.status(401).send({ message: 'auth required' });
-            return;
-        }
+    /* verificando autenticação */
+    if (!verifyToken(req.headers.cookie)) {
+        res.status(401).json({ message: 'auth required' });
+        return;
     }
 
     /* pegando e validando caminho do arquivo */
@@ -59,7 +51,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     send_file(req, res, url_path, file)
 }
 
-function send_file(req: NextApiRequest, res: NextApiResponse, url_path:string, file: fs.Stats) {
+function send_file(req: NextApiRequest, res: NextApiResponse, url_path: string, file: fs.Stats) {
     /* pegando informações do arquivo */
     let file_path = path.resolve(url_path)
     let content_type = lookup(file_path);
@@ -85,8 +77,8 @@ function send_file(req: NextApiRequest, res: NextApiResponse, url_path:string, f
     res.status(206).send(file_stream)
 }
 
-function get_range(range, length) {
-    if (range == null || range.length == 0)
+function get_range(range: null | string, length: number) {
+    if (!range || range.length == 0)
         return null;
 
     let buffer = 524288;

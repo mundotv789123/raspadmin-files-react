@@ -1,5 +1,4 @@
 #!/bin/bash
-
 if [[ $1 == 'start' ]]; then
     if [ ! -d node_modules ]; then 
         npm install;
@@ -21,7 +20,7 @@ fi
 # instalando dependencias
 apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
 curl -sSL https://get.docker.com/ | CHANNEL=stable bash
-apt install -y docker-compose
+apt install -y docker-compose pwgen
 
 # criando serviço
 echo "[Unit]
