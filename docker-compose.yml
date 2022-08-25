@@ -9,7 +9,7 @@ services:
     - '8080:3000'
     volumes:
     - './:/app'
-    - '/mnt/files:/mnt/files'
+    - '/home/billy/Vídeos/:/mnt/files'
     environment:
       NEXT_PUBLIC_API_URL: '/api'
       API_AUTH: 'false'

@@ -4,7 +4,7 @@ import FilesList from "../components/FilesList"
 import { useEffect, useState } from "react";
 import LoginMenu from "../components/LoginMenu"
 import VideoPlayer from "../components/VideoPlayer"
-import { api, fileFormat, getErrorMessage, getFiles } from "../libs/api";
+import {fileFormat, getErrorMessage, getFiles } from "../libs/api";
 
 const Container = styled.div`
     display: grid;
@@ -51,7 +51,6 @@ export default function App() {
     const [files, setFiles] = useState<fileFormat[]>(null)
     const [video, setVideo]: any = useState(null)
     const [login, setLogin]: any = useState(false)
-    const [loginError, setLoginError]: any = useState(null)
     const [text, setText]: any = useState(null)
 
     function errorMessage(e: any) {
@@ -97,36 +96,10 @@ export default function App() {
         }, errorMessage)
     }
 
-    const doLogin = event => {
-        event.preventDefault();
-        let username = event.target.username.value;
-        let password = event.target.password.value;
-        if (username === '' || password === '') {
-            setLoginError('Preencha todos os campos');
-            return;
-        }
-        api.post(`/login`, {
-            username: username,
-            password: password
-        }).then(() => {
-            setLogin(false)
-            setLoginError(null)
-            updateTabFiles()
-            updateFiles(location.hash)
-        }).catch((error) => {
-            let data: { message: string };
-            try {
-                data = JSON.parse(error.request.response);
-            } catch {
-                setLoginError('Erro interno ao processar requisição')
-                return;
-            }
-            if (data.message) {
-                setLoginError(data.message)
-            } else {
-                setLoginError('Erro interno ao processar requisição')
-            }
-        })
+    function reloadPage() {
+        setLogin(false)
+        updateTabFiles()
+        updateFiles(location.hash)
     }
 
     useEffect(() => {
@@ -149,8 +122,8 @@ export default function App() {
             <Aside>
                 <FilesBlocks files={files} text={text} />
             </Aside>
-            <VideoPlayer src={video == null ? null : video.src} backUrl={video == null ? null : `#${video.parent}`} />
-            <LoginMenu do={login} error={loginError} onSubmit={doLogin} />
+            {video && <VideoPlayer src={video.src} backUrl={`#${video.parent}`} />}
+            {login && <LoginMenu onSuccess={reloadPage} />}
         </Container>
     )
 }

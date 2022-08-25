@@ -1,5 +1,7 @@
+import { useState } from "react";
 import styled from "styled-components";
 import { keyframes } from "styled-components";
+import { api } from "../libs/api";
 
 const LoginCont = styled.div`
     display: flex;
@@ -86,17 +88,39 @@ const Button = styled.button`
 `
 
 export default function LoginMenu(props: any) {
-    if (!props.do) {
-        return <></>
+    const [errorText, setErroText] = useState<string>();
+
+    function submit(event: any) {
+        event.preventDefault();
+        let username = event.target.username.value;
+        let password = event.target.password.value;
+        if (username === '' || password === '') {
+            setErroText('Preencha todos os campos');
+            return;
+        }
+        api.post(`/login`, {username,password}).then(props.onSuccess).catch((error) => {
+            let data: { message: string };
+            try {
+                data = JSON.parse(error.request.response);
+            } catch {
+                setErroText('Erro interno ao processar requisição')
+                return;
+            }
+            if (data.message) {
+                setErroText(data.message)
+            } else {
+                setErroText('Erro interno ao processar requisição')
+            }
+        })
     }
 
     return (
         <LoginCont>
-            <LoginForm onSubmit={props.onSubmit}>
+            <LoginForm onSubmit={submit}>
                 <Title>Login</Title>
                 <Input placeholder={"Username"} id={'username'} required />
                 <Input placeholder={"Password"} id={'password'} type={'password'} required />
-                <ErrorArea style={{ opacity: (props.error ? '100' : '0') }}><p>{props.error}</p></ErrorArea>
+                {errorText && <ErrorArea><p>{errorText}</p></ErrorArea>}
                 <Button>Login</Button>
             </LoginForm>
         </LoginCont>
