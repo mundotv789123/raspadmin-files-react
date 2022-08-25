@@ -1,17 +1,7 @@
 ## Tutorial de instalação
 
-- Primeiro temos que instalar o nodejs 17.
-- Para isso basta executar os seguintes comandos.
-
-
-```bash
-curl -sL https://deb.nodesource.com/setup_17.x | sudo -E bash -
-sudo apt install nodejs
-```
-
-- Agora vamos clonar o repositório `raspadmin-files-react`.
+- Primeiro vamos clonar o repositório `raspadmin-files-react`.
 - Para isso vamos executar os seguintes comandos.
-
 
 ```bash
 sudo apt install git
@@ -19,72 +9,58 @@ cd /srv
 git clone https://github.com/mundotv789123/raspadmin-files-react.git
 ```
 
-- Após isso basta instalar os módulos do nodejs.
+- Após isso basta entrar na pasta e executar o script de instalação
 
 ```bash
 cd raspadmin-files-react/
-npm install
+bash ./install.sh
 ```
 
-- Vamos configurar, para isso basta renomear o arquivo `.env.example` para `.env`.
-- Após isso basta abrir o arquivo com um editor de texto configura-lo.
+- Vamos configurar, para isso basta acessar o arquivo `docker-compose.yml`.
 
-```
-#aqui não vamos editar
-NEXT_PUBLIC_API_URL='/api' 
-
-#configuração de autenticação, caso queira usar uma senha basta mudar o API_AUTH para true e definir um usuário/senha
-API_AUTH=false
-API_USERNAME='admin'
-API_PASSWORD='admin'
-
-#aqui vc irá definir a pasta que a aplicação irá listar os arquivos
-API_DIR='./files'
+- Aqui você irá definir a pasta onde os arquivos serão armazenados
+```yml
+volumes:
+- './:/app'
+- '/mnt/files:/mnt/files'
 ```
 
-- Depois de tudo configurado vamos compilar nossa aplicação.
+- Exemplo caso você queira armazenar na pasta /root/arquivos
+```yml
+volumes:
+- './:/app'
+- '/root/arquivos:/mnt/files'
+```
+> Você só irá editar o caminho da primeira pasta.
+
+- Você também pode definir uma senha de usuário, caso queira restringir o acesso
+
+```yml
+environment:
+  NEXT_PUBLIC_API_URL: '/api'
+  API_AUTH: 'false'
+  API_USERNAME: 'admin'
+  API_PASSWORD: 'admin'
+  API_DIR: '/mnt/files'
+```
+
+- Basta mudar as seguintes linhas
+```yml
+API_AUTH: 'true'
+API_USERNAME: 'seu usuário'
+API_PASSWORD: 'sua senha aqui'
+```
+
+- Após configurar basta reiniciar o projeto.
 
 ```bash
-npm run build
-```
-
-- Agora vamos iniciar nosso servidor.
-
-```bash
-npm run start
+service raspadmin restart
 ```
 
 - Para acessar basta informar a seguinte url.
-- `http://127.0.0.1/3000` ou `http://(endereço ip do servidor)/3000`.
+- `http://127.0.0.1/8080` ou `http://(endereço ip do servidor)/8080`.
 
-# Vamos configurar um serviço para nossa aplicação
-
-Isso ira manter a aplicação rodando em segundo plano e fará ela iniciar autom
-
-- Para isso basta criar um arquivo chamado `raspadmin.service` na pasta `/etc/systemd/system`.
-- Nesse arquivo você ira copiar o seguinte texto.
-
-```service
-[Unit]
-Description=raspadmin files
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/srv/raspadmin-files-react
-ExecStart=/usr/bin/npm start
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-```
-
-- Após isso basta executar o seguinte comando
-
-```bash
-systemctl enable --now raspadmin.service
-```
+> Lembrando que a primeira inicialização pode demorar um pouco, caso queira ver os logs de inicialização basta executar `docker-compose logs` ou `docker-compose logs -f` para visualizar em tempo real.
 
 # Usando ssl com nginx (opicional)
 
@@ -105,7 +81,7 @@ server {
         server_name <dominio>;
 
         location / {
-                proxy_pass http://127.0.0.1:3000;
+                proxy_pass http://127.0.0.1:8080;
         }
         
         # informe aqui seus arquivos ssl
@@ -123,7 +99,7 @@ server {
         server_name <dominio>;
 
         location / {
-                proxy_pass http://127.0.0.1:3000;
+                proxy_pass http://127.0.0.1:8080;
         }
 }
 ```

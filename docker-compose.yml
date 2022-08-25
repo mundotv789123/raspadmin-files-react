@@ -4,9 +4,9 @@ services:
     image: 'node:16.15.0'
     working_dir: '/app'
     container_name: 'raspadmin_files'
-    command: 'sh -c "chmod 755 ./start.sh && ./start.sh"'
+    command: 'sh -c "chmod 755 ./setup.sh && ./setup.sh start"'
     ports:
-    - '3000:3000'
+    - '8080:3000'
     volumes:
     - './:/app'
     - '/mnt/files:/mnt/files'
