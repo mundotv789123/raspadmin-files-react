@@ -1,10 +1,12 @@
-import axios from "axios";
+import axios from "axios"
+import { lookup } from 'mime-types'
 
 /* interfaces */
 export interface fileFormat {
     name: string,
     is_dir: boolean,
     icon: string | null,
+    type: string | false,
     url?: string | null,
 }
 
@@ -33,7 +35,7 @@ export function getFiles(path: string | null, call: (files: fileFormat[], file: 
             let src_splited = path.split('/');
             let parent_src = path.substring(0, (path.length - src_splited[src_splited.length - 1].length) - 1);
             call([], {
-                type: type.split('/')[0],
+                type: type,
                 src: `${api_url}/files?path=${path}`,
                 parent: `${parent_src}`
             });
@@ -47,6 +49,7 @@ export function getFiles(path: string | null, call: (files: fileFormat[], file: 
                 url: (`#${path}/${file.name}`),
                 name: file.name,
                 is_dir: file.is_dir,
+                type: lookup(file.name),
                 icon: file.icon ? encodeURI(`${api_url}/files?path=${file.icon}`) : null
             }
         }), null)

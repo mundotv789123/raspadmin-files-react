@@ -43,6 +43,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             return {
                 name: file,
                 is_dir: is_dir,
+                type: lookup(file),
                 icon: icon
             }
         })

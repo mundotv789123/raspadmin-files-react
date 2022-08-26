@@ -1,4 +1,5 @@
 import styled from "styled-components"
+import { fileFormat } from "../libs/api"
 import FileBlock from "./FileBlock"
 import Loading from "./Loading"
 
@@ -35,9 +36,9 @@ const Text = styled.h1`
     width: 100%;
 `
 
-export default function FilesBlock(props) {
+export default function FilesBlock(props: { files: fileFormat[] | null, text: string }) {
     if (props.text) {
-        return(
+        return (
             <Panel>
                 <Text>{props.text}</Text>
             </Panel>
@@ -58,8 +59,8 @@ export default function FilesBlock(props) {
     let key = 0;
     return (
         <Panel>
-            {props.files.map((file: any) => {
-                return <FileBlock key={++key} src={file.url} dir={file.is_dir} icon={file.icon}/>
+            {props.files.map((file: fileFormat) => {
+                return <FileBlock file={file} key={key++} />
             })}
         </Panel>
     )

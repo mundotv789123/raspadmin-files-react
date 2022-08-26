@@ -1,12 +1,12 @@
 import styled from "styled-components"
-import { lookup } from 'mime-types'
+import { fileFormat } from "../libs/api";
 
 const iconsPath = "/img/icons/";
 
-const getFileIcon = (fileName: string, isDir: boolean = false): string => {
-    if (isDir)
+const getFileIcon = (file: fileFormat): string => {
+    if (file.is_dir)
         return 'folder.png'
-    let [type, format] = lookup(fileName).toString().split('/');
+    let [type, format] = file.type.toString().split('/');
     switch (type) {
         case 'video':
             return 'video.png';
@@ -66,13 +66,11 @@ const Name = styled.p`
     font-weight: bold;
 `
 
-export default function FileBlock(props) {
-    const srcSplited = props.src.split("/");
-    const fileName = srcSplited[srcSplited.length - 1];
+export default function FileBlock(props: {file: fileFormat, key: number}) {
     return (
-        <FileCont href={props.src}>
-            <FileIcon style={{ backgroundImage: "url('" + (props.icon ? props.icon : (iconsPath + getFileIcon(fileName, props.dir))) + "')" }} />
-            <Name>{fileName}</Name>
+        <FileCont href={props.file.url}>
+            <FileIcon style={{ backgroundImage: "url('" + (props.file.icon ? props.file.icon : (iconsPath + getFileIcon(props.file))) + "')" }} />
+            <Name>{props.file.name}</Name>
         </FileCont>
     )
 }
