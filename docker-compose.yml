@@ -12,7 +12,8 @@ services:
     - './files:/mnt/files'
     environment:
       NEXT_PUBLIC_API_URL: '/api'
-      API_AUTH_KEY: '' # Coloque aqui uma chave aleatória para encriptação da chave jwt
+      # Coloque aqui uma chave aleatória para encriptação da chave jwt
+      API_AUTH_KEY: ''
       API_USERNAME: 'admin'
       API_PASSWORD: 'admin'
       API_DIR: '/mnt/files'
