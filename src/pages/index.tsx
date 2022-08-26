@@ -117,7 +117,7 @@ export default function App() {
             </Header>
             <Nav />
             <Main>
-                <FilesList files={tabFiles} />
+                <FilesList files={tabFiles.filter(e => e.is_dir)} />
             </Main>
             <Aside>
                 <FilesBlocks files={files} text={text} />

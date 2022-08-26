@@ -1,35 +1,39 @@
 import styled from "styled-components"
+import { lookup } from 'mime-types'
 
 const iconsPath = "/img/icons/";
 
 const getFileIcon = (fileName: string, isDir: boolean = false): string => {
     if (isDir)
         return 'folder.png'
-    let fileNameSplited = fileName.split("\.");
-    switch (fileNameSplited[fileNameSplited.length - 1]) {
-        case 'mp4':
-        case 'mkv':
-        case 'avi':
-        case 'm4v':
+    let [type, format] = lookup(fileName).toString().split('/');
+    switch (type) {
+        case 'video':
             return 'video.png';
-        case "exe":
-            return 'exe.png';
-        case "zip":
-        case "rar":
-        case "tar":
-        case "gz":
-            return 'compact.png';
-        case "java":
-        case "jar":
-        case "class":
-            return 'java.png';
-        case 'iso':
-        case 'img':
-            return 'iso.png';
-        case "mp3":
+        case 'audio':
             return 'music.png';
-        case "part":
-            return 'part.png';
+        case 'image':
+            return 'image.png';
+        case "application":
+            switch(format) {
+                case 'java-archive':
+                    return 'java.png'
+                case 'x-msdos-program':
+                    return 'exe.png';
+                case 'x-iso9660-image':
+                case 'octet-stream':
+                    return 'iso.png';
+                case 'x-msdownload':
+                case 'x-sh':
+                    return 'document.png';
+            }
+            return 'compact.png';
+        case 'text':
+            switch(format) {
+                case 'x-java-source':
+                    return 'java.png'
+            }
+            return 'document.png';
     }
     return 'document.png';
 }
