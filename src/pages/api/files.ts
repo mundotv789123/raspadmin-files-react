@@ -5,6 +5,10 @@ import { lookup } from 'mime-types'
 import { fileFormat as file } from '../../libs/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 
+export const config = {
+    api: {responseLimit: false}
+}
+
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     /* verificando autenticação */
     if (!verifyToken(req.headers.cookie)) {
