@@ -47,6 +47,8 @@ const FileCont = styled.a`
     word-wrap: break-word;
     &:hover {
         background: rgba(255, 255, 255, 0.3);
+        overflow: inherit;
+        z-index: 1;
     }
 `
 
