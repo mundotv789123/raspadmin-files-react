@@ -1,7 +1,7 @@
 ## Raspadmin Files
 Um sistema para listagem de arquivos e reprodução de mídia.
 
-Site demo para desmonstração: [raspadmin-files-react.vercel.app](https://arquivos.raspadmin.tk/)
+Site demo para desmonstração: [arquivos.raspadmin.tk](https://arquivos.raspadmin.tk/)
 
 ## Tutorial de instalação
 
