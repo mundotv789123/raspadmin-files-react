@@ -18,7 +18,7 @@ git clone https://github.com/mundotv789123/raspadmin-files-react.git
 
 ```bash
 cd raspadmin-files-react/
-bash ./install.sh
+bash ./setup.sh
 ```
 
 - Vamos configurar, para isso basta acessar o arquivo `docker-compose.yml`.
