@@ -4,7 +4,7 @@ import FilesList from "../components/FilesList"
 import { useEffect, useState } from "react";
 import LoginMenu from "../components/LoginMenu"
 import VideoPlayer from "../components/VideoPlayer"
-import {fileFormat, getErrorMessage, getFiles } from "../libs/api";
+import { fileFormat, getErrorMessage, getFiles, openFile } from "../libs/api";
 
 const Container = styled.div`
     display: grid;
@@ -48,10 +48,10 @@ const Aside = styled.aside`
 
 export default function App() {
     const [tabFiles, setTabFiles] = useState<fileFormat[]>([])
-    const [files, setFiles] = useState<fileFormat[]>(null)
-    const [video, setVideo]: any = useState(null)
-    const [login, setLogin]: any = useState(false)
-    const [text, setText]: any = useState(null)
+    const [files, setFiles] = useState<fileFormat[] | null>(null)
+    const [login, setLogin] = useState<boolean>(false)
+    const [text, setText] = useState<string>()
+    const [video, setVideo] = useState<openFile>()
 
     function errorMessage(e: any) {
         let json: { status: number };
@@ -79,8 +79,9 @@ export default function App() {
             if (file) {
                 if (!open || hash == null)
                     return
-                if (file.type === 'video') {
-                    setVideo(file);
+                updateFiles(`#${file.parent}`, false);
+                if (file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
+                    setVideo(file)
                 } else {
                     location.href = file.src;
                 }

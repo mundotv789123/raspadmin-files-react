@@ -46,7 +46,7 @@ export function getFiles(path: string | null, call: (files: fileFormat[], file: 
         files = files.sort((a: fileFormat, b: fileFormat) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true }))
         call(files.map((file: fileFormat) => {
             return {
-                url: (`#${path}/${file.name}`),
+                url: ('#'+`${path}/${file.name}`.replace('&', '%26').replace('#', '%23')),
                 name: file.name,
                 is_dir: file.is_dir,
                 type: lookup(file.name),
