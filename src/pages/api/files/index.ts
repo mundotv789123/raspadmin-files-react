@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
-import { verifyToken } from './login'
+import { verifyToken } from '../auth/login'
 import { lookup } from 'mime-types'
-import { fileFormat as file } from '../../libs/api'
+import { fileFormat as file } from '../../../libs/api'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export const config = {

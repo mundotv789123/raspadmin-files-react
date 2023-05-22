@@ -29,7 +29,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             return;
         }
         let token = jwt.sign({ name: process.env.API_USERNAME, password: md5(process.env.API_PASSWORD) }, process.env.API_AUTH_KEY, { expiresIn: '1d' });
-        res.setHeader('Set-Cookie', cookie.serialize('AUTH_TOKEN', token, { httpOnly: true }))
+        res.setHeader('Set-Cookie', cookie.serialize('AUTH_TOKEN', token, { httpOnly: true, path: "/" }))
     }
     res.status(200).json({ message: 'Success' });
 }
