@@ -59,7 +59,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 function send_file(req: NextApiRequest, res: NextApiResponse, url_path: string, file: fs.Stats) {
     /* pegando informações do arquivo */
     let file_path = path.resolve(url_path)
-    let content_type = lookup(file_path);
+    let content_type = lookup(file_path)
+    res.setHeader('Cache-Control', 'max-age=86400')
     if (content_type)
         res.setHeader('Content-Type', content_type)
 
