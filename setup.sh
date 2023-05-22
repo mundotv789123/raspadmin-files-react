@@ -20,7 +20,7 @@ fi
 # instalando dependencias
 apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
 curl -sSL https://get.docker.com/ | CHANNEL=stable bash
-apt install -y docker-compose pwgen
+apt install -y docker-compose
 
 # criando serviço
 echo "[Unit]
