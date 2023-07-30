@@ -98,7 +98,12 @@ export default function LoginMenu(props: any) {
             setErroText('Preencha todos os campos');
             return;
         }
-        api.post(`/auth/login`, {username,password}).then(props.onSuccess).catch((error) => {
+
+        var formData = new URLSearchParams();
+        formData.append("username", username);
+        formData.append("password", password);
+
+        api.post(`/auth/login`, formData, {auth: {username, password}}).then(props.onSuccess).catch((error) => {
             let data: { message: string };
             try {
                 data = JSON.parse(error.request.response);

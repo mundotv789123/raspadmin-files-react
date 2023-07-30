@@ -2,7 +2,7 @@ import axios from "axios"
 import { lookup } from 'mime-types'
 
 /* api */
-export const api_url = process.env.NEXT_PUBLIC_API_URL;
+export const api_url = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 export const api = axios.create({ baseURL: api_url, timeout: 1000 })
 
 export interface fileFormat {
