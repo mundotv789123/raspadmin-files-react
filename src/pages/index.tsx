@@ -80,7 +80,7 @@ export default function App() {
                 if (!open || hash == null)
                     return
                 updateFiles(`#${file.parent}`, false);
-                if (file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
+                if (file.type && file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
                     setVideo(file)
                 } else {
                     location.href = file.src;
