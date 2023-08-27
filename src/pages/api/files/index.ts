@@ -11,6 +11,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     /* pegando e validando caminho do arquivo */
+    let path = (req.query.path ? req.query.path : '/');
     let url_path = process.env.API_DIR + (req.query.path ? req.query.path : '/');
     if (!fs.existsSync(url_path) || !fs.realpathSync(url_path).startsWith(fs.realpathSync(process.env.API_DIR))) {
         res.status(404).send({ message: 'not found' });
@@ -23,7 +24,16 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (file.isDirectory()) {
         let files = fs.readdirSync(url_path).filter(file => (!file.startsWith('.') && !file.startsWith('_')));
-        files_rest = files.map(file => statsToFile(fs.lstatSync(url_path + '/' + file), file));
+        files_rest = files.map(file => {
+            let fileModel = statsToFile(fs.lstatSync(url_path + '/' + file), file)
+            if (fileModel.is_dir) {
+                let icon = getFileIcon(url_path + '/' + file)
+                if (icon)
+                    fileModel.icon = `${path}/${file}/${icon}`
+            }
+            return fileModel;
+        }
+    );
     } else {
         let file_name = url_path.split(/\/([^\/])^/)[0]
         files_rest.push(statsToFile(file, file_name, true));
@@ -40,11 +50,16 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
 function statsToFile(file: fs.Stats, name: string, open: boolean = false): fileFormat {
     let is_dir = file.isDirectory();
-    let icon = null;
-    // if (is_dir) {
-    //     let icon_path = url_path + file + '/_icon'
-    //     icon = fs.existsSync(icon_path + '.png') ? icon_path + '.png' : (fs.existsSync(icon_path + '.jpeg') ? icon_path + '.jpeg' : (fs.existsSync(icon_path + '.jpg') ? icon_path + '.jpg' : null));
-    //     icon = (icon != null) ? icon.substring(process.env.API_DIR.length) : null;
-    // }
-    return { name, is_dir, icon, open: open }
+    return { name, is_dir, icon: null, open: open }
+}
+
+function getFileIcon(url_path: string):string | null {
+    if (fs.existsSync(url_path + '/_icon.png')) {
+        return '_icon.png';
+    } else if (fs.existsSync(url_path + '/_icon.jpg')) {
+        return '_icon.jpg';
+    } else if (fs.existsSync(url_path + '/_icon.jpeg')) {
+        return '_icon.jpeg';
+    }
+    return null;
 }

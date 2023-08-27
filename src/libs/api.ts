@@ -46,7 +46,7 @@ export function getFiles(path: string | null, call: (files: fileFormat[], file: 
                 is_dir: file.is_dir,
                 open: file.open,
                 type: lookup(file.name),
-                icon: file.icon ? encodeURI(`${api_url}/files?path=${file.icon}`) : null,
+                icon: file.icon ? encodeURI(`${api_url}/files/open?path=${file.icon}`) : null,
                 url: ('#'+`${path}/${file.name}`.replace('&', '%26').replace('#', '%23'))
             }
         }), null)
