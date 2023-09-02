@@ -17,7 +17,7 @@ export class FilesService {
     public getFiles(pathFile: string | null, callback: ((files: Array<FileModel>, path: string) => void), callbackError?: ((status: number, errorMessage: string) => void)) {
         let path = this.clearPath(pathFile);
 
-        this.api.get(`/files?path=/${encodeURIComponent(path)}`).then(reponse => {
+        this.api.get('/files', { params: {path: `/${path}` }}).then(reponse => {
             if (reponse.status == 204) {
                 return callback([], path);
             }

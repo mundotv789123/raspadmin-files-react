@@ -1,196 +1,8 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from '@fortawesome/free-solid-svg-icons'
-import styled, { keyframes } from "styled-components";
 import { useRef, useState } from "react";
 import md5 from "md5";
-
-const VideoCont = styled.div`
-    display: flex;
-    background-color: black;
-    color: white;
-    overflow: hidden;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-`
-
-const VideoElement = styled.video`
-    width: 100%;
-    height: 100%;
-    margin: auto;
-`
-
-const VideoMain = styled.div`
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    transition: 0.5s;
-    opacity: 0;
-    cursor: none;
-    transition-delay: 3s;
-    &:hover {
-        transition-delay: 0s;
-        opacity: 100;
-        cursor: default;
-    }
-`
-
-const VideoTop = styled.div`
-    color: white;
-    padding: 15px;
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
-    user-select: none;
-`
-
-const VideoTitle = styled.h2`
-    text-align: center;
-    margin: 0;
-`
-
-const VideoCenter = styled.div`
-    height: 100%;
-    display: flex;
-`
-
-const VideoLoadingSpin = keyframes`
-    to {
-        transform: rotate(0);
-    }
-    from {
-        transform: rotate(-360deg);
-    }
-`
-
-const VideoLoading = styled.div`
-    margin: auto;
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-    border: solid 10px transparent;
-    border-left-color: white;
-    animation: ${VideoLoadingSpin} 0.7s linear infinite;
-`
-
-const VideoBottom = styled.div`
-    padding: 10px;
-    display: flex;
-    background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.8));
-`
-
-const VideoButton = styled.button`
-    background-color: transparent;
-    border: none;
-    color: white;
-    font-size: 13pt;
-    margin: 0 5px;
-    font-size: 20px;
-    text-align: center;
-    width: 28px;
-    &:hover {
-        color: lightgray;
-        transform: translateY(-1px);
-    }
-`
-
-const VideoCloseButton = styled.a`
-    background-color: transparent;
-    border: none;
-    color: white;
-    font-size: 13pt;
-    font-size: 20px;
-    text-align: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 10px 15px; 
-    &:hover {
-        color: lightgray;
-        transform: translateY(-1px);
-    }
-`
-
-const VideoProgress = styled.div`
-    width: 100%;
-    padding: 2px 0;
-    display: flex;
-    & .background {
-        width: 100%;
-        margin: auto 5px;
-        background: rgb(100,100,100);
-        height: 7px;
-        border-radius: 5px;
-        display: flex;
-    }
-    &:hover .follower {
-        opacity: 100;
-    }
-`
-
-const VideoProgressBar = styled.div`
-    background-color: white;
-    height: 100%;
-    border-radius: 5px 0 0 5px;
-    display: flex;
-    z-index: 1;
-    &::after {
-        content: "";
-        display: block;
-        border: solid 7px white;
-        top: -3px;
-        margin-right: -5px;
-        margin-left: auto;
-        position: relative;
-        border-radius: 50%;
-    }
-`
-
-const VideoProgressFollower = styled.div`
-    border-radius: 5px 0px 0px 5px;
-    height: 100%;
-    width: 50%;
-    position:;
-    background-color: gray;
-    display: flex;
-    opacity: 0;
-`
-
-const VideoVolume = styled.div`
-    border-radius: 10px;
-    overflow: show;
-    display: flex;
-    flex-direction: column;
-    transition: 320ms;
-    & .volume {
-        height: 100%;
-        width: 10px;
-        background-color: #999;
-        margin: 0 auto;
-        border-radius: 15px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-    & .volume .volume_percent {
-        width: 100%;
-        margin-top: auto;
-        background-color: white;
-        transition: all 0.2s ease 0s;
-    }
-    &:hover {
-        background-color: #444;
-        padding: 10px 0 5px 0;
-        margin-top: -105px;
-    }
-    & button {
-        margin: 0 !important; 
-    }
-`
+import { VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoProgressBar, VideoProgressFollower, VideoTitle, VideoTop, VideoVolume } from './styles';
 
 export function getVideoTime(url) {
     if (!localStorage['videos']) {
@@ -216,18 +28,16 @@ export default function VideoPlayer(props) {
     /* states */
     const [buttonPlayIcon, setButtonPlayIcon] = useState(faPlay);
     const [progressPercent, setProgressPercent] = useState(0);
-    const [progressFollowerPercent, setProgressFollerPercent]  = useState(0);
+    const [progressFollowerPercent, setProgressFollerPercent] = useState(0);
     const [loading, setLoading] = useState(true)
 
-    /* refs */
     const main_element = useRef(null);
     const video_element = useRef(null);
     const progress_follower = useRef(null);
     const progress_bar = useRef(null);
     const volume = useRef(null);
     const volume_percent = useRef(null);
-    
-    /* functions */
+
     function togglePauseVideo() {
         if (video_element.current.paused) {
             video_element.current.play();
@@ -314,7 +124,6 @@ export default function VideoPlayer(props) {
         return <></>
     }
 
-    /* video name */
     let srcSplited = props.src.split("/")
     const fileName = decodeURI(srcSplited[srcSplited.length - 1]);
 
@@ -338,7 +147,7 @@ export default function VideoPlayer(props) {
                     <VideoProgress onClick={(e) => updateVideoTime(e)} onMouseMove={(e) => updateProgressFollower(e)} ref={progress_bar}>
                         <div className='background'>
                             <VideoProgressBar style={{ width: `${progressPercent}%` }} />
-                            <VideoProgressFollower className='follower' style={{ marginLeft: `-${progressPercent}%`, width: `${progressFollowerPercent}%` }} ref={progress_follower} /> 
+                            <VideoProgressFollower className='follower' style={{ marginLeft: `-${progressPercent}%`, width: `${progressFollowerPercent}%` }} ref={progress_follower} />
                         </div>
                     </VideoProgress>
                     <VideoVolume>
