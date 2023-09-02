@@ -1,7 +1,7 @@
 import styled from "styled-components"
-import { fileFormat } from "../libs/api"
 import FileBlock from "./FileBlock"
 import Loading from "./Loading"
+import { FileModel } from "../services/models/FilesModel"
 
 const Panel = styled.div`
     display: flex;
@@ -36,7 +36,7 @@ const Text = styled.h1`
     width: 100%;
 `
 
-export default function FilesBlock(props: { files: fileFormat[] | null, text: string }) {
+export default function FilesBlock(props: { files: Array<FileModel> | null, text: string }) {
     if (props.text) {
         return (
             <Panel>
@@ -51,15 +51,17 @@ export default function FilesBlock(props: { files: fileFormat[] | null, text: st
             </Panel>
         )
     }
-    if (props.files.length === 0) {
-        <Panel>
-            <h1>Pasta vazia</h1>
-        </Panel>
+    if (props.files.length == 0) {
+        return (
+            <Panel>
+                <Text>Essa pasta está vazia!</Text>
+            </Panel>
+        )
     }
     let key = 0;
     return (
         <Panel>
-            {props.files.map((file: fileFormat) => {
+            {props.files.map((file: FileModel) => {
                 return <FileBlock file={file} key={key++} />
             })}
         </Panel>

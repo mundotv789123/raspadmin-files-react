@@ -8,7 +8,7 @@ const Row = styled.a `
     }
 `
 
-export default function FileRow(props) {
+export default function FileRow(props: {src: string}) {
     const srcSplited = props.src.split("/");
     const fileName = srcSplited[srcSplited.length - 1];
     return (

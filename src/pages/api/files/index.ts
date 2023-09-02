@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { verifyToken } from '../auth/login'
-import { fileFormat } from '../../../libs/api'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { FileModel } from '../../../services/models/FilesModel';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     /* verificando autenticação */
@@ -20,7 +20,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     /* retornando arquivos em json */
     let file = fs.lstatSync(url_path);
-    let files_rest: fileFormat[] = [];
+    let files_rest: Array<FileModel> = [];
 
     if (file.isDirectory()) {
         let files = fs.readdirSync(url_path).filter(file => (!file.startsWith('.') && !file.startsWith('_')));
@@ -48,7 +48,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(200).json({ files: files_rest })
 }
 
-function statsToFile(file: fs.Stats, name: string, open: boolean = false): fileFormat {
+function statsToFile(file: fs.Stats, name: string, open: boolean = false): FileModel {
     let is_dir = file.isDirectory();
     return { name, is_dir, icon: null, open: open }
 }

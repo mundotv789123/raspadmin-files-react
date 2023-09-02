@@ -4,7 +4,8 @@ import FilesList from "../components/FilesList"
 import { useEffect, useState } from "react";
 import LoginMenu from "../components/LoginMenu"
 import VideoPlayer from "../components/VideoPlayer"
-import { fileFormat, getErrorMessage, getFiles, openFile } from "../libs/api";
+import { FilesService } from "../services/FilesService";
+import { FileLinkModel, FileModel } from "../services/models/FilesModel";
 
 const Container = styled.div`
     display: grid;
@@ -47,68 +48,67 @@ const Aside = styled.aside`
 `
 
 export default function App() {
-    const [tabFiles, setTabFiles] = useState<fileFormat[]>([])
-    const [files, setFiles] = useState<fileFormat[] | null>(null)
+    const service = new FilesService();
+
+    const [tabFiles, setTabFiles] = useState<FileModel[]>([])
+    const [mainFiles, setMainFiles] = useState<FileModel[] | null>(null)
+
     const [login, setLogin] = useState<boolean>(false)
     const [text, setText] = useState<string>()
-    const [video, setVideo] = useState<openFile>()
 
-    function errorMessage(e: any) {
-        let json: { status: number };
-        try {
-            json = e.toJSON();
-        } catch {
-            json = { status: 500 }
-        }
-        if (json.status == 401) {
-            setLogin(true);
-            return;
-        }
-        setText(getErrorMessage(json.status));
+    const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
+
+    function loadPage() {
+        setLogin(false);
+        service.getFiles(null, (files) => {
+            setTabFiles(files.filter(file => file.is_dir).map(file => {
+                file.href = `#/${file.name}`; 
+                return file; 
+            }));
+            loadMainFiles();
+        }, (status, message) => {
+            if (status == 401) 
+                return setLogin(true);
+            setText(message);
+        });
     }
 
-    function updateTabFiles() {
-        getFiles('', setTabFiles, errorMessage);
-    }
-
-    function updateFiles(hash: (string | null) = null, open = true) {
-        hash = (hash == null || hash === '') ? '#' : hash
-        setFiles(null);
+    function loadMainFiles(hashPath: string = location.hash.substring(1)) {
+        setMainFiles(null);
         setText(null);
-        getFiles(hash.substring(1), (files, file) => {
-            if (file) {
-                if (!open || hash == null)
-                    return
-                updateFiles(`#${file.parent}`, false);
-                if (file.type && file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
-                    setVideo(file)
-                } else {
-                    location.href = file.src;
-                }
+        service.getFiles(hashPath, (files, path) => {
+            if (files.length == 1 && files[0].open) {
+                let link = service.openFile(files[0], path);
+                openFile(link);
+                loadMainFiles(link.parent);
                 return;
             }
-            if (files.length === 0) {
-                setText('Essa pasta está vazia!');
-                return;
-            }
-            if (open)
-                setVideo(null);
-            setFiles(files)
-        }, errorMessage)
+
+            setMainFiles(files.map(file => {
+                file.href = path ? `#/${path}/${file.name}` : `#/${file.name}`;
+                return file;
+            }));
+        }, (status, message) => {
+            if (status == 401) 
+                return setLogin(true);
+            setText(message);
+        })
     }
 
-    function reloadPage() {
-        setLogin(false)
-        updateTabFiles()
-        updateFiles(location.hash)
+    function openFile(file: FileLinkModel) {
+        if (file.type && file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
+            setOpenendVideo(file);
+        } else {
+            location.href = file.src;
+        }
     }
-
+    
     useEffect(() => {
         window.onhashchange = () => {
-            updateFiles(location.hash)
+            setOpenendVideo(null);
+            loadMainFiles();
         }
-        updateTabFiles()
-        updateFiles(location.hash)
+        loadPage();
     }, [])
 
     return (
@@ -121,10 +121,10 @@ export default function App() {
                 <FilesList files={tabFiles.filter(e => e.is_dir)} />
             </Main>
             <Aside>
-                <FilesBlocks files={files} text={text} />
+                <FilesBlocks files={mainFiles} text={text} />
             </Aside>
-            {video && <VideoPlayer src={video.src} backUrl={`#${video.parent}`} />}
-            {login && <LoginMenu onSuccess={reloadPage} />}
+            {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
+            {login && <LoginMenu onSuccess={loadPage} />}
         </Container>
     )
 }

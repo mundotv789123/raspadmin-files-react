@@ -1,11 +1,13 @@
 import styled from "styled-components"
-import { fileFormat } from "../libs/api";
+import { FileModel } from "../services/models/FilesModel";
 
 const iconsPath = "/img/icons/";
 
-const getFileIcon = (file: fileFormat): string => {
+const getFileIcon = (file: FileModel): string => {
     if (file.is_dir)
         return 'folder.png'
+    if (!file.type)
+        return 'document.png';
     let [type, format] = file.type.toString().split('/');
     switch (type) {
         case 'video':
@@ -66,9 +68,9 @@ const Name = styled.p`
     font-weight: bold;
 `
 
-export default function FileBlock(props: {file: fileFormat, key: number}) {
+export default function FileBlock(props: {file: FileModel, key: number}) {
     return (
-        <FileCont href={props.file.url}>
+        <FileCont href={props.file.href}>
             <FileIcon style={{ backgroundImage: "url('" + (props.file.icon ? props.file.icon : (iconsPath + getFileIcon(props.file))) + "')" }} />
             <Name>{props.file.name}</Name>
         </FileCont>

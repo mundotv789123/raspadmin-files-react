@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { keyframes } from "styled-components";
-import { api } from "../libs/api";
+import { LoginService } from "../services/LoginService";
 
 const LoginCont = styled.div`
     display: flex;
@@ -87,7 +87,9 @@ const Button = styled.button`
     }
 `
 
-export default function LoginMenu(props: any) {
+export default function LoginMenu(props: { onSuccess: (() => void) | null }) {
+    const service = new LoginService();
+
     const [errorText, setErroText] = useState<string>();
 
     function submit(event: any) {
@@ -98,24 +100,9 @@ export default function LoginMenu(props: any) {
             setErroText('Preencha todos os campos');
             return;
         }
-
-        var formData = new URLSearchParams();
-        formData.append("username", username);
-        formData.append("password", password);
-
-        api.post(`/auth/login`, formData, {auth: {username, password}}).then(props.onSuccess).catch((error) => {
-            let data: { message: string };
-            try {
-                data = JSON.parse(error.request.response);
-            } catch {
-                setErroText('Erro interno ao processar requisição')
-                return;
-            }
-            if (data.message) {
-                setErroText(data.message)
-            } else {
-                setErroText('Erro interno ao processar requisição')
-            }
+        
+        service.login(username, password, props.onSuccess, (message) => {
+            setErroText(message);
         })
     }
 
