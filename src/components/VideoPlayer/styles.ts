@@ -115,6 +115,7 @@ export const VideoProgress = styled.div`
     width: 100%;
     padding: 2px 0;
     display: flex;
+    cursor: pointer;
     & .background {
         width: 100%;
         margin: auto 5px;
@@ -170,6 +171,7 @@ export const VideoVolume = styled.div`
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        cursor: pointer;
     }
     & .volume .volume_percent {
         width: 100%;

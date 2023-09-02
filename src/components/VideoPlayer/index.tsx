@@ -124,8 +124,11 @@ export default function VideoPlayer(props) {
         return <></>
     }
 
-    let srcSplited = props.src.split("/")
-    const fileName = decodeURI(srcSplited[srcSplited.length - 1]);
+    /* get file name from url, ex: http://exemple.local/video/cool_video.mp4 ->  cool_video */
+    const fileName = decodeURIComponent(props.src)
+        .replace(/\/+$/, '')
+        .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
+        .replace(/\.[a-zA-Z0-9]+$/, '');
 
     return (
         <VideoCont ref={main_element}>
