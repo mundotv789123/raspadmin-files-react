@@ -32,6 +32,7 @@ export class FilesService {
                     file.icon = `${this.API_URL}/files/open?path=/${encodeURIComponent(file.icon)}`
                 return file;
             });
+            files = files.sort((a: FileModel, b: FileModel) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true }));
             callback(files, path);
         }).catch(error => {
             if (!callbackError)
