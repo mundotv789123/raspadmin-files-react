@@ -6,6 +6,8 @@ import LoginMenu from "../components/LoginMenu"
 import VideoPlayer from "../components/VideoPlayer"
 import { FilesService } from "../services/FilesService";
 import { FileLinkModel, FileModel } from "../services/models/FilesModel";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 const Container = styled.div`
     display: grid;
@@ -26,6 +28,22 @@ const Header = styled.header`
     background: rgba(0, 0, 0, 0.5);
     & .title {
         margin: auto;
+    }
+`
+
+const CollapseButtom = styled.button`
+    display: none;
+    color: white;
+    background-color: transparent;
+    border: none;
+    font-size: 15pt;
+    margin: auto 20px;
+    cursor: pointer;
+    &:hover {
+        color: #dddddd;
+    }
+    @media(max-width:950px) {
+        display: block;
     }
 `
 
@@ -57,6 +75,8 @@ export default function App() {
     const [text, setText] = useState<string>()
 
     const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
+
+    const [barOpen, setBarOpen] = useState(false);
 
     function loadPage() {
         setLogin(false);
@@ -102,6 +122,10 @@ export default function App() {
             location.href = file.src;
         }
     }
+
+    function toggleBar() {
+        setBarOpen(!barOpen);
+    }
     
     useEffect(() => {
         window.onhashchange = () => {
@@ -112,11 +136,12 @@ export default function App() {
     }, [])
 
     return (
-        <Container>
+        <Container style={{gridTemplateColumns: (barOpen ? "220px auto" : null)}}>
             <Header>
                 <h2 className={"title"}><a href={"#"}>RaspAdmin</a></h2>
             </Header>
-            <Nav />
+            
+            <Nav><CollapseButtom onClick={toggleBar}><FontAwesomeIcon icon={faBars} /></CollapseButtom></Nav>
             <Main>
                 <FilesList files={tabFiles.filter(e => e.is_dir)} />
             </Main>
