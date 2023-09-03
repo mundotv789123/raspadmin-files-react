@@ -46,7 +46,10 @@ export const VideoTop = styled.div`
 
 export const VideoTitle = styled.h2`
     text-align: center;
-    margin: 0;
+    margin: 0 60px;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 `
 
 export const VideoCenter = styled.div`
@@ -187,4 +190,9 @@ export const VideoVolume = styled.div`
     & button {
         margin: 0 !important; 
     }
+`
+
+export const Error = styled.h1`
+    margin: auto;
+    color: #ff5b5b;
 `

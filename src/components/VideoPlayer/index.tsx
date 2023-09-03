@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from '@fortawesome/free-solid-svg-icons'
 import { useRef, useState } from "react";
-import { VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoProgressBar, VideoProgressFollower, VideoTitle, VideoTop, VideoVolume } from './styles';
+import { Error, VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoProgressBar, VideoProgressFollower, VideoTitle, VideoTop, VideoVolume } from './styles';
 import VideoService from '../../services/VideoService';
 
 export default function VideoPlayer(props: { src: string | undefined, backUrl: string | undefined }) {
@@ -10,6 +10,7 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
 
     const [loading, setLoading] = useState(true);
     const [playing, setPlaying] = useState(false);
+    const [error, setError] = useState(null);
 
     const main_element = useRef<HTMLDivElement>(null);
     const progress_follower = useRef<HTMLDivElement>(null);
@@ -26,6 +27,7 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
         } else {
             video_element.current.play();
         }
+        setError(false);
         setLoading(false);
     }
 
@@ -50,6 +52,11 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
         let rect = progress_bar.current.getBoundingClientRect();
         let percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
         setProgressFollerPercent(percent);
+    }
+
+    function updateError() {
+        setLoading(false);
+        setError(video_element.current.error.message);
     }
 
     function updateVideoTime(event: any) {
@@ -98,10 +105,20 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
 
     return (
         <VideoCont ref={main_element}>
-            <VideoElement onPlay={togglePauseButton} onPause={togglePauseButton} onTimeUpdate={updateProgress} onCanPlay={() => playVideo()} src={props.src} autoPlay={true} controls={false} ref={video_element}></VideoElement>
+            <VideoElement 
+                onPlay={togglePauseButton} 
+                onPause={togglePauseButton} 
+                onTimeUpdate={updateProgress}
+                onError={() => updateError}
+                onCanPlay={() => playVideo()} 
+                src={props.src} 
+                autoPlay={true} 
+                controls={false} 
+                ref={video_element} 
+            />
             <VideoMain>
                 <VideoTop>
-                    <VideoTitle>{fileName.substring(0, 32) + (fileName.length > 32 ? '...' : '')}</VideoTitle>
+                    <VideoTitle>{fileName}</VideoTitle>
                     <VideoCloseButton
                         style={{
                             display: (props.backUrl ? '' : 'none')
@@ -114,6 +131,7 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
                 </VideoTop>
                 <VideoCenter onClick={togglePauseVideo}>
                     <VideoLoading style={{ display: (loading ? '' : 'none') }} />
+                    {error && <Error>Erro ao carregar vídeo: {error}</Error>}
                 </VideoCenter>
                 <VideoBottom>
                     <VideoButton onClick={togglePauseVideo}>
