@@ -8,7 +8,7 @@ export class LoginService {
     constructor() {
         this.api = axios.create({ 
             baseURL: `${this.API_URL}/auth`,
-            timeout: 1000 
+            timeout: 5000 
         })
     }
 

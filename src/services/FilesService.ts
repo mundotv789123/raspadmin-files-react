@@ -10,7 +10,7 @@ export class FilesService {
     constructor() {
         this.api = axios.create({
             baseURL: `${this.API_URL}`,
-            timeout: 1000
+            timeout: 5000
         })
     }
 
