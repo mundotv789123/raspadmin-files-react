@@ -47,10 +47,13 @@ const FileCont = styled.a`
     overflow: hidden;
     font-weight: 600;
     word-wrap: break-word;
+    transition: 0.5s;
+    border-radius: 5px;
     &:hover {
         background: rgba(255, 255, 255, 0.3);
         overflow: inherit;
         z-index: 1;
+        transition: 0.1s;
     }
 `
 

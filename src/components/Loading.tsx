@@ -22,7 +22,7 @@ const LoadingCont = styled.div`
 
 const LoadingBar = styled.div`
     height: 10px;
-    background-color: #646464;
+    background-color: white;
     animation: ${LoadingAnimation} 1s ease infinite;
 `
 

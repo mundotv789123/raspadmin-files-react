@@ -65,6 +65,19 @@ const Aside = styled.aside`
     background: rgba(9, 9, 9, 0.3);
 `
 
+const PathLink = styled.div`
+    font-size: 11pt;
+    font-weight: bold;
+    margin: auto 25px;
+    color: white;
+    & a {
+        color: white;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+`
+
 export default function App() {
     const service = new FilesService();
 
@@ -77,6 +90,8 @@ export default function App() {
     const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
 
     const [barOpen, setBarOpen] = useState(false);
+
+    const [path, setPath] = useState<string>(null);
 
     function loadPage() {
         setLogin(false);
@@ -104,6 +119,7 @@ export default function App() {
                 return;
             }
 
+            setPath(path);
             setMainFiles(files.map(file => {
                 file.href = path ? `#/${path}/${file.name}` : `#/${file.name}`;
                 return file;
@@ -141,7 +157,19 @@ export default function App() {
                 <h2 className={"title"}><a href={"#"}>RaspAdmin</a></h2>
             </Header>
             
-            <Nav><CollapseButtom onClick={toggleBar}><FontAwesomeIcon icon={faBars} /></CollapseButtom></Nav>
+            <Nav>
+                <CollapseButtom onClick={toggleBar}>
+                    <FontAwesomeIcon icon={faBars} />
+                </CollapseButtom>
+                {path && 
+                <PathLink>
+                    {path.split("/").map((p, i) => {
+                        let link = '';
+                        path.split('/').forEach((l, li) => { if (li <= i) link += `/${l}` });
+                        return (<>/<a href={`#${link}`}>{p}</a></>)
+                    })}
+                </PathLink>}
+            </Nav>
             <Main>
                 <FilesList files={tabFiles.filter(e => e.is_dir)} />
             </Main>

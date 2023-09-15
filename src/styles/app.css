@@ -3,8 +3,7 @@ a {
     text-decoration: none;
 }
 html, body {
-    background: rgb(12, 75, 112);
-    background-image: url('/img/wallpaper.jpg');
+    background: linear-gradient(45deg, rgb(23, 97, 139), rgb(41, 175, 253));
     background-repeat: no-repeat;
     background-size: cover;
     color: white;
