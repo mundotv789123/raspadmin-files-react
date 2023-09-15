@@ -161,14 +161,14 @@ export default function App() {
                 <CollapseButtom onClick={toggleBar}>
                     <FontAwesomeIcon icon={faBars} />
                 </CollapseButtom>
-                {path && 
                 <PathLink>
-                    {path.split("/").map((p, i) => {
+                    /<a href="#/">home</a>
+                    {path && path.split("/").map((p, i) => {
                         let link = '';
                         path.split('/').forEach((l, li) => { if (li <= i) link += `/${l}` });
                         return (<>/<a href={`#${link}`}>{p}</a></>)
                     })}
-                </PathLink>}
+                </PathLink>
             </Nav>
             <Main>
                 <FilesList files={tabFiles.filter(e => e.is_dir)} />
