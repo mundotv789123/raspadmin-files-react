@@ -51,6 +51,7 @@ const Nav = styled.nav`
     grid-area: n;
     display: flex;
     background: rgba(0, 0, 0, 0.5);
+    overflow-x: scroll;
 `
 
 const Main = styled.main`
@@ -72,8 +73,11 @@ const PathLink = styled.div`
     color: white;
     & a {
         color: white;
+        margin: 0 2px;
+        padding: 2px;
+        border-radius: 5px;
         &:hover {
-            text-decoration: underline;
+            background-color: rgba(255, 255, 255, 0.3);
         }
     }
 `
