@@ -1,10 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from '@fortawesome/free-solid-svg-icons'
 import { useRef, useState } from "react";
-import { Error, VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoProgressBar, VideoProgressFollower, VideoTitle, VideoTop, VideoVolume } from './styles';
+import { CenterButtonPlay, Error, VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoProgressBar, VideoProgressFollower, VideoTitle, VideoTop, VideoVolume } from './styles';
 import VideoService from '../../services/VideoService';
 
+var cursorTimeout = 0;
+
 export default function VideoPlayer(props: { src: string | undefined, backUrl: string | undefined }) {
+
     const [progressPercent, setProgressPercent] = useState(0);
     const [progressFollowerPercent, setProgressFollerPercent] = useState(0);
 
@@ -13,6 +16,7 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
     const [error, setError] = useState(null);
 
     const main_element = useRef<HTMLDivElement>(null);
+    const main_video = useRef<HTMLDivElement>(null);
     const progress_follower = useRef<HTMLDivElement>(null);
     const progress_bar = useRef<HTMLDivElement>(null);
     const volume = useRef<HTMLDivElement>(null);
@@ -21,7 +25,33 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
 
     const service = new VideoService();
 
+    function resetCursorTimeout() {
+        if (main_video.current.classList)
+            main_video.current.classList.remove('hide');
+        if (cursorTimeout <= 0)
+            cursorTimeoutExec();
+        cursorTimeout = 3;
+    }
+
+    function cursorTimeoutExec() {
+        setTimeout(() => {
+            cursorTimeout--;
+            if (!main_video.current)
+                return;
+            if (cursorTimeout > 0) {
+                cursorTimeoutExec();
+                return;
+            }
+            if (video_element.current.paused)
+                return;
+            main_video.current.classList.add('hide');
+        }, 1000);
+    }
+
     function togglePauseVideo() {
+        if (loading || error)
+            return;
+        resetCursorTimeout();
         if (playing) {
             video_element.current.pause();
         } else {
@@ -37,9 +67,11 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
 
     function toggleFullScreen() {
         if (!document.fullscreenElement) {
-            main_element.current.requestFullscreen()
+            main_element.current.requestFullscreen();
+            screen.orientation.lock('landscape');
         } else {
-            document.exitFullscreen()
+            document.exitFullscreen();
+            screen.orientation.unlock();
         }
     }
 
@@ -60,6 +92,8 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
     }
 
     function updateVideoTime(event: any) {
+        if (loading || error)
+            return;
         let rect = progress_bar.current.getBoundingClientRect();
         let percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
         video_element.current.currentTime = (video_element.current.duration / 100 * percent);
@@ -97,26 +131,26 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
         return <></>
     }
 
-    /* get file name from url, ex: http://exemple.local/video/cool_video.mp4 ->  cool_video */
+    /* get file name from url, ex: http://exemple.local/video/cool_video.mp4 -> cool_video */
     const fileName = decodeURIComponent(props.src)
         .replace(/\/+$/, '')
         .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
         .replace(/\.[a-zA-Z0-9]+$/, '');
 
     return (
-        <VideoCont ref={main_element}>
-            <VideoElement 
-                onPlay={togglePauseButton} 
-                onPause={togglePauseButton} 
+        <VideoCont ref={main_element} onMouseMove={resetCursorTimeout}>
+            <VideoElement
+                onPlay={togglePauseButton}
+                onPause={togglePauseButton}
                 onTimeUpdate={updateProgress}
-                onError={() => updateError}
-                onCanPlay={() => playVideo()} 
-                src={props.src} 
-                autoPlay={true} 
-                controls={false} 
-                ref={video_element} 
+                onError={updateError}
+                onCanPlay={playVideo}
+                src={props.src}
+                autoPlay={true}
+                controls={false}
+                ref={video_element}
             />
-            <VideoMain>
+            <VideoMain ref={main_video}>
                 <VideoTop>
                     <VideoTitle>{fileName}</VideoTitle>
                     <VideoCloseButton
@@ -129,9 +163,10 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
                         <FontAwesomeIcon icon={faAngleLeft} />
                     </VideoCloseButton>
                 </VideoTop>
-                <VideoCenter onClick={togglePauseVideo}>
-                    <VideoLoading style={{ display: (loading ? '' : 'none') }} />
+                <VideoCenter>
+                    {loading && <VideoLoading />}
                     {error && <Error>Erro ao carregar vídeo: {error}</Error>}
+                    {!loading && <CenterButtonPlay onClick={togglePauseVideo}><FontAwesomeIcon icon={(playing ? faPause : faPlay)} /></CenterButtonPlay>}
                 </VideoCenter>
                 <VideoBottom>
                     <VideoButton onClick={togglePauseVideo}>

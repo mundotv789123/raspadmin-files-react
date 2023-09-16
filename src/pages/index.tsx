@@ -52,6 +52,7 @@ const Nav = styled.nav`
     display: flex;
     background: rgba(0, 0, 0, 0.5);
     overflow-x: scroll;
+    white-space: nowrap;
 `
 
 const Main = styled.main`

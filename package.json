@@ -19,7 +19,7 @@
     "babel-plugin-macros": "^3.1.0",
     "babel-plugin-styled-components": "^2.0.6",
     "cookie": "^0.4.2",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.2",
     "md5": "^2.3.0",
     "mime-types": "^2.1.35",
     "next": "12.2.5",

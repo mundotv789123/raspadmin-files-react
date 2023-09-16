@@ -20,12 +20,7 @@ const Panel = styled.div`
     }
     @media(max-width:680px) {
         & a {
-            width: calc(25% - 10px);
-        }
-    }
-    @media(max-width:380px) {
-        & a {
-            width: calc(30% - 2px);
+            width: calc(50% - 10px);
         }
     }
 `

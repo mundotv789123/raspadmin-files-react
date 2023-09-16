@@ -10,6 +10,11 @@ export const VideoCont = styled.div`
     bottom: 0;
     left: 0;
     right: 0;
+    & .hide {
+        transition: 0.5s;
+        opacity: 0;
+        cursor: none;
+    }
 `
 
 export const VideoElement = styled.video`
@@ -26,15 +31,6 @@ export const VideoMain = styled.div`
     position: absolute;
     display: flex;
     flex-direction: column;
-    transition: 0.5s;
-    opacity: 0;
-    cursor: none;
-    transition-delay: 3s;
-    &:hover {
-        transition-delay: 0s;
-        opacity: 100;
-        cursor: default;
-    }
 `
 
 export const VideoTop = styled.div`
@@ -94,6 +90,24 @@ export const VideoButton = styled.button`
     &:hover {
         color: lightgray;
         transform: translateY(-1px);
+    }
+`
+
+export const CenterButtonPlay = styled.button`
+    font-size: 50px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    margin: auto;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    //box-shadow: 0 3px 5px 0px black;
+    transition: 0.1s;
+    &:hover {
+        font-size: 52px;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 5px 1px black;
     }
 `
 
