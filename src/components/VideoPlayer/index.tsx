@@ -36,13 +36,11 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
     function cursorTimeoutExec() {
         setTimeout(() => {
             cursorTimeout--;
-            if (!main_video.current)
-                return;
             if (cursorTimeout > 0) {
                 cursorTimeoutExec();
                 return;
             }
-            if (video_element.current.paused)
+            if (!main_video.current || video_element.current.paused)
                 return;
             main_video.current.classList.add('hide');
         }, 1000);
@@ -165,8 +163,8 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
                 </VideoTop>
                 <VideoCenter>
                     {loading && <VideoLoading />}
-                    {error && <Error>Erro ao carregar vídeo: {error}</Error>}
-                    {!loading && <CenterButtonPlay onClick={togglePauseVideo}><FontAwesomeIcon icon={(playing ? faPause : faPlay)} /></CenterButtonPlay>}
+                    {error && <Error>Erro ao carregar vídeo</Error>}
+                    {(!loading && !error) && <CenterButtonPlay onClick={togglePauseVideo}><FontAwesomeIcon icon={(playing ? faPause : faPlay)} /></CenterButtonPlay>}
                 </VideoCenter>
                 <VideoBottom>
                     <VideoButton onClick={togglePauseVideo}>
