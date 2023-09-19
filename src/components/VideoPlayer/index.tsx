@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause } from '@fortawesome/free-solid-svg-icons'
+import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause, faForward, faBackward, faRotateRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { useRef, useState } from "react";
-import { CenterButtonPlay, Error, VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoProgressBar, VideoProgressFollower, VideoTitle, VideoTop, VideoVolume } from './styles';
+import { CenterButtons, Error, VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoProgressBar, VideoProgressFollower, VideoTitle, VideoTop, VideoVolume } from './styles';
 import VideoService from '../../services/VideoService';
 
 var cursorTimeout = 0;
@@ -125,6 +125,14 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
         service.startAutoSaving(video_element.current.src, video_element.current);
     }
 
+    function forward() {
+        video_element.current.currentTime+=5;
+    }
+
+    function backward() {
+        video_element.current.currentTime-=5;
+    }
+
     if (props.src == null) {
         return <></>
     }
@@ -164,7 +172,18 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
                 <VideoCenter>
                     {loading && <VideoLoading />}
                     {error && <Error>Erro ao carregar vídeo</Error>}
-                    {(!loading && !error) && <CenterButtonPlay onClick={togglePauseVideo}><FontAwesomeIcon icon={(playing ? faPause : faPlay)} /></CenterButtonPlay>}
+                    {(!loading && !error) && 
+                    <CenterButtons>
+                        <button className='buttonSmall' onClick={backward}>
+                            <FontAwesomeIcon icon={faRotateLeft} />
+                        </button>
+                        <button className='buttonBig' onClick={togglePauseVideo}>
+                            <FontAwesomeIcon icon={(playing ? faPause : faPlay)} />
+                        </button>
+                        <button className='buttonSmall' onClick={forward}>
+                            <FontAwesomeIcon icon={faRotateRight} />
+                        </button>
+                    </CenterButtons>}
                 </VideoCenter>
                 <VideoBottom>
                     <VideoButton onClick={togglePauseVideo}>

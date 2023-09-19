@@ -93,22 +93,38 @@ export const VideoButton = styled.button`
     }
 `
 
-export const CenterButtonPlay = styled.button`
-    font-size: 50px;
-    color: white;
-    background-color: rgba(0, 0, 0, 0.5);
-    border: none;
+export const CenterButtons= styled.div`
     margin: auto;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    //box-shadow: 0 3px 5px 0px black;
-    transition: 0.1s;
-    &:hover {
-        font-size: 52px;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 5px 1px black;
+    display: flex;
+    & button {
+        color: white;
+        background-color: rgba(0, 0, 0, 0.5);
+        border: none;
+        border-radius: 50%;
+        transition: 0.1s;
+        margin: auto 10px;
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px 1px black;
+        }
     }
+    & .buttonBig {
+        font-size: 50px;
+        width: 100px;
+        height: 100px;
+        &:hover {
+            font-size: 52px;
+        }
+    }
+    & .buttonSmall {
+        width: 50px;
+        height: 50px;
+        font-size: 25px;
+        &:hover {
+            font-size: 26px;
+        }
+    }
+    
 `
 
 export const VideoCloseButton = styled.a`
