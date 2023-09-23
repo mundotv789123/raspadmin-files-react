@@ -12,6 +12,7 @@ body {
 
 /* scrollbar */
 * {
+  scrollbar-width: thin;
   scrollbar-width: 4px;
   scrollbar-color: #252525 transparent;
 }
