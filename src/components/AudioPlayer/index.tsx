@@ -14,7 +14,9 @@ export default function AudioPlayer(props: { src: string | undefined }) {
 
     return (
         <AudioContent>
-            <AudioElement controls={true} autoPlay={true} src={props.src}/>
+            <AudioElement>
+                <audio controls={true} autoPlay={true} src={props.src} style={{margin: 'auto', width: '80%'}}/>
+            </AudioElement>
         </AudioContent>
     );
 }
