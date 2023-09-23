@@ -8,6 +8,7 @@ import { FilesService } from "../services/FilesService";
 import { FileLinkModel, FileModel } from "../services/models/FilesModel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+import AudioPlayer from "../components/AudioPlayer";
 
 const Container = styled.div`
     display: grid;
@@ -93,6 +94,7 @@ export default function App() {
     const [text, setText] = useState<string>()
 
     const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
+    const [openedAudio, setOpenendAudio] = useState<FileLinkModel>()
 
     const [barOpen, setBarOpen] = useState(false);
 
@@ -137,11 +139,23 @@ export default function App() {
     }
 
     function openFile(file: FileLinkModel) {
-        if (file.type && file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
-            setOpenendVideo(file);
-        } else {
-            location.href = file.src;
+        closeAllFiles();
+        if (file.type) {
+            if (file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
+                setOpenendVideo(file);
+                return;
+            } 
+            if (file.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)) {
+                setOpenendAudio(file);
+                return;
+            } 
         }
+        location.href = file.src;
+    }
+
+    function closeAllFiles() {
+        setOpenendAudio(null);
+        setOpenendVideo(null);
     }
 
     function toggleBar() {
@@ -182,6 +196,7 @@ export default function App() {
                 <FilesBlocks files={mainFiles} text={text} />
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
+            {openedAudio && <AudioPlayer src={openedAudio.src} />}
             {login && <LoginMenu onSuccess={loadPage} />}
         </Container>
     )
