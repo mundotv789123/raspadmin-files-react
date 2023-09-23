@@ -1,4 +1,4 @@
-import { AudioElement } from "./styles";
+import { AudioContent, AudioElement } from "./styles";
 
 export default function AudioPlayer(props: { src: string | undefined }) {
 
@@ -13,6 +13,8 @@ export default function AudioPlayer(props: { src: string | undefined }) {
         .replace(/\.[a-zA-Z0-9]+$/, '');
 
     return (
-        <AudioElement controls={true} autoPlay={true} src={props.src}/>
+        <AudioContent>
+            <AudioElement controls={true} autoPlay={true} src={props.src}/>
+        </AudioContent>
     );
 }
