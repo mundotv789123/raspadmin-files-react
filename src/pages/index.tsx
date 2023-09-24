@@ -116,14 +116,13 @@ export default function App() {
         });
     }
 
-    function loadMainFiles(hashPath: string = location.hash.substring(1)) {
+    function loadMainFiles(hashPath: string = location.hash.substring(1), callback: Function | null = null) {
         setMainFiles(null);
         setText(null);
         service.getFiles(hashPath, (files, path) => {
             if (files.length == 1 && files[0].open) {
                 let link = service.openFile(files[0], path);
-                loadMainFiles(link.parent);
-                openFile(link);
+                loadMainFiles(link.parent, () => openFile(link));
                 return;
             }
 
@@ -132,6 +131,8 @@ export default function App() {
                 file.href = path ? `#/${path}/${file.name}` : `#/${file.name}`;
                 return file;
             }));
+            if (callback)
+                callback();
         }, (status, message) => {
             if (status == 401) 
                 return setLogin(true);
@@ -147,12 +148,12 @@ export default function App() {
                 return;
             } 
             if (file.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)) {
-                setOpenendAudio(file);
-                setAudioPlaylist(mainFiles ? mainFiles.filter(f => 
+                setAudioPlaylist(mainFiles != null ? mainFiles.filter(f => 
                     f.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)).map(
                         f => service.getFileSrc(`${openedAudio.parent}/${f.name}`)
                     ) 
                 : null)
+                setOpenendAudio(file);
                 return;
             } 
         }
