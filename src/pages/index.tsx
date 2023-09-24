@@ -95,6 +95,7 @@ export default function App() {
 
     const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
     const [openedAudio, setOpenendAudio] = useState<FileLinkModel>()
+    const [audioPlayList, setAudioPlaylist] = useState<Array<string>>();
 
     const [barOpen, setBarOpen] = useState(false);
 
@@ -121,8 +122,8 @@ export default function App() {
         service.getFiles(hashPath, (files, path) => {
             if (files.length == 1 && files[0].open) {
                 let link = service.openFile(files[0], path);
-                openFile(link);
                 loadMainFiles(link.parent);
+                openFile(link);
                 return;
             }
 
@@ -147,6 +148,11 @@ export default function App() {
             } 
             if (file.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)) {
                 setOpenendAudio(file);
+                setAudioPlaylist(mainFiles ? mainFiles.filter(f => 
+                    f.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)).map(
+                        f => service.getFileSrc(`${openedAudio.parent}/${f.name}`)
+                    ) 
+                : null)
                 return;
             } 
         }
@@ -185,7 +191,7 @@ export default function App() {
                     {path && path.split("/").map((p, i) => {
                         let link = '';
                         path.split('/').forEach((l, li) => { if (li <= i) link += `/${l}` });
-                        return (<>/<a href={`#${link}`}>{p}</a></>)
+                        return (<>/<a key={i} href={`#${link}`}>{p}</a></>)
                     })}
                 </PathLink>
             </Nav>
@@ -196,7 +202,7 @@ export default function App() {
                 <FilesBlocks files={mainFiles} text={text} />
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
-            {openedAudio && <AudioPlayer src={openedAudio.src} />}
+            {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
             {login && <LoginMenu onSuccess={loadPage} />}
         </Container>
     )
