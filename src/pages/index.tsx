@@ -155,7 +155,6 @@ export default function App() {
                         f => service.getFileSrc(`${file.parent}/${f.name}`)
                     )
                 : [])
-                console.log(main_files);
                 return;
             } 
         }

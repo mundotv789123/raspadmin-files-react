@@ -19,6 +19,12 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     const audio_progress = useRef<HTMLDivElement>();
     const audio_volume = useRef<HTMLDivElement>();
 
+    /* get file name from url, ex: http://exemple.local/video/cool_song.mp3 -> cool_song */
+    const fileName = decodeURIComponent(src)
+        .replace(/\/+$/, '')
+        .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
+        .replace(/\.[a-zA-Z0-9]+$/, '');
+
     useEffect(() => {
         setSrc(props.src);
     }, [props.src])
@@ -26,8 +32,13 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     function loadPlayer() {
         if (!loading)
             return;
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: fileName,
+        })
+        navigator.mediaSession.setActionHandler('previoustrack', backSong);
+        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
         setLoading(false);
-        setAudioVolume(audio_element.current.volume*100);
+        setAudioVolume(audio_element.current.volume * 100);
         setAudioDuration(calculateTime(audio_element.current.duration));
     }
 
@@ -64,34 +75,30 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     }
 
     function nextSong() {
+        setLoading(true)
         let index = playlist.indexOf(src)
         if (index < 0 || (index + 1) >= playlist.length) {
             setSrc(playlist[0]);
             return;
         }
-        setSrc(playlist[index+1]);
+        setSrc(playlist[index + 1]);
     }
 
     function backSong() {
+        setLoading(true)
         let index = playlist.indexOf(src);
         if (index <= 0) {
             setSrc(playlist[playlist.length - 1]);
             return;
         }
-        setSrc(playlist[index-1]);
+        setSrc(playlist[index - 1]);
     }
 
-    function calculateTime(time: number):string {
+    function calculateTime(time: number): string {
         let secs = time % 60;
         let min = (time - secs) / 60;
         return `${min < 10 ? '0' : ''}${min.toFixed(0)}:${secs < 10 ? '0' : ''}${secs.toFixed(0)}`;
     }
-
-    /* get file name from url, ex: http://exemple.local/video/cool_song.mp3 -> cool_song */
-    const fileName = decodeURIComponent(src)
-     .replace(/\/+$/, '')
-     .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
-     .replace(/\.[a-zA-Z0-9]+$/, '');
 
     return (
         <AudioContent>
@@ -107,11 +114,11 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                         <FontAwesomeIcon icon={faForwardStep} />
                     </ControlButton>
                     <VolumeControl>
-                        <ControlButton style={{display: 'flex'}}>
-                            <FontAwesomeIcon icon={faVolumeUp} style={{fontSize: '16pt'}}/>
+                        <ControlButton style={{ display: 'flex' }}>
+                            <FontAwesomeIcon icon={faVolumeUp} style={{ fontSize: '16pt' }} />
                         </ControlButton>
                         <VolumeProgress onClick={updateAudioVolume} ref={audio_volume}>
-                            <VolumeProgressBar style={{width: `${audioVolume}%`}}/>
+                            <VolumeProgressBar style={{ width: `${audioVolume}%` }} />
                         </VolumeProgress>
                     </VolumeControl>
                     <AudioTitle>
@@ -121,12 +128,12 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                 <AudioDurationContent>
                     <AudioDurationCount>{audioCurrentTime}/{audioDuration}</AudioDurationCount>
                     <AudioProgress onClick={updateAudioTime} ref={audio_progress}>
-                        <AudioProgressBar style={{width: `${progressPercent}%`}}/>
+                        <AudioProgressBar style={{ width: `${progressPercent}%` }} />
                     </AudioProgress>
                 </AudioDurationContent>
-                <audio 
-                    autoPlay={true} 
-                    src={src} 
+                <audio
+                    autoPlay={true}
+                    src={src}
                     onPlay={updatePlaying}
                     onPause={updatePlaying}
                     onCanPlay={loadPlayer}
