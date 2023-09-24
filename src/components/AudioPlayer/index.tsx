@@ -3,7 +3,7 @@ import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, A
 import { faBackwardStep, faForwardStep, faPause, faPlay, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useState } from "react";
 
-export default function AudioPlayer(props: { src: string | undefined, playlist: Array<string> | undefined }) {
+export default function AudioPlayer(props: { src: string, playlist: Array<string> | undefined }) {
     const playlist = props.playlist ?? [];
 
     const [src, setSrc] = useState(props.src);
@@ -12,6 +12,8 @@ export default function AudioPlayer(props: { src: string | undefined, playlist: 
     const [progressPercent, setProgressPercent] = useState(0);
     const [audioVolume, setAudioVolume] = useState(0);
 
+    const [audioDuration, setAudioDuration] = useState('00:00');
+    const [audioCurrentTime, setAudioCurrentTime] = useState('00:00');
 
     const audio_element = useRef<HTMLAudioElement>();
     const audio_progress = useRef<HTMLDivElement>();
@@ -22,6 +24,7 @@ export default function AudioPlayer(props: { src: string | undefined, playlist: 
             return;
         setLoading(false);
         setAudioVolume(audio_element.current.volume*100);
+        setAudioDuration(calculateTime(audio_element.current.duration));
     }
 
     function updatePlaying() {
@@ -39,6 +42,7 @@ export default function AudioPlayer(props: { src: string | undefined, playlist: 
     function updateAudioProgress() {
         let percent = (audio_element.current.currentTime * 100 / audio_element.current.duration);
         setProgressPercent(percent);
+        setAudioCurrentTime(calculateTime(audio_element.current.currentTime));
     }
 
     function updateAudioTime(event: any) {
@@ -73,15 +77,17 @@ export default function AudioPlayer(props: { src: string | undefined, playlist: 
         setSrc(playlist[index-1]);
     }
 
+    function calculateTime(time: number):string {
+        let secs = time % 60;
+        let min = (time - secs) / 60;
+        return `${min < 10 ? '0' : ''}${min.toFixed(0)}:${secs < 10 ? '0' : ''}${secs.toFixed(0)}`;
+    }
+
     /* get file name from url, ex: http://exemple.local/video/cool_song.mp3 -> cool_song */
     const fileName = decodeURIComponent(src)
      .replace(/\/+$/, '')
      .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
      .replace(/\.[a-zA-Z0-9]+$/, '');
-
-    if (props.src == null) {
-        return <></>
-    }
 
     return (
         <AudioContent>
@@ -109,7 +115,7 @@ export default function AudioPlayer(props: { src: string | undefined, playlist: 
                     </AudioTitle>
                 </ControlContent>
                 <AudioDurationContent>
-                    <AudioDurationCount>00:00/00:35</AudioDurationCount>
+                    <AudioDurationCount>{audioCurrentTime}/{audioDuration}</AudioDurationCount>
                     <AudioProgress onClick={updateAudioTime} ref={audio_progress}>
                         <AudioProgressBar style={{width: `${progressPercent}%`}}/>
                     </AudioProgress>
