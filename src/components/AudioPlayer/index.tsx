@@ -1,10 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioProgressBar, AudioTitle, ControlButton, ControlContent, VolumeControl, VolumeProgress, VolumeProgressBar } from "./styles";
 import { faBackwardStep, faForwardStep, faPause, faPlay, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function AudioPlayer(props: { src: string, playlist: Array<string> | undefined }) {
-    const playlist = props.playlist ?? [];
+export default function AudioPlayer(props: { src: string, playlist: Array<string> }) {
+    const playlist = props.playlist;
 
     const [src, setSrc] = useState(props.src);
     const [loading, setLoading] = useState(true);
@@ -18,6 +18,10 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     const audio_element = useRef<HTMLAudioElement>();
     const audio_progress = useRef<HTMLDivElement>();
     const audio_volume = useRef<HTMLDivElement>();
+
+    useEffect(() => {
+        setSrc(props.src);
+    }, [props.src])
 
     function loadPlayer() {
         if (!loading)
@@ -93,13 +97,13 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         <AudioContent>
             <AudioElement>
                 <ControlContent>
-                    <ControlButton onClick={backSong}>
+                    <ControlButton onClick={backSong} disabled={playlist.length <= 0}>
                         <FontAwesomeIcon icon={faBackwardStep} />
                     </ControlButton>
                     <ControlButton onClick={togglePlay}>
                         <FontAwesomeIcon icon={playing ? faPause : faPlay} />
                     </ControlButton>
-                    <ControlButton onClick={nextSong}>
+                    <ControlButton onClick={nextSong} disabled={playlist.length <= 0}>
                         <FontAwesomeIcon icon={faForwardStep} />
                     </ControlButton>
                     <VolumeControl>

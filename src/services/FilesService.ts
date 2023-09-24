@@ -35,6 +35,7 @@ export class FilesService {
             files = files.sort((a: FileModel, b: FileModel) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true }));
             callback(files, path);
         }).catch(error => {
+            console.error(error);
             if (!callbackError)
                 return;
 

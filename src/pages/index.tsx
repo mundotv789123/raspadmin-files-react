@@ -95,7 +95,7 @@ export default function App() {
 
     const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
     const [openedAudio, setOpenendAudio] = useState<FileLinkModel>()
-    const [audioPlayList, setAudioPlaylist] = useState<Array<string>>();
+    const [audioPlayList, setAudioPlaylist] = useState<Array<string>>([]);
 
     const [barOpen, setBarOpen] = useState(false);
 
@@ -116,23 +116,24 @@ export default function App() {
         });
     }
 
-    function loadMainFiles(hashPath: string = location.hash.substring(1), callback: Function | null = null) {
+    function loadMainFiles(hashPath: string = location.hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
         setMainFiles(null);
         setText(null);
         service.getFiles(hashPath, (files, path) => {
             if (files.length == 1 && files[0].open) {
                 let link = service.openFile(files[0], path);
-                loadMainFiles(link.parent, () => openFile(link));
+                loadMainFiles(link.parent, (main_files) => openFile(link, main_files));
                 return;
             }
 
             setPath(path);
-            setMainFiles(files.map(file => {
+            let main_files = files.map(file => {
                 file.href = path ? `#/${path}/${file.name}` : `#/${file.name}`;
                 return file;
-            }));
+            });
+            setMainFiles(main_files);
             if (callback)
-                callback();
+                callback(main_files);
         }, (status, message) => {
             if (status == 401) 
                 return setLogin(true);
@@ -140,7 +141,7 @@ export default function App() {
         })
     }
 
-    function openFile(file: FileLinkModel) {
+    function openFile(file: FileLinkModel, main_files: Array<FileModel>) {
         closeAllFiles();
         if (file.type) {
             if (file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
@@ -148,12 +149,13 @@ export default function App() {
                 return;
             } 
             if (file.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)) {
-                setAudioPlaylist(mainFiles != null ? mainFiles.filter(f => 
-                    f.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)).map(
-                        f => service.getFileSrc(`${openedAudio.parent}/${f.name}`)
-                    ) 
-                : null)
                 setOpenendAudio(file);
+                setAudioPlaylist(main_files ? main_files.filter(f => 
+                    f.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)).map(
+                        f => service.getFileSrc(`${file.parent}/${f.name}`)
+                    )
+                : [])
+                console.log(main_files);
                 return;
             } 
         }
