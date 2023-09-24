@@ -1,8 +1,31 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioProgressBar, AudioTitle, ControlButton, ControlContent, VolumeControl, VolumeProgress, VolumeProgressBar } from "./styles";
-import { faBackwardStep, faForward, faForwardStep, faPause, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { faBackwardStep, faForwardStep, faPause, faPlay, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { useRef, useState } from "react";
 
 export default function AudioPlayer(props: { src: string | undefined }) {
+
+    const [playing, setPlaying] = useState(false);
+    const [progressPercent, setProgressPercent] = useState(0);
+
+    const audio_element = useRef<HTMLAudioElement>();
+
+    function updatePlaying() {
+        setPlaying(!audio_element.current.paused);
+    }
+
+    function togglePlay() {
+        if (playing) {
+            audio_element.current.pause();
+        } else {
+            audio_element.current.play();
+        }
+    }
+
+    function updateAudioProgress() {
+        let percent = (audio_element.current.currentTime * 100 / audio_element.current.duration);
+        setProgressPercent(percent);
+    }
 
     if (props.src == null) {
         return <></>
@@ -19,7 +42,9 @@ export default function AudioPlayer(props: { src: string | undefined }) {
             <AudioElement>
                 <ControlContent>
                     <ControlButton><FontAwesomeIcon icon={faBackwardStep} /></ControlButton>
-                    <ControlButton><FontAwesomeIcon icon={faPause} /></ControlButton>
+                    <ControlButton onClick={togglePlay}>
+                        <FontAwesomeIcon icon={playing ? faPause : faPlay} />
+                    </ControlButton>
                     <ControlButton><FontAwesomeIcon icon={faForwardStep} /></ControlButton>
                     <VolumeControl>
                         <ControlButton style={{display: 'flex'}}>
@@ -36,10 +61,17 @@ export default function AudioPlayer(props: { src: string | undefined }) {
                 <AudioDurationContent>
                     <AudioDurationCount>00:00/00:35</AudioDurationCount>
                     <AudioProgress>
-                        <AudioProgressBar style={{width: '25%'}}/>
+                        <AudioProgressBar style={{width: `${progressPercent}%`}}/>
                     </AudioProgress>
                 </AudioDurationContent>
-                <audio autoPlay={true} src={props.src} style={{margin: 'auto', width: '80%'}}/>
+                <audio 
+                    autoPlay={true} 
+                    src={props.src} 
+                    onPlay={updatePlaying}
+                    onPause={updatePlaying}
+                    onTimeUpdate={updateAudioProgress}
+                    ref={audio_element}
+                />
             </AudioElement>
         </AudioContent>
     );

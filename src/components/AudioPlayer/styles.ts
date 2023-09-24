@@ -12,15 +12,15 @@ export const ShowElement = keyframes`
 
 export const AudioContent = styled.div`
     position: fixed;
-    bottom: 0;
-    right: 0;
+    bottom: 10px;
+    right: 10px;
     width: 580px;
     transition: 200ms;
     animation: ${ShowElement} 200ms linear normal;
     display: flex;
     @media(max-width: 780px) {
-        width: 100vw;
-        animation: none;
+        width: auto;
+        left: 10px;
     }
 `
 
@@ -31,7 +31,6 @@ export const AudioElement = styled.div`
     flex-direction: column;
     height: 90px;
     border-radius: 15px;
-    margin: 10px;
     width: 100%;
 `
 
@@ -46,6 +45,11 @@ export const ControlButton = styled.button`
     background-color: transparent;
     margin: auto 6px;
     font-size: 22pt;
+    transition: 200ms;
+    &:hover {
+        color: #d9d9d9;
+        transform: translateY(-1px);
+    }
 `
 
 export const VolumeControl = styled.div`
@@ -58,18 +62,11 @@ export const VolumeProgress = styled.div`
     width: 75px;
     margin: auto 0;
     border-radius: 5px;
-`
-
-export const VolumeProgressBar = styled.div`
-    background-color: white;;
-    height: 100%;
     display: flex;
-    border-radius: 5px;
     &::after {
         content: "";
         display: block;
-        position: relative;
-        margin: -5px -5px 0 auto;
+        margin: -5px -5px 0 0;
         width: 5px;
         height: 5px;
         background-color: white;
@@ -77,6 +74,13 @@ export const VolumeProgressBar = styled.div`
         border-radius: 50%;
         box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
     }
+`
+
+export const VolumeProgressBar = styled.div`
+    background-color: white;;
+    height: 100%;
+    display: flex;
+    border-radius: 5px;
 `
 
 export const AudioTitle = styled.h3`
@@ -106,18 +110,11 @@ export const AudioProgress = styled.div `
     height: 5px;
     margin: auto 15px;
     border-radius: 5px;
-`
-
-export const AudioProgressBar = styled.div `
-    background-color: white;;
-    height: 100%;
-    display: flex;
-    border-radius: 5px;
     &::after {
         content: "";
         display: block;
         position: relative;
-        margin: -5px -5px 0 auto;
+        margin: -5px -5px 0 0;
         width: 5px;
         height: 5px;
         background-color: white;
@@ -125,4 +122,11 @@ export const AudioProgressBar = styled.div `
         border-radius: 50%;
         box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
     }
+`
+
+export const AudioProgressBar = styled.div `
+    background-color: white;;
+    height: 100%;
+    display: flex;
+    border-radius: 5px;
 `
