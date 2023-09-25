@@ -29,12 +29,13 @@ export class FilesService {
                         file.type = type;
                 }
                 if (file.icon) 
-                    file.icon = `${this.API_URL}/files/open?path=/${encodeURIComponent(file.icon)}`
+                    file.icon = this.getFileSrc(file.icon)
                 return file;
             });
             files = files.sort((a: FileModel, b: FileModel) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true }));
             callback(files, path);
         }).catch(error => {
+            console.error(error);
             if (!callbackError)
                 return;
 
@@ -57,8 +58,12 @@ export class FilesService {
             name: file.name,
             type: file.type,
             parent: parent,
-            src: `${this.API_URL}/files/open?path=/${encodeURIComponent(path)}`
+            src: this.getFileSrc(path)
         }
+    }
+
+    public getFileSrc(path: string): string {
+        return `${this.API_URL}/files/open?path=/${encodeURIComponent(path)}`;
     }
 
     private clearPath(path: string | null): string {
