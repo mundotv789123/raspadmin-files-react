@@ -151,7 +151,7 @@ export default function App() {
             if (file.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)) {
                 setOpenendAudio(file);
                 setAudioPlaylist(main_files ? main_files.filter(f => 
-                    f.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)).map(
+                    f.type?.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)).map(
                         f => service.getFileSrc(`${file.parent}/${f.name}`)
                     )
                 : [])
