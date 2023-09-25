@@ -18,6 +18,7 @@ export const AudioContent = styled.div`
     transition: 200ms;
     animation: ${ShowElement} 200ms linear normal;
     display: flex;
+    z-index: 1;
     @media(max-width: 780px) {
         width: auto;
         left: 10px;
@@ -66,7 +67,7 @@ export const VolumeProgress = styled.div`
     &::after {
         content: "";
         display: block;
-        margin: -5px -5px 0 0;
+        margin: -5px -5px 0 -5px;
         width: 5px;
         height: 5px;
         background-color: white;
@@ -104,7 +105,7 @@ export const AudioDurationCount = styled.p`
     text-align: right; 
 `
 
-export const AudioProgress = styled.div `
+export const AudioProgress = styled.div`
     display: flex;
     background-color: #D9D9D9;
     height: 5px;
@@ -114,7 +115,7 @@ export const AudioProgress = styled.div `
         content: "";
         display: block;
         position: relative;
-        margin: -5px -5px 0 0;
+        margin: -5px -5px 0 -5px;
         width: 5px;
         height: 5px;
         background-color: white;
@@ -124,7 +125,7 @@ export const AudioProgress = styled.div `
     }
 `
 
-export const AudioProgressBar = styled.div `
+export const AudioProgressBar = styled.div`
     background-color: white;;
     height: 100%;
     display: flex;
