@@ -41,9 +41,10 @@ export const ControlContent = styled.div`
 `
 
 export const ControlButton = styled.button`
+    background-color: transparent;
+    cursor: pointer;
     border: none;
     color: white;
-    background-color: transparent;
     margin: auto 6px;
     font-size: 22pt;
     transition: 200ms;
@@ -59,6 +60,7 @@ export const VolumeControl = styled.div`
 
 export const VolumeProgress = styled.div`
     background-color: #D9D9D9;
+    cursor: pointer;
     height: 5px;
     width: 75px;
     margin: auto 0;
@@ -106,8 +108,9 @@ export const AudioDurationCount = styled.p`
 `
 
 export const AudioProgress = styled.div`
-    display: flex;
     background-color: #D9D9D9;
+    cursor: pointer;
+    display: flex;
     height: 5px;
     margin: auto 15px;
     border-radius: 5px;
