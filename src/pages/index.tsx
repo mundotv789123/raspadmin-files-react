@@ -8,6 +8,7 @@ import { FilesService } from "../services/FilesService";
 import { FileLinkModel, FileModel } from "../services/models/FilesModel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+import AudioPlayer from "../components/AudioPlayer";
 
 const Container = styled.div`
     display: grid;
@@ -93,6 +94,8 @@ export default function App() {
     const [text, setText] = useState<string>()
 
     const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
+    const [openedAudio, setOpenendAudio] = useState<FileLinkModel>()
+    const [audioPlayList, setAudioPlaylist] = useState<Array<string>>([]);
 
     const [barOpen, setBarOpen] = useState(false);
 
@@ -113,22 +116,24 @@ export default function App() {
         });
     }
 
-    function loadMainFiles(hashPath: string = location.hash.substring(1)) {
+    function loadMainFiles(hashPath: string = location.hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
         setMainFiles(null);
         setText(null);
         service.getFiles(hashPath, (files, path) => {
             if (files.length == 1 && files[0].open) {
                 let link = service.openFile(files[0], path);
-                openFile(link);
-                loadMainFiles(link.parent);
+                loadMainFiles(link.parent, (main_files) => openFile(link, main_files));
                 return;
             }
 
             setPath(path);
-            setMainFiles(files.map(file => {
+            let main_files = files.map(file => {
                 file.href = path ? `#/${path}/${file.name}` : `#/${file.name}`;
                 return file;
-            }));
+            });
+            setMainFiles(main_files);
+            if (callback)
+                callback(main_files);
         }, (status, message) => {
             if (status == 401) 
                 return setLogin(true);
@@ -136,12 +141,29 @@ export default function App() {
         })
     }
 
-    function openFile(file: FileLinkModel) {
-        if (file.type && file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
-            setOpenendVideo(file);
-        } else {
-            location.href = file.src;
+    function openFile(file: FileLinkModel, main_files: Array<FileModel>) {
+        closeAllFiles();
+        if (file.type) {
+            if (file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
+                setOpenendVideo(file);
+                return;
+            } 
+            if (file.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)) {
+                setOpenendAudio(file);
+                setAudioPlaylist(main_files ? main_files.filter(f => 
+                    f.type?.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)).map(
+                        f => service.getFileSrc(`${file.parent}/${f.name}`)
+                    )
+                : [])
+                return;
+            } 
         }
+        location.href = file.src;
+    }
+
+    function closeAllFiles() {
+        setOpenendAudio(null);
+        setOpenendVideo(null);
     }
 
     function toggleBar() {
@@ -171,7 +193,7 @@ export default function App() {
                     {path && path.split("/").map((p, i) => {
                         let link = '';
                         path.split('/').forEach((l, li) => { if (li <= i) link += `/${l}` });
-                        return (<>/<a href={`#${link}`}>{p}</a></>)
+                        return (<>/<a key={i} href={`#${link}`}>{p}</a></>)
                     })}
                 </PathLink>
             </Nav>
@@ -182,6 +204,7 @@ export default function App() {
                 <FilesBlocks files={mainFiles} text={text} />
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
+            {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
             {login && <LoginMenu onSuccess={loadPage} />}
         </Container>
     )
