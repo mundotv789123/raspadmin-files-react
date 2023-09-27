@@ -37,6 +37,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         })
         navigator.mediaSession.setActionHandler('previoustrack', backSong);
         navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+        audio_element.current.volume = localStorage.getItem('audio_volume') ? Number(localStorage.getItem('audio_volume')) : 0.5;
         setLoading(false);
         setAudioVolume(audio_element.current.volume * 100);
         setAudioDuration(calculateTime(audio_element.current.duration));
@@ -71,6 +72,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         let rect = audio_volume.current.getBoundingClientRect();
         let percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
         audio_element.current.volume = percent / 100;
+        localStorage.setItem('audio_volume', audio_element.current.volume.toString());
         setAudioVolume(percent);
     }
 
