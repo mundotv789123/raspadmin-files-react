@@ -96,8 +96,14 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
     function calculateTime(time: number): string {
         let secs = time % 60;
-        let min = (time - secs) / 60;
-        return `${min < 10 ? '0' : ''}${min.toFixed(0)}:${secs < 10 ? '0' : ''}${secs.toFixed(0)}`;
+        let min = ((time - secs) / 60) % 60;
+        let hours = ((time - secs) / 60) / 60;
+
+        let timer = `${min.toFixed(0).padStart(2, '0')}:${secs.toFixed(0).padStart(2, '0')}`;
+        if (hours >= 1) {
+            timer = `${hours.toFixed(0).padStart(2, '0')}:${timer}`
+        }
+        return timer;
     }
 
     return (
