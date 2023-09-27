@@ -54,6 +54,29 @@ export const ControlButton = styled.button`
     }
 `
 
+export const SpinAnimation = keyframes`
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+`
+
+export const LoadingSpin = styled.div`
+    display: flex;
+    &:before {
+        content: "";
+        width: 15px;
+        height: 15px;
+        margin: auto;
+        border-radius: 50%;
+        border: solid 5px transparent;
+        border-top-color: white; 
+        animation: ${SpinAnimation} 500ms linear infinite;
+    }
+`
+
 export const VolumeControl = styled.div`
     display: flex;
 `

@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioProgressBar, AudioTitle, ControlButton, ControlContent, VolumeControl, VolumeProgress, VolumeProgressBar } from "./styles";
+import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioProgressBar, AudioTitle, ControlButton, ControlContent, LoadingSpin, VolumeControl, VolumeProgress, VolumeProgressBar } from "./styles";
 import { faBackwardStep, faForwardStep, faPause, faPlay, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 
@@ -26,6 +26,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         .replace(/\.[a-zA-Z0-9]+$/, '');
 
     useEffect(() => {
+        setLoading(true);
         setSrc(props.src);
     }, [props.src])
 
@@ -116,7 +117,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                         <FontAwesomeIcon icon={faBackwardStep} />
                     </ControlButton>
                     <ControlButton onClick={togglePlay}>
-                        <FontAwesomeIcon icon={playing ? faPause : faPlay} />
+                        {loading ? <LoadingSpin /> : <FontAwesomeIcon icon={playing ? faPause : faPlay} />}
                     </ControlButton>
                     <ControlButton onClick={nextSong} disabled={playlist.length <= 0}>
                         <FontAwesomeIcon icon={faForwardStep} />
