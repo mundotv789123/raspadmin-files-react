@@ -1,7 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioProgressBar, AudioTitle, ControlButton, ControlContent, LoadingSpin, VolumeControl, VolumeProgress, VolumeProgressBar } from "./styles";
-import { faBackwardStep, faForwardStep, faPause, faPlay, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioProgressBar, AudioTitle, ContentHeader, ControlButton, ControlContent, LoadingSpin, VolumeControl, VolumeProgress, VolumeProgressBar } from "./styles";
+import { faAngleUp, faBackwardStep, faForwardStep, faPause, faPlay, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
+import PlayList from "./PlayList";
 
 export default function AudioPlayer(props: { src: string, playlist: Array<string> }) {
     const playlist = props.playlist;
@@ -14,6 +15,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
     const [audioDuration, setAudioDuration] = useState('00:00');
     const [audioCurrentTime, setAudioCurrentTime] = useState('00:00');
+
+    const [playlistOpened, setPlayerlistOpened] = useState(false);
 
     const audio_element = useRef<HTMLAudioElement>();
     const audio_progress = useRef<HTMLDivElement>();
@@ -111,7 +114,13 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
     return (
         <AudioContent>
+            <PlayList open={playlistOpened}/>
             <AudioElement>
+                <ContentHeader>
+                    <ControlButton style={{height: '16px', display: 'flex', marginLeft: 'auto', padding: '5px'}} onClick={() => {setPlayerlistOpened(!playlistOpened)}}>
+                        <FontAwesomeIcon icon={faAngleUp} style={{ fontSize: '16pt', margin: 'auto'}} />
+                    </ControlButton>
+                </ContentHeader>
                 <ControlContent>
                     <ControlButton onClick={backSong} disabled={playlist.length <= 0}>
                         <FontAwesomeIcon icon={faBackwardStep} />

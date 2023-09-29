@@ -18,6 +18,7 @@ export const AudioContent = styled.div`
     transition: 200ms;
     animation: ${ShowElement} 200ms linear normal;
     display: flex;
+    flex-direction: column;
     z-index: 1;
     @media(max-width: 780px) {
         width: auto;
@@ -35,9 +36,13 @@ export const AudioElement = styled.div`
     width: 100%;
 `
 
+export const ContentHeader = styled.div`
+    display: flex;
+`
+
 export const ControlContent = styled.div`
     display: flex;
-    margin: 15px 0 0 15px;
+    margin: 0 0 0 15px;
 `
 
 export const ControlButton = styled.button`
