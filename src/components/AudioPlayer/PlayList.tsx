@@ -39,7 +39,7 @@ const MusicRow = styled.div`
         background-color: transparent;
         border: none;
         color: white;
-        font-weight: 500;
+        font-weight: 600;
         white-space: nowrap;
         overflow-x: hidden;
         text-overflow: ellipsis;
@@ -74,7 +74,7 @@ export default function PlayList(props: { open: boolean, playlist: Array<string>
             <MusicCol>
                 {props.playlist.map((name, index) =>
                     <MusicRow key={index} onClick={() => playSong(index)}>
-                        <p>{name}</p> 
+                        <p>{index + 1}. {name}</p> 
                         {playing != null && index == playing && <FontAwesomeIcon icon={faVolumeUp} style={{ margin: 'auto 5px auto auto' }} />}
                     </MusicRow>
                 )}
