@@ -10,6 +10,9 @@ Capaz de reproduzir vídeo e músicas
 ### Reprodução de músicas
 ![audio_player](_images/audio_player.png)
 
+### Reprodução de músicas com playlist
+![audio_player](_images/audio_playlist.png)
+
 ### Reprodução de vídeo
 ![video_player](_images/video_player.png)
 
