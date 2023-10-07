@@ -5,39 +5,39 @@ const iconsPath = "/img/icons/";
 
 const getFileIcon = (file: FileModel): string => {
     if (file.is_dir)
-        return 'folder.png'
+        return 'folder.svg'
     if (!file.type)
-        return 'document.png';
+        return 'document.svg';
     let [type, format] = file.type.toString().split('/');
     switch (type) {
         case 'video':
-            return 'video.png';
+            return 'video.svg';
         case 'audio':
-            return 'music.png';
+            return 'music.svg';
         case 'image':
-            return 'image.png';
+            return 'image.svg';
         case "application":
             switch(format) {
                 case 'java-archive':
-                    return 'java.png'
+                    return 'java.svg'
                 case 'x-msdos-program':
-                    return 'exe.png';
+                    return 'exe.svg';
                 case 'x-iso9660-image':
                 case 'octet-stream':
-                    return 'iso.png';
+                    return 'iso.svg';
                 case 'x-msdownload':
                 case 'x-sh':
-                    return 'document.png';
+                    return 'document.svg';
             }
-            return 'compact.png';
+            return 'compact.svg';
         case 'text':
             switch(format) {
                 case 'x-java-source':
-                    return 'java.png'
+                    return 'java.svg'
             }
-            return 'document.png';
+            return 'document.svg';
     }
-    return 'document.png';
+    return 'document.svg';
 }
 
 const FileCont = styled.a`
