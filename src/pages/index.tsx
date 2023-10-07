@@ -9,7 +9,6 @@ import { FileLinkModel, FileModel } from "../services/models/FilesModel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import AudioPlayer from "../components/AudioPlayer";
-import Head from "next/head";
 
 const Container = styled.div`
     display: grid;
