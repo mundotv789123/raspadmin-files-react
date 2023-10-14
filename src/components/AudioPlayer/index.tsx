@@ -95,6 +95,10 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     }
 
     function backSong() {
+        if (audio_element.current.currentTime > 1) {
+            audio_element.current.currentTime = 0;
+            return;
+        }
         setLoading(true)
         let index = playlist.indexOf(src);
         if (index <= 0) {
