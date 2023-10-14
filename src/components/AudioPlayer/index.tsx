@@ -132,7 +132,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                             <FontAwesomeIcon icon={faVolumeUp} style={{ fontSize: '16pt' }} />
                         </ControlButton>
                         <VolumeProgress>
-                            <Range percent={audioVolume} onInput={updateAudioVolume}/>
+                            <Range percent={audioVolume} onInput={updateAudioVolume} live={true}/>
                         </VolumeProgress>
                     </VolumeControl>
                     <AudioTitle>

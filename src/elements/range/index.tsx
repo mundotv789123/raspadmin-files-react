@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Progress, ProgressBar, ProgressFollower, RangeElement } from "./styles";
 
-export default function Range(props: { percent?: number, onInput?: ((percent: number) => boolean), follower?: boolean }) {
+export default function Range(props: { percent?: number, onInput?: ((percent: number) => boolean), follower?: boolean, live?: boolean }) {
 
     const [percent, setPercent] = useState(props.percent ?? 0)
     const [followerPercent, setFollowerPercent] = useState(0)
@@ -33,7 +33,12 @@ export default function Range(props: { percent?: number, onInput?: ((percent: nu
             setFollowerPercent(props.follower && perc);
             return;
         }
-
+        
+        if (props.live) {
+            callEvent(event);
+            return;
+        }
+            
         setFollowerPercent(0);
         setPercent(perc);
     }
@@ -52,7 +57,7 @@ export default function Range(props: { percent?: number, onInput?: ((percent: nu
         <RangeElement 
             onMouseUp={callEvent} 
             onMouseMove={updateProgress}
-            onMouseLeave={() => {setFollowerPercent(0), setKeyPressing(false)}}
+            onMouseLeave={() => {setFollowerPercent(0); setKeyPressing(false)}}
         >
             <Progress ref={progress}>
                 <ProgressBar style={{ width: `${percent}%` }} />
