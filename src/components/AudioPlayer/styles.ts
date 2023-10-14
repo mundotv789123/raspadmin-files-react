@@ -113,5 +113,5 @@ export const AudioDurationCount = styled.p`
 `
 
 export const AudioProgress = styled.div`
-    margin: auto 15px;
+    margin: auto 10px;
 `

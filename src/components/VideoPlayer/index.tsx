@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { CenterButtons, Error, VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoTitle, VideoTop, VideoVolume } from './styles';
 import VideoService from '../../services/VideoService';
 import Range from '../../elements/range';
+import { srcToFileName } from '../../services/helpers/ConverterHelper';
 
 var cursorTimeout = 0;
 
@@ -17,8 +18,6 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
 
     const main_element = useRef<HTMLDivElement>(null);
     const main_video = useRef<HTMLDivElement>(null);
-    const progress_follower = useRef<HTMLDivElement>(null);
-    const progress_bar = useRef<HTMLDivElement>(null);
     const volume = useRef<HTMLDivElement>(null);
     const volume_percent = useRef<HTMLDivElement>(null);
     const video_element = useRef<HTMLVideoElement>(null);
@@ -130,11 +129,7 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
         return <></>
     }
 
-    /* get file name from url, ex: http://exemple.local/video/cool_video.mp4 -> cool_video */
-    const fileName = decodeURIComponent(props.src)
-        .replace(/\/+$/, '')
-        .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
-        .replace(/\.[a-zA-Z0-9]+$/, '');
+    const fileName = srcToFileName(props.src);
 
     return (
         <VideoCont ref={main_element} onMouseMove={resetCursorTimeout}>

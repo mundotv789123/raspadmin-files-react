@@ -4,6 +4,7 @@ import { faAngleUp, faBackwardStep, faForwardStep, faPause, faPlay, faVolumeUp }
 import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
 import Range from "../../elements/range";
+import { numberClockTime, srcToFileName } from "../../services/helpers/ConverterHelper";
 
 export default function AudioPlayer(props: { src: string, playlist: Array<string> }) {
     const playlist = props.playlist;
@@ -26,14 +27,6 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         setSrc(props.src);
     }, [props.src])
 
-    function srcToFileName(src: string): string {
-        return decodeURIComponent(src)
-            .replace(/\/+$/, '')
-            .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
-            .replace(/\.[a-zA-Z0-9]+$/, '');
-    }
-
-    /* get file name from url, ex: http://exemple.local/video/cool_song.mp3 -> cool_song */
     const fileName = srcToFileName(src);
 
     function loadPlayer() {
@@ -47,7 +40,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         audio_element.current.volume = localStorage.getItem('audio_volume') ? Number(localStorage.getItem('audio_volume')) : 0.5;
         setLoading(false);
         setAudioVolume(audio_element.current.volume * 100);
-        setAudioDuration(calculateTime(audio_element.current.duration));
+        setAudioDuration(numberClockTime(audio_element.current.duration));
     }
 
     function updatePlaying() {
@@ -65,7 +58,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     function updateAudioProgress() {
         let percent = (audio_element.current.currentTime * 100 / audio_element.current.duration);
         setProgressPercent(percent);
-        setAudioCurrentTime(calculateTime(audio_element.current.currentTime));
+        setAudioCurrentTime(numberClockTime(audio_element.current.currentTime));
     }
 
     function updateAudioTime(percent: number) {
@@ -103,18 +96,6 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
             return;
         }
         setSrc(playlist[index - 1]);
-    }
-
-    function calculateTime(time: number): string {
-        let secs = time % 60;
-        let min = ((time - secs) / 60) % 60;
-        let hours = ((time - secs) / 60) / 60;
-
-        let timer = `${min.toFixed(0).padStart(2, '0')}:${secs.toFixed(0).padStart(2, '0')}`;
-        if (hours >= 1) {
-            timer = `${hours.toFixed(0).padStart(2, '0')}:${timer}`
-        }
-        return timer;
     }
 
     function updateSongPlaying(index: number) {
