@@ -32,7 +32,11 @@ export class FilesService {
                     file.icon = this.getFileSrc(file.icon)
                 return file;
             });
-            files = files.sort((a: FileModel, b: FileModel) => ("" + a.name).localeCompare(b.name, undefined, { numeric: true }));
+            files = files.sort((a: FileModel, b: FileModel) => {
+                if ( a.is_dir == b.is_dir )
+                    return a.name.localeCompare(b.name, undefined, { numeric: true });
+                return a.is_dir ? -1 : 1;
+            });
             callback(files, path);
         }).catch(error => {
             console.error(error);

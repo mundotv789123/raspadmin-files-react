@@ -146,47 +146,7 @@ export const VideoCloseButton = styled.a`
 
 export const VideoProgress = styled.div`
     width: 100%;
-    padding: 2px 0;
-    display: flex;
-    cursor: pointer;
-    & .background {
-        width: 100%;
-        margin: auto 5px;
-        background: rgb(100,100,100);
-        height: 7px;
-        border-radius: 5px;
-        display: flex;
-    }
-    &:hover .follower {
-        opacity: 100;
-    }
-`
-
-export const VideoProgressBar = styled.div`
-    background-color: white;
-    height: 100%;
-    border-radius: 5px 0 0 5px;
-    display: flex;
-    z-index: 1;
-    &::after {
-        content: "";
-        display: block;
-        border: solid 7px white;
-        top: -3px;
-        margin-right: -5px;
-        margin-left: auto;
-        position: relative;
-        border-radius: 50%;
-    }
-`
-
-export const VideoProgressFollower = styled.div`
-    border-radius: 5px 0px 0px 5px;
-    height: 100%;
-    width: 50%;
-    background-color: gray;
-    display: flex;
-    opacity: 0;
+    margin: auto 0;
 `
 
 export const VideoVolume = styled.div`

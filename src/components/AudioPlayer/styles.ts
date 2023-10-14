@@ -87,31 +87,8 @@ export const VolumeControl = styled.div`
 `
 
 export const VolumeProgress = styled.div`
-    background-color: #D9D9D9;
-    cursor: pointer;
-    height: 5px;
     width: 75px;
     margin: auto 0;
-    border-radius: 5px;
-    display: flex;
-    &::after {
-        content: "";
-        display: block;
-        margin: -5px -5px 0 -5px;
-        width: 5px;
-        height: 5px;
-        background-color: white;
-        border: solid 5px white;
-        border-radius: 50%;
-        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
-    }
-`
-
-export const VolumeProgressBar = styled.div`
-    background-color: white;;
-    height: 100%;
-    display: flex;
-    border-radius: 5px;
 `
 
 export const AudioTitle = styled.h3`
@@ -136,29 +113,5 @@ export const AudioDurationCount = styled.p`
 `
 
 export const AudioProgress = styled.div`
-    background-color: #D9D9D9;
-    cursor: pointer;
-    display: flex;
-    height: 5px;
-    margin: auto 15px;
-    border-radius: 5px;
-    &::after {
-        content: "";
-        display: block;
-        position: relative;
-        margin: -5px -5px 0 -5px;
-        width: 5px;
-        height: 5px;
-        background-color: white;
-        border: solid 5px white;
-        border-radius: 50%;
-        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
-    }
-`
-
-export const AudioProgressBar = styled.div`
-    background-color: white;;
-    height: 100%;
-    display: flex;
-    border-radius: 5px;
+    margin: auto 10px;
 `

@@ -1,8 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioProgressBar, AudioTitle, ContentHeader, ControlButton, ControlContent, LoadingSpin, VolumeControl, VolumeProgress, VolumeProgressBar } from "./styles";
+import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
 import { faAngleUp, faBackwardStep, faForwardStep, faPause, faPlay, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
+import Range from "../../elements/range";
+import { numberClockTime, srcToFileName } from "../../services/helpers/ConverterHelper";
 
 export default function AudioPlayer(props: { src: string, playlist: Array<string> }) {
     const playlist = props.playlist;
@@ -19,22 +21,12 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     const [playlistOpened, setPlayerlistOpened] = useState(false);
 
     const audio_element = useRef<HTMLAudioElement>();
-    const audio_progress = useRef<HTMLDivElement>();
-    const audio_volume = useRef<HTMLDivElement>();
 
     useEffect(() => {
         setLoading(true);
         setSrc(props.src);
     }, [props.src])
 
-    function srcToFileName(src: string): string {
-        return decodeURIComponent(src)
-            .replace(/\/+$/, '')
-            .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
-            .replace(/\.[a-zA-Z0-9]+$/, '');
-    }
-
-    /* get file name from url, ex: http://exemple.local/video/cool_song.mp3 -> cool_song */
     const fileName = srcToFileName(src);
 
     function loadPlayer() {
@@ -48,7 +40,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         audio_element.current.volume = localStorage.getItem('audio_volume') ? Number(localStorage.getItem('audio_volume')) : 0.5;
         setLoading(false);
         setAudioVolume(audio_element.current.volume * 100);
-        setAudioDuration(calculateTime(audio_element.current.duration));
+        setAudioDuration(numberClockTime(audio_element.current.duration));
     }
 
     function updatePlaying() {
@@ -66,22 +58,20 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     function updateAudioProgress() {
         let percent = (audio_element.current.currentTime * 100 / audio_element.current.duration);
         setProgressPercent(percent);
-        setAudioCurrentTime(calculateTime(audio_element.current.currentTime));
+        setAudioCurrentTime(numberClockTime(audio_element.current.currentTime));
     }
 
-    function updateAudioTime(event: any) {
-        let rect = audio_progress.current.getBoundingClientRect();
-        let percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
+    function updateAudioTime(percent: number) {
         audio_element.current.currentTime = (audio_element.current.duration / 100 * percent);
         setProgressPercent(percent);
+        return true;
     }
 
-    function updateAudioVolume(event: any) {
-        let rect = audio_volume.current.getBoundingClientRect();
-        let percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
+    function updateAudioVolume(percent: any) {
         audio_element.current.volume = percent / 100;
         localStorage.setItem('audio_volume', audio_element.current.volume.toString());
         setAudioVolume(percent);
+        return true;
     }
 
     function nextSong() {
@@ -95,6 +85,10 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     }
 
     function backSong() {
+        if (audio_element.current.currentTime > 1) {
+            audio_element.current.currentTime = 0;
+            return;
+        }
         setLoading(true)
         let index = playlist.indexOf(src);
         if (index <= 0) {
@@ -102,18 +96,6 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
             return;
         }
         setSrc(playlist[index - 1]);
-    }
-
-    function calculateTime(time: number): string {
-        let secs = time % 60;
-        let min = ((time - secs) / 60) % 60;
-        let hours = ((time - secs) / 60) / 60;
-
-        let timer = `${min.toFixed(0).padStart(2, '0')}:${secs.toFixed(0).padStart(2, '0')}`;
-        if (hours >= 1) {
-            timer = `${hours.toFixed(0).padStart(2, '0')}:${timer}`
-        }
-        return timer;
     }
 
     function updateSongPlaying(index: number) {
@@ -149,8 +131,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                         <ControlButton style={{ display: 'flex' }}>
                             <FontAwesomeIcon icon={faVolumeUp} style={{ fontSize: '16pt' }} />
                         </ControlButton>
-                        <VolumeProgress onClick={updateAudioVolume} ref={audio_volume}>
-                            <VolumeProgressBar style={{ width: `${audioVolume}%` }} />
+                        <VolumeProgress>
+                            <Range percent={audioVolume} onInput={updateAudioVolume} live={true}/>
                         </VolumeProgress>
                     </VolumeControl>
                     <AudioTitle>
@@ -159,8 +141,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                 </ControlContent>
                 <AudioDurationContent>
                     <AudioDurationCount>{audioCurrentTime}/{audioDuration}</AudioDurationCount>
-                    <AudioProgress onClick={updateAudioTime} ref={audio_progress}>
-                        <AudioProgressBar style={{ width: `${progressPercent}%` }} />
+                    <AudioProgress>
+                        <Range percent={progressPercent} follower={true} onInput={updateAudioTime}/>
                     </AudioProgress>
                 </AudioDurationContent>
                 <audio

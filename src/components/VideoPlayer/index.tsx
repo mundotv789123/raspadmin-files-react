@@ -1,15 +1,16 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause, faForward, faBackward, faRotateRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause, faRotateRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { useRef, useState } from "react";
-import { CenterButtons, Error, VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoProgressBar, VideoProgressFollower, VideoTitle, VideoTop, VideoVolume } from './styles';
+import { CenterButtons, Error, VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoTitle, VideoTop, VideoVolume } from './styles';
 import VideoService from '../../services/VideoService';
+import Range from '../../elements/range';
+import { srcToFileName } from '../../services/helpers/ConverterHelper';
 
 var cursorTimeout = 0;
 
 export default function VideoPlayer(props: { src: string | undefined, backUrl: string | undefined }) {
 
     const [progressPercent, setProgressPercent] = useState(0);
-    const [progressFollowerPercent, setProgressFollerPercent] = useState(0);
 
     const [loading, setLoading] = useState(true);
     const [playing, setPlaying] = useState(false);
@@ -17,8 +18,6 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
 
     const main_element = useRef<HTMLDivElement>(null);
     const main_video = useRef<HTMLDivElement>(null);
-    const progress_follower = useRef<HTMLDivElement>(null);
-    const progress_bar = useRef<HTMLDivElement>(null);
     const volume = useRef<HTMLDivElement>(null);
     const volume_percent = useRef<HTMLDivElement>(null);
     const video_element = useRef<HTMLVideoElement>(null);
@@ -78,24 +77,17 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
         setProgressPercent(percent);
     }
 
-    function updateProgressFollower(event: any) {
-        let rect = progress_bar.current.getBoundingClientRect();
-        let percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
-        setProgressFollerPercent(percent);
-    }
-
     function updateError() {
         setLoading(false);
         setError(video_element.current.error.message);
     }
 
-    function updateVideoTime(event: any) {
+    function updateVideoTime(percent: number) {
         if (loading || error)
-            return;
-        let rect = progress_bar.current.getBoundingClientRect();
-        let percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
+            return false;
         video_element.current.currentTime = (video_element.current.duration / 100 * percent);
         setProgressPercent(percent);
+        return true;
     }
 
     function updateVolume(event: any) {
@@ -137,11 +129,7 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
         return <></>
     }
 
-    /* get file name from url, ex: http://exemple.local/video/cool_video.mp4 -> cool_video */
-    const fileName = decodeURIComponent(props.src)
-        .replace(/\/+$/, '')
-        .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
-        .replace(/\.[a-zA-Z0-9]+$/, '');
+    const fileName = srcToFileName(props.src);
 
     return (
         <VideoCont ref={main_element} onMouseMove={resetCursorTimeout}>
@@ -189,21 +177,8 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
                     <VideoButton onClick={togglePauseVideo}>
                         <FontAwesomeIcon icon={(playing ? faPause : faPlay)} />
                     </VideoButton>
-                    <VideoProgress
-                        onClick={updateVideoTime}
-                        onMouseMove={updateProgressFollower}
-                        ref={progress_bar}
-                    >
-                        <div className='background'>
-                            <VideoProgressBar style={{ width: `${progressPercent}%` }} />
-                            <VideoProgressFollower
-                                className='follower' style={{
-                                    marginLeft: `-${progressPercent}%`,
-                                    width: `${progressFollowerPercent}%`
-                                }}
-                                ref={progress_follower}
-                            />
-                        </div>
+                    <VideoProgress>
+                        <Range percent={progressPercent} onInput={updateVideoTime} follower={true}/>
                     </VideoProgress>
                     <VideoVolume>
                         <div className="volume" ref={volume} onClick={updateVolume}>
