@@ -50,10 +50,9 @@ export default function Range(props: { percent?: number, onInput?: ((percent: nu
 
     return (
         <RangeElement 
-            onMouseDown={() => setKeyPressing(true)} 
             onMouseUp={callEvent} 
             onMouseMove={updateProgress}
-            onMouseLeave={() => setFollowerPercent(0)}
+            onMouseLeave={() => {setFollowerPercent(0), setKeyPressing(false)}}
         >
             <Progress ref={progress}>
                 <ProgressBar style={{ width: `${percent}%` }} />

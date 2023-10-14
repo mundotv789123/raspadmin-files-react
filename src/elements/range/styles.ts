@@ -2,6 +2,7 @@ import styled from "styled-components"
 
 export const RangeElement = styled.div`
     cursor: pointer;
+    user-select: none;
     display: flex;
     flex-direction: column;
 `
