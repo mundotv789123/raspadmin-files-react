@@ -25,11 +25,16 @@ export default function Range(props: { percent?: number, onInput?: ((percent: nu
     }
 
     function updateProgress(event: any) {
+        console.log(event)
+        let kp = event.buttons == 1; 
+        setKeyPressing(kp);
+
         let perc = getCursorPercent(event);
-        if (!keyPressing) {
+        if (!kp) {
             setFollowerPercent(props.follower && perc);
             return;
         }
+        
         setFollowerPercent(0);
         setPercent(perc);
     }

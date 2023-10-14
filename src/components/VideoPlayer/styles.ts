@@ -146,7 +146,7 @@ export const VideoCloseButton = styled.a`
 
 export const VideoProgress = styled.div`
     width: 100%;
-    margin: 0 auto;
+    margin: auto 0;
 `
 
 export const VideoVolume = styled.div`
