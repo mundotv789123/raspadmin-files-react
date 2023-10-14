@@ -10,7 +10,6 @@ var cursorTimeout = 0;
 export default function VideoPlayer(props: { src: string | undefined, backUrl: string | undefined }) {
 
     const [progressPercent, setProgressPercent] = useState(0);
-    const [progressFollowerPercent, setProgressFollerPercent] = useState(0);
 
     const [loading, setLoading] = useState(true);
     const [playing, setPlaying] = useState(false);
@@ -77,12 +76,6 @@ export default function VideoPlayer(props: { src: string | undefined, backUrl: s
     function updateProgress() {
         let percent = (video_element.current.currentTime * 100 / video_element.current.duration);
         setProgressPercent(percent);
-    }
-
-    function updateProgressFollower(event: any) {
-        let rect = progress_bar.current.getBoundingClientRect();
-        let percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
-        setProgressFollerPercent(percent);
     }
 
     function updateError() {
