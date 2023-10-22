@@ -9,6 +9,8 @@ import { FileLinkModel, FileModel } from "../services/models/FilesModel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import AudioPlayer from "../components/AudioPlayer";
+import { isAudio, isImage, isVideo } from "../services/helpers/FileTypeHelper";
+import ImageViewer from "../components/ImageViewer";
 
 const Container = styled.div`
     display: grid;
@@ -95,6 +97,7 @@ export default function App() {
 
     const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
     const [openedAudio, setOpenendAudio] = useState<FileLinkModel>()
+    const [openedImage, setOpenendImage] = useState<FileLinkModel>()
     const [audioPlayList, setAudioPlaylist] = useState<Array<string>>([]);
 
     const [barOpen, setBarOpen] = useState(false);
@@ -144,19 +147,23 @@ export default function App() {
     function openFile(file: FileLinkModel, main_files: Array<FileModel>) {
         closeAllFiles();
         if (file.type) {
-            if (file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
+            if (isVideo(file.type)) {
                 setOpenendVideo(file);
                 return;
-            } 
-            if (file.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)) {
+            }
+            if (isAudio(file.type)) {
                 setOpenendAudio(file);
-                setAudioPlaylist(main_files ? main_files.filter(f => 
-                    f.type?.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)).map(
+                setAudioPlaylist(main_files ? main_files.filter(f => f.type && isAudio(f.type))
+                    .map(
                         f => service.getFileSrc(`${file.parent}/${f.name}`)
                     )
-                : [])
+                : []);
                 return;
-            } 
+            }
+            if (isImage(file.type)) {
+                setOpenendImage(file);
+                return;
+            }
         }
         location.href = file.src;
     }
@@ -164,6 +171,7 @@ export default function App() {
     function closeAllFiles() {
         setOpenendAudio(null);
         setOpenendVideo(null);
+        setOpenendImage(null);
     }
 
     function toggleBar() {
@@ -205,6 +213,7 @@ export default function App() {
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
             {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
+            {openedImage && <ImageViewer src={openedImage.src}/>}
             {login && <LoginMenu onSuccess={loadPage} />}
         </Container>
     )
