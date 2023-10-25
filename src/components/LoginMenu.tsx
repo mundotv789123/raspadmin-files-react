@@ -64,7 +64,6 @@ const ErrorArea = styled.div`
     width: 220px;
     border-radius: 5px;
     padding: 3px;
-    transition: 0.5s;
     & p {
         font-size: 10pt;
     }
@@ -80,11 +79,46 @@ const Button = styled.button`
     &:focus {
         outline: none;
     }
-    &:hover {
+    &:hover:not(:disabled) {
         background: rgb(80, 80, 80);
     }
-    &:active {
+    &:active:not(:disabled) {
         border: solid 1px white;
+    }
+    &:disabled {
+        color: gray;
+        cursor: not-allowed;
+    }
+`
+
+const LoadingAnimation = keyframes`
+    0% {
+        margin-left: 0;
+        width: 0%;
+    }
+    50% {
+        margin-left: 0;
+        width: 100%;
+    }
+    51% {
+        margin-left: auto;
+    }
+    100% {
+        margin-left: auto;
+        width: 0;
+    }
+`
+
+const Loading = styled.div`
+    height: 2px;
+    display: flex;
+    &::before {
+        content: "";
+        display: block;
+        background-color: white;
+        width: 0%;
+        height: 100%;
+        animation: ${LoadingAnimation} 1s infinite;
     }
 `
 
@@ -92,6 +126,7 @@ export default function LoginMenu(props: { onSuccess: (() => void) | null }) {
     const service = new LoginService();
 
     const [errorText, setErroText] = useState<string>();
+    const [loading, setLoding] = useState(false);
 
     function submit(event: any) {
         event.preventDefault();
@@ -102,7 +137,9 @@ export default function LoginMenu(props: { onSuccess: (() => void) | null }) {
             return;
         }
         
+        setLoding(true);
         service.login(username, password, props.onSuccess, (message) => {
+            setLoding(false);
             setErroText(message);
         })
     }
@@ -113,8 +150,9 @@ export default function LoginMenu(props: { onSuccess: (() => void) | null }) {
                 <Title>Login</Title>
                 <Input placeholder={"Username"} id={'username'} required />
                 <Input placeholder={"Password"} id={'password'} type={'password'} required />
-                {errorText && <ErrorArea><p>{errorText}</p></ErrorArea>}
-                <Button>Login</Button>
+                {errorText && !loading && <ErrorArea><p>{errorText}</p></ErrorArea>}
+                {loading && <Loading />}
+                <Button disabled={loading}>Login</Button>
             </LoginForm>
         </LoginCont>
     )
