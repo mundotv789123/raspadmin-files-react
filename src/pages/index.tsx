@@ -214,7 +214,7 @@ export default function App() {
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
             {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
-            {openedImage && <ImageViewer src={openedImage.src}/>}
+            {openedImage && <ImageViewer src={openedImage.src} backUrl={`#${openedImage.parent}`}/>}
             {login && <LoginMenu onSuccess={loadPage} />}
         </Container>
     )
