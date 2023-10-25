@@ -7,12 +7,12 @@ export const ImagemContainer = styled.div`
     top: 0;
     left: 0;
     right: 0;
+    text-align: center;
     background-color: rgba(0, 0, 0, 0.5);
 `
 
 export const Img = styled.img`
     max-width: 100%;
-    max-height: 100%;
-    margin: 0 auto;
+    max-height: 100vh;
     background-color: gray;
 `

@@ -181,6 +181,7 @@ export default function App() {
     useEffect(() => {
         window.onhashchange = () => {
             setOpenendVideo(null);
+            setOpenendImage(null);
             loadMainFiles();
         }
         loadPage();
