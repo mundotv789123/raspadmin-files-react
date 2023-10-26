@@ -20,7 +20,7 @@ const Container = styled.div`
     height: 100vh;
     transition: grid-template-columns .2s;
     @media(max-width:950px) {
-        grid-template-columns:0 auto
+        grid-template-columns: 0 auto;
     }
 `
 
@@ -89,16 +89,19 @@ const PathLink = styled.div`
 export default function App() {
     const service = new FilesService();
 
-    const [tabFiles, setTabFiles] = useState<FileModel[]>([])
-    const [mainFiles, setMainFiles] = useState<FileModel[] | null>(null)
+    const [tabFiles, setTabFiles] = useState<FileModel[]>([]);
+    const [mainFiles, setMainFiles] = useState<FileModel[] | null>(null);
 
-    const [login, setLogin] = useState<boolean>(false)
-    const [text, setText] = useState<string>()
+    const [login, setLogin] = useState<boolean>(false);
+    const [text, setText] = useState<string>();
 
-    const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
-    const [openedAudio, setOpenendAudio] = useState<FileLinkModel>()
-    const [openedImage, setOpenendImage] = useState<FileLinkModel>()
+    const [openedVideo, setOpenendVideo] = useState<FileLinkModel>();
+    
+    const [openedAudio, setOpenendAudio] = useState<FileLinkModel>();
     const [audioPlayList, setAudioPlaylist] = useState<Array<string>>([]);
+
+    const [openedImage, setOpenendImage] = useState<FileLinkModel>();
+    const [imagesList, setImagesList] = useState<Array<string>>([]);
 
     const [barOpen, setBarOpen] = useState(false);
 
@@ -162,6 +165,7 @@ export default function App() {
             }
             if (isImage(file.type)) {
                 setOpenendImage(file);
+                setImagesList(main_files ? main_files.filter(f => f.type && isImage(f.type)).map(f => f.href) : []);
                 return;
             }
         }
@@ -178,6 +182,26 @@ export default function App() {
         setBarOpen(!barOpen);
     }
     
+    function getNextImage() {
+        let hashPath = location.hash;
+        if (!hashPath || !openedImage  || !imagesList)
+            return null;
+        let index = imagesList.indexOf(hashPath);
+        if (index <= (imagesList.length - 1))
+            return imagesList[index+1];
+        return null;
+    }
+
+    function getBackImage() {
+        let hashPath = location.hash;
+        if (!hashPath || !openedImage || imagesList.length == 0)
+            return null;
+        let index = imagesList.indexOf(hashPath);
+        if (index > 0)
+            return imagesList[index-1];
+        return null;
+    }
+
     useEffect(() => {
         window.onhashchange = () => {
             setOpenendVideo(null);
@@ -214,7 +238,12 @@ export default function App() {
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
             {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
-            {openedImage && <ImageViewer src={openedImage.src} backUrl={`#${openedImage.parent}`}/>}
+            {openedImage && <ImageViewer 
+                src={openedImage.src} 
+                closeUrl={`#${openedImage.parent}`}
+                nextUrl={getNextImage()}
+                backUrl={getBackImage()}
+            />}
             {login && <LoginMenu onSuccess={loadPage} />}
         </Container>
     )
