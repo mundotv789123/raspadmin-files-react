@@ -9,6 +9,8 @@ import { FileLinkModel, FileModel } from "../services/models/FilesModel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import AudioPlayer from "../components/AudioPlayer";
+import { isAudio, isImage, isVideo } from "../services/helpers/FileTypeHelper";
+import ImageViewer from "../components/ImageViewer";
 
 const Container = styled.div`
     display: grid;
@@ -18,7 +20,7 @@ const Container = styled.div`
     height: 100vh;
     transition: grid-template-columns .2s;
     @media(max-width:950px) {
-        grid-template-columns:0 auto
+        grid-template-columns: 0 auto;
     }
 `
 
@@ -87,15 +89,19 @@ const PathLink = styled.div`
 export default function App() {
     const service = new FilesService();
 
-    const [tabFiles, setTabFiles] = useState<FileModel[]>([])
-    const [mainFiles, setMainFiles] = useState<FileModel[] | null>(null)
+    const [tabFiles, setTabFiles] = useState<FileModel[]>([]);
+    const [mainFiles, setMainFiles] = useState<FileModel[] | null>(null);
 
-    const [login, setLogin] = useState<boolean>(false)
-    const [text, setText] = useState<string>()
+    const [login, setLogin] = useState<boolean>(false);
+    const [text, setText] = useState<string>();
 
-    const [openedVideo, setOpenendVideo] = useState<FileLinkModel>()
-    const [openedAudio, setOpenendAudio] = useState<FileLinkModel>()
+    const [openedVideo, setOpenendVideo] = useState<FileLinkModel>();
+    
+    const [openedAudio, setOpenendAudio] = useState<FileLinkModel>();
     const [audioPlayList, setAudioPlaylist] = useState<Array<string>>([]);
+
+    const [openedImage, setOpenendImage] = useState<FileLinkModel>();
+    const [imagesList, setImagesList] = useState<Array<string>>([]);
 
     const [barOpen, setBarOpen] = useState(false);
 
@@ -144,19 +150,24 @@ export default function App() {
     function openFile(file: FileLinkModel, main_files: Array<FileModel>) {
         closeAllFiles();
         if (file.type) {
-            if (file.type.match(/video\/(mp4|webm|ogg|mkv)/)) {
+            if (isVideo(file.type)) {
                 setOpenendVideo(file);
                 return;
-            } 
-            if (file.type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)) {
+            }
+            if (isAudio(file.type)) {
                 setOpenendAudio(file);
-                setAudioPlaylist(main_files ? main_files.filter(f => 
-                    f.type?.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/)).map(
+                setAudioPlaylist(main_files ? main_files.filter(f => f.type && isAudio(f.type))
+                    .map(
                         f => service.getFileSrc(`${file.parent}/${f.name}`)
                     )
-                : [])
+                : []);
                 return;
-            } 
+            }
+            if (isImage(file.type)) {
+                setOpenendImage(file);
+                setImagesList(main_files ? main_files.filter(f => f.type && isImage(f.type)).map(f => f.href) : []);
+                return;
+            }
         }
         location.href = file.src;
     }
@@ -164,15 +175,37 @@ export default function App() {
     function closeAllFiles() {
         setOpenendAudio(null);
         setOpenendVideo(null);
+        setOpenendImage(null);
     }
 
     function toggleBar() {
         setBarOpen(!barOpen);
     }
     
+    function getNextImage() {
+        let hashPath = location.hash;
+        if (!hashPath || !openedImage  || !imagesList)
+            return null;
+        let index = imagesList.indexOf(hashPath);
+        if (index <= (imagesList.length - 1))
+            return imagesList[index+1];
+        return null;
+    }
+
+    function getBackImage() {
+        let hashPath = location.hash;
+        if (!hashPath || !openedImage || imagesList.length == 0)
+            return null;
+        let index = imagesList.indexOf(hashPath);
+        if (index > 0)
+            return imagesList[index-1];
+        return null;
+    }
+
     useEffect(() => {
         window.onhashchange = () => {
             setOpenendVideo(null);
+            setOpenendImage(null);
             loadMainFiles();
         }
         loadPage();
@@ -205,6 +238,12 @@ export default function App() {
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
             {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
+            {openedImage && <ImageViewer 
+                src={openedImage.src} 
+                closeUrl={`#${openedImage.parent}`}
+                nextUrl={getNextImage()}
+                backUrl={getBackImage()}
+            />}
             {login && <LoginMenu onSuccess={loadPage} />}
         </Container>
     )
