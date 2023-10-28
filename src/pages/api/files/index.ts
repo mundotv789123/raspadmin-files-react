@@ -32,8 +32,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                     fileModel.icon = `${path}/${file}/${icon}`
             }
             return fileModel;
-        }
-    );
+        });
     } else {
         let file_name = url_path.split(/\/([^\/])^/)[0]
         files_rest.push(statsToFile(file, file_name, true));
@@ -54,12 +53,10 @@ function statsToFile(file: fs.Stats, name: string, open: boolean = false): FileM
 }
 
 function getFileIcon(url_path: string):string | null {
-    if (fs.existsSync(url_path + '/_icon.png')) {
-        return '_icon.png';
-    } else if (fs.existsSync(url_path + '/_icon.jpg')) {
-        return '_icon.jpg';
-    } else if (fs.existsSync(url_path + '/_icon.jpeg')) {
-        return '_icon.jpeg';
+    let files = fs.readdirSync(url_path);
+    for(let file of files) {
+        if (file.match(/^_icon\.(png|jpe?g|svg|webp)$/))
+            return file;
     }
     return null;
 }

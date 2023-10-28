@@ -3,6 +3,8 @@ import * as jwt from 'jsonwebtoken';
 import md5 from "md5";
 import { NextApiRequest, NextApiResponse } from "next";
 
+const COOKIE_NAME = "token";
+
 export function verifyToken(cookies: string | null): boolean {
     if (!process.env.API_AUTH_KEY || process.env.API_AUTH_KEY === '') {
         return true;
@@ -10,7 +12,7 @@ export function verifyToken(cookies: string | null): boolean {
 
     if (!cookies)
         return false;
-    let token = cookie.parse(cookies).AUTH_TOKEN;
+    let token = cookie.parse(cookies)[COOKIE_NAME];
     if (!token)
         return false;
 
@@ -29,7 +31,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             return;
         }
         let token = jwt.sign({ name: process.env.API_USERNAME, password: md5(process.env.API_PASSWORD) }, process.env.API_AUTH_KEY, { expiresIn: '1d' });
-        res.setHeader('Set-Cookie', cookie.serialize('AUTH_TOKEN', token, { httpOnly: true, path: "/" }))
+        res.setHeader('Set-Cookie', cookie.serialize(COOKIE_NAME, token, { httpOnly: true, path: "/" }))
     }
     res.status(200).json({ message: 'Success' });
 }
