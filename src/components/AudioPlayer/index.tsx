@@ -29,6 +29,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
     useEffect(() => {
         setLoading(true);
+        setRandomPlaylist(null);
         setSrc(props.src);
     }, [props.src])
 
