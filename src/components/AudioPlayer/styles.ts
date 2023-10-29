@@ -53,6 +53,8 @@ export const ControlButton = styled.button`
     margin: auto 6px;
     font-size: 22pt;
     transition: 200ms;
+    width: 22px;
+    min-width: 22px;
     &:hover {
         color: #d9d9d9;
         transform: translateY(-1px);
