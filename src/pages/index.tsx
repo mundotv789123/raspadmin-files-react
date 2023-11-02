@@ -214,7 +214,7 @@ export default function App() {
     return (
         <Container style={{gridTemplateColumns: (barOpen ? "220px auto" : null)}}>
             <Header>
-                <h2 className={"title"}><a href={"#"}>RaspAdmin</a></h2>
+                <h2 className={"title"}><a href={"#"}>{process.env.NEXT_PUBLIC_APP_NAME ?? 'RaspAdmin'}</a></h2>
             </Header>
             
             <Nav>
