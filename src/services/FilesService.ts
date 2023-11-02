@@ -4,6 +4,8 @@ import { lookup } from "mime-types";
 
 export class FilesService {
     private API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
+    private API_QUERY = process.env.NEXT_PUBLIC_API_QUERY ?? "?path={0}"
+    private SRC_QUERY = process.env.NEXT_PUBLIC_SRC_QUERY ?? "?path={0}"
 
     private api: AxiosInstance;
 
@@ -17,7 +19,7 @@ export class FilesService {
     public getFiles(pathFile: string | null, callback: ((files: Array<FileModel>, path: string) => void), callbackError?: ((status: number, errorMessage: string) => void)) {
         let path = this.clearPath(pathFile);
 
-        this.api.get(`/files?path=${encodeURIComponent(`/${path}`)}`).then(reponse => {
+        this.api.get(`/files${this.getQuery(path)}`).then(reponse => {
             if (reponse.status == 204) {
                 return callback([], path);
             }
@@ -67,7 +69,7 @@ export class FilesService {
     }
 
     public getFileSrc(path: string): string {
-        return `${this.API_URL}/files/open?path=/${encodeURIComponent(path)}`;
+        return `${this.API_URL}/files/open${this.getSrcQuery(path)}`;
     }
 
     private clearPath(path: string | null): string {
@@ -93,6 +95,14 @@ export class FilesService {
             default:
                 return 'Erro desconhecido ao processar requisição!'
         }
+    }
+
+    private getQuery(path: string): string {
+        return this.API_QUERY.replace('{0}', encodeURIComponent(`${path}`));
+    }
+
+    private getSrcQuery(path: string): string {
+        return this.SRC_QUERY.replace('{0}', encodeURIComponent(`${path}`));
     }
 }
 
