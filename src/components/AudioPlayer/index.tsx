@@ -122,7 +122,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     }
 
     function getSessionVolume(): number {
-        let volume = localStorage.getItem('audio_volume') ? Number(localStorage.getItem('audio_volume')) : 0.5;
+        let volume = localStorage.getItem('audio_volume') ? Number(localStorage.getItem('audio_volume')) : 50;
         return volume < 0 ? 0 : volume;
     }
 
