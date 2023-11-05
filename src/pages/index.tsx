@@ -86,6 +86,16 @@ const PathLink = styled.div`
     }
 `
 
+const SearchInput = styled.input`
+background-color: #114868;
+    margin: auto 25px auto auto;
+    border: none;
+    padding: 5px;
+    outline: none;
+    color: white;
+    font-size: 12pt;
+`
+
 export default function App() {
     const service = new FilesService();
 
@@ -107,6 +117,8 @@ export default function App() {
 
     const [path, setPath] = useState<string>(null);
 
+    const [search, setSearch] = useState<string>('');
+
     function loadPage() {
         setLogin(false);
         service.getFiles(null, (files) => {
@@ -125,6 +137,7 @@ export default function App() {
     function loadMainFiles(hashPath: string = location.hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
         setMainFiles(null);
         setText(null);
+        setSearch("");
         service.getFiles(hashPath, (files, path) => {
             if (files.length == 1 && files[0].open) {
                 let link = service.openFile(files[0], path);
@@ -229,12 +242,13 @@ export default function App() {
                         return (<>/<a key={i} href={`#${link}`}>{p}</a></>)
                     })}
                 </PathLink>
+                <SearchInput placeholder="Pesquisar" onChange={(e) => setSearch(e.currentTarget.value)} value={search}/>
             </Nav>
             <Main>
                 <FilesList files={tabFiles.filter(e => e.is_dir)} />
             </Main>
             <Aside>
-                <FilesBlocks files={mainFiles} text={text} />
+                <FilesBlocks files={mainFiles} text={text} search={search}/>
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
             {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}

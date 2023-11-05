@@ -2,6 +2,7 @@ import styled from "styled-components"
 import FileBlock from "./FileBlock"
 import Loading from "./Loading"
 import { FileModel } from "../services/models/FilesModel"
+import { useEffect } from "react"
 
 const Panel = styled.div`
     display: flex;
@@ -31,7 +32,7 @@ const Text = styled.h1`
     width: 100%;
 `
 
-export default function FilesBlock(props: { files: Array<FileModel> | null, text: string }) {
+export default function FilesBlock(props: { files: Array<FileModel> | null, text: string, search?: string }) {
     if (props.text) {
         return (
             <Panel>
@@ -56,7 +57,7 @@ export default function FilesBlock(props: { files: Array<FileModel> | null, text
     let key = 0;
     return (
         <Panel>
-            {props.files.map((file: FileModel) => {
+            {props.files.filter(f => !props.search || f.name.toLowerCase().includes(props.search.toLowerCase())).map((file: FileModel) => {
                 return <FileBlock file={file} key={key++} />
             })}
         </Panel>
