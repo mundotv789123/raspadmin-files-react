@@ -87,7 +87,7 @@ const PathLink = styled.div`
 `
 
 const SearchInput = styled.input`
-background-color: #114868;
+    background-color: rgba(0, 0, 0, 0.3);
     margin: auto 25px auto auto;
     border: none;
     padding: 5px;

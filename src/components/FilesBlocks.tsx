@@ -2,7 +2,6 @@ import styled from "styled-components"
 import FileBlock from "./FileBlock"
 import Loading from "./Loading"
 import { FileModel } from "../services/models/FilesModel"
-import { useEffect } from "react"
 
 const Panel = styled.div`
     display: flex;
@@ -33,33 +32,16 @@ const Text = styled.h1`
 `
 
 export default function FilesBlock(props: { files: Array<FileModel> | null, text: string, search?: string }) {
-    if (props.text) {
-        return (
-            <Panel>
-                <Text>{props.text}</Text>
-            </Panel>
-        )
-    }
-    if (props.files === null) {
-        return (
-            <Panel>
-                <Loading />
-            </Panel>
-        )
-    }
-    if (props.files.length == 0) {
-        return (
-            <Panel>
-                <Text>Essa pasta está vazia!</Text>
-            </Panel>
-        )
-    }
-    let key = 0;
+    if (props.files?.length == 0 ?? false)
+        props.text = "Essa pasta está vazia!"
+
     return (
         <Panel>
-            {props.files.filter(f => !props.search || f.name.toLowerCase().includes(props.search.toLowerCase())).map((file: FileModel) => {
-                return <FileBlock file={file} key={key++} />
-            })}
+            {props.files === null ? <Loading /> : props.text ? <Text>{props.text}</Text> :
+                props.files.filter(f => !props.search || f.name.toLowerCase().includes(props.search.toLowerCase())).map((file: FileModel, index: number) => {
+                    return <FileBlock file={file} key={index} />
+                })
+            }
         </Panel>
     )
 }
