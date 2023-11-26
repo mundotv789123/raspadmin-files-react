@@ -103,6 +103,7 @@ export default function App() {
 
     const [tabFiles, setTabFiles] = useState<FileModel[]>([]);
     const [mainFiles, setMainFiles] = useState<FileModel[] | null>(null);
+    const [fileLoading, setFileLoading] = useState<number>(-1);
 
     const [login, setLogin] = useState<boolean>(false);
     const [text, setText] = useState<string>();
@@ -136,18 +137,21 @@ export default function App() {
         });
     }
 
-    function loadMainFiles(hashPath: string = hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
+    function loadMainFiles(hashPath: string = location.hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
         if (mainFiles !== null) {
             let fileFind = mainFiles.filter(f => decodeURIComponent(f.href) == decodeURIComponent(hash));
-            if (fileFind.length != 1 || fileFind[0].is_dir) {
+            if (fileFind.length == 1 && !fileFind[0].is_dir) {
+                setFileLoading(mainFiles.indexOf(fileFind[0]));
+            } else {
                 setSearch("");
                 setMainFiles(null);
             }
         }
 
         setText(null);
-        
+
         service.getFiles(hashPath, (files, path) => {
+            setFileLoading(-1);
             if (files.length == 1 && files[0].open) {
                 let link = service.openFile(files[0], path);
                 loadMainFiles(link.parent, (main_files) => openFile(link, main_files));
@@ -159,11 +163,10 @@ export default function App() {
                 file.href = path ? `#/${path}/${file.name}` : `#/${file.name}`;
                 return file;
             });
-            setTimeout(() => {
-                setMainFiles(main_files);
-                if (callback)
-                    callback(main_files);
-            }, 500);
+
+            setMainFiles(main_files);
+            if (callback)
+                callback(main_files);
         }, (status, message) => {
             if (status == 401)
                 return setLogin(true);
@@ -261,7 +264,7 @@ export default function App() {
                 <FilesList files={tabFiles.filter(e => e.is_dir)} />
             </Main>
             <Aside>
-                <FilesBlocks files={mainFiles} text={text} search={search} />
+                <FilesBlocks files={mainFiles} text={text} search={search} fileLoading={fileLoading}/>
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
             {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}

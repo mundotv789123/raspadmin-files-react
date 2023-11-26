@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled, { keyframes } from "styled-components"
 import { FileModel } from "../services/models/FilesModel";
 
 const iconsPath = "/img/icons/";
@@ -58,6 +58,9 @@ const FileCont = styled.a`
 `
 
 const FileIcon = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 80px;
     height: 80px;
     margin: 5px auto;
@@ -70,11 +73,30 @@ const Name = styled.p`
     text-align: center;
     font-weight: bold;
 `
+const Spin = keyframes`
+    0% {
+        transform: rotate(0);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+`
 
-export default function FileBlock(props: {file: FileModel, key: number}) {
+const Loading = styled.div`
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: solid 5px transparent;
+    border-top: solid 5px cyan;
+    animation: ${Spin} 500ms linear infinite;
+`
+
+export default function FileBlock(props: {file: FileModel, key: number, loading: boolean}) {
     return (
         <FileCont href={props.file.href}>
-            <FileIcon style={{ backgroundImage: "url('" + (props.file.icon ? props.file.icon : (iconsPath + getFileIcon(props.file))) + "')" }} />
+            <FileIcon style={{ backgroundImage: "url('" + (props.file.icon ? props.file.icon : (iconsPath + getFileIcon(props.file))) + "')" }}>
+                {props.loading && <Loading/>}
+            </FileIcon>
             <Name>{props.file.name}</Name>
         </FileCont>
     )
