@@ -35,12 +35,11 @@ export default function FilesBlock(props: { files: Array<FileModel> | null, text
     if (props.files?.length == 0 ?? false)
         props.text = "Essa pasta está vazia!"
 
-        console.log(props.fileLoading);
     return (
         <Panel>
             {props.files === null ? <Loading /> : props.text ? <Text>{props.text}</Text> :
-                props.files.filter(f => !props.search || f.name.toLowerCase().includes(props.search.toLowerCase())).map((file: FileModel, index: number) => {
-                    return <FileBlock file={file} key={index} loading={props.fileLoading == index}/>
+                props.files.map((file: FileModel, index: number) => {
+                    return <>{(!props.search || file.name.toLowerCase().includes(props.search.toLowerCase())) && <FileBlock file={file} key={index} loading={props.fileLoading == index}/>}</>
                 })
             }
         </Panel>
