@@ -31,34 +31,18 @@ const Text = styled.h1`
     width: 100%;
 `
 
-export default function FilesBlock(props: { files: Array<FileModel> | null, text: string }) {
-    if (props.text) {
-        return (
-            <Panel>
-                <Text>{props.text}</Text>
-            </Panel>
-        )
-    }
-    if (props.files === null) {
-        return (
-            <Panel>
-                <Loading />
-            </Panel>
-        )
-    }
-    if (props.files.length == 0) {
-        return (
-            <Panel>
-                <Text>Essa pasta está vazia!</Text>
-            </Panel>
-        )
-    }
-    let key = 0;
+export default function FilesBlock(props: { files: Array<FileModel> | null, text: string, search?: string, fileLoading: number }) {
+    if (props.files?.length == 0 ?? false)
+        props.text = "Essa pasta está vazia!"
+
+        console.log(props.fileLoading);
     return (
         <Panel>
-            {props.files.map((file: FileModel) => {
-                return <FileBlock file={file} key={key++} />
-            })}
+            {props.files === null ? <Loading /> : props.text ? <Text>{props.text}</Text> :
+                props.files.filter(f => !props.search || f.name.toLowerCase().includes(props.search.toLowerCase())).map((file: FileModel, index: number) => {
+                    return <FileBlock file={file} key={index} loading={props.fileLoading == index}/>
+                })
+            }
         </Panel>
     )
 }

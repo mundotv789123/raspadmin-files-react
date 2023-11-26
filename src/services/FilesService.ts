@@ -105,6 +105,3 @@ export class FilesService {
         return this.SRC_QUERY.replace('{0}', encodeURIComponent(`${path}`));
     }
 }
-
-
-

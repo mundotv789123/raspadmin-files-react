@@ -4,6 +4,7 @@ export const VideoCont = styled.div`
     display: flex;
     background-color: black;
     color: white;
+    z-index: 1;
     overflow: hidden;
     position: fixed;
     top: 0;

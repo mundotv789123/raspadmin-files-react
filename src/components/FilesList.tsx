@@ -1,5 +1,4 @@
 import styled from "styled-components"
-import FileRow from "./FileRow"
 import { FileModel } from "../services/models/FilesModel";
 
 const Column = styled.div`
@@ -7,16 +6,26 @@ const Column = styled.div`
     flex-direction: column;
 `
 
-export default function FilesList(props: {files: Array<FileModel>}) {
-    if (props.files) {
-        let c = 0;
-        return (
-            <Column>
-                {props.files.map((file: any) => {
-                    return <FileRow key={++c} src={file.href} />
-                })}
-            </Column>
-        )
+const FileRow = styled.a`
+    padding: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    &:hover {
+        background: rgba(255, 255, 255, 0.3);
     }
-    return <Column />
+`
+
+export default function FilesList(props: { files: Array<FileModel> }) {
+    if (!props.files)
+        return <Column />
+        
+    return (
+        <Column>
+            {props.files.map((file: FileModel, index: number) =>
+                <FileRow key={index} href={file.href}>{file.name}</FileRow>
+            )}
+        </Column>
+    )
 }
