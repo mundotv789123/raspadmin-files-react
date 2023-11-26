@@ -42,7 +42,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         
         navigator.mediaSession.metadata = new MediaMetadata({
             title: fileName,
-        })
+            artwork: [{ src: "/img/icons/music.svg" }]
+        });
         navigator.mediaSession.setActionHandler('previoustrack', backSong);
         navigator.mediaSession.setActionHandler('nexttrack', nextSong);
 
@@ -88,9 +89,13 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     }
 
     function nextSong() {
+        if (playlist.length <= 1) {
+            audio_element.current.currentTime = 0;
+            return;
+        }
         setLoading(true)
         let list = random ? randomPlayList : playlist;
-
+        
         let index = list.indexOf(src)
         if (index < 0 || (index + 1) >= list.length) {
             setSrc(list[0]);
@@ -100,7 +105,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     }
 
     function backSong() {
-        if (audio_element.current.currentTime > 1) {
+        if (audio_element.current.currentTime > 1 || playlist.length <= 1) {
             audio_element.current.currentTime = 0;
             return;
         }
