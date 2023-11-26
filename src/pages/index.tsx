@@ -99,6 +99,8 @@ const SearchInput = styled.input`
 export default function App() {
     const service = new FilesService();
 
+    const [hash, setHash] = useState<string>("");
+
     const [tabFiles, setTabFiles] = useState<FileModel[]>([]);
     const [mainFiles, setMainFiles] = useState<FileModel[] | null>(null);
 
@@ -106,7 +108,7 @@ export default function App() {
     const [text, setText] = useState<string>();
 
     const [openedVideo, setOpenendVideo] = useState<FileLinkModel>();
-    
+
     const [openedAudio, setOpenendAudio] = useState<FileLinkModel>();
     const [audioPlayList, setAudioPlaylist] = useState<Array<string>>([]);
 
@@ -123,21 +125,28 @@ export default function App() {
         setLogin(false);
         service.getFiles(null, (files) => {
             setTabFiles(files.filter(file => file.is_dir).map(file => {
-                file.href = `#/${file.name}`; 
-                return file; 
+                file.href = `#/${file.name}`;
+                return file;
             }));
             loadMainFiles();
         }, (status, message) => {
-            if (status == 401) 
+            if (status == 401)
                 return setLogin(true);
             setText(message);
         });
     }
 
-    function loadMainFiles(hashPath: string = location.hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
-        setMainFiles(null);
+    function loadMainFiles(hashPath: string = hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
+        if (mainFiles !== null) {
+            let fileFind = mainFiles.filter(f => decodeURIComponent(f.href) == decodeURIComponent(hash));
+            if (fileFind.length != 1 || fileFind[0].is_dir) {
+                setSearch("");
+                setMainFiles(null);
+            }
+        }
+
         setText(null);
-        setSearch("");
+        
         service.getFiles(hashPath, (files, path) => {
             if (files.length == 1 && files[0].open) {
                 let link = service.openFile(files[0], path);
@@ -150,11 +159,13 @@ export default function App() {
                 file.href = path ? `#/${path}/${file.name}` : `#/${file.name}`;
                 return file;
             });
-            setMainFiles(main_files);
-            if (callback)
-                callback(main_files);
+            setTimeout(() => {
+                setMainFiles(main_files);
+                if (callback)
+                    callback(main_files);
+            }, 500);
         }, (status, message) => {
-            if (status == 401) 
+            if (status == 401)
                 return setLogin(true);
             setText(message);
         })
@@ -173,7 +184,7 @@ export default function App() {
                     .map(
                         f => service.getFileSrc(`${file.parent}/${f.name}`)
                     )
-                : []);
+                    : []);
                 return;
             }
             if (isImage(file.type)) {
@@ -194,14 +205,14 @@ export default function App() {
     function toggleBar() {
         setBarOpen(!barOpen);
     }
-    
+
     function getNextImage() {
         let hashPath = location.hash;
-        if (!hashPath || !openedImage  || !imagesList)
+        if (!hashPath || !openedImage || !imagesList)
             return null;
         let index = imagesList.indexOf(hashPath);
         if (index <= (imagesList.length - 1))
-            return imagesList[index+1];
+            return imagesList[index + 1];
         return null;
     }
 
@@ -211,25 +222,27 @@ export default function App() {
             return null;
         let index = imagesList.indexOf(hashPath);
         if (index > 0)
-            return imagesList[index-1];
+            return imagesList[index - 1];
         return null;
     }
 
     useEffect(() => {
-        window.onhashchange = () => {
-            setOpenendVideo(null);
-            setOpenendImage(null);
-            loadMainFiles();
-        }
+        window.onhashchange = () => setHash(location.hash);
         loadPage();
     }, [])
 
+    useEffect(() => {
+        setOpenendVideo(null);
+        setOpenendImage(null);
+        loadMainFiles();
+    }, [hash]);
+
     return (
-        <Container style={{gridTemplateColumns: (barOpen ? "220px auto" : null)}}>
+        <Container style={{ gridTemplateColumns: (barOpen ? "220px auto" : null) }}>
             <Header>
                 <h2 className={"title"}><a href={"#"}>{process.env.NEXT_PUBLIC_APP_NAME ?? 'RaspAdmin'}</a></h2>
             </Header>
-            
+
             <Nav>
                 <CollapseButtom onClick={toggleBar}>
                     <FontAwesomeIcon icon={faBars} />
@@ -242,18 +255,18 @@ export default function App() {
                         return (<>/<a key={i} href={`#${link}`}>{p}</a></>)
                     })}
                 </PathLink>
-                <SearchInput placeholder="Pesquisar" onChange={(e) => setSearch(e.currentTarget.value)} value={search}/>
+                <SearchInput placeholder="Pesquisar" onChange={(e) => setSearch(e.currentTarget.value)} value={search} />
             </Nav>
             <Main>
                 <FilesList files={tabFiles.filter(e => e.is_dir)} />
             </Main>
             <Aside>
-                <FilesBlocks files={mainFiles} text={text} search={search}/>
+                <FilesBlocks files={mainFiles} text={text} search={search} />
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
             {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
-            {openedImage && <ImageViewer 
-                src={openedImage.src} 
+            {openedImage && <ImageViewer
+                src={openedImage.src}
                 closeUrl={`#${openedImage.parent}`}
                 nextUrl={getNextImage()}
                 backUrl={getBackImage()}
