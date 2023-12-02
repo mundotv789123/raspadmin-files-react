@@ -28,9 +28,17 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     const audio_element = useRef<HTMLAudioElement>();
 
     useEffect(() => {
-        setLoading(true);
-        setRandom(false);
-        setRandomPlaylist(null);
+        if (props.src == null)
+            return;
+
+        if (props.src != src) {
+            setLoading(true);
+            setRandom(false);
+            setRandomPlaylist(null);
+        } else {
+            audio_element.current.currentTime = 0;
+        }
+
         setSrc(props.src);
     }, [props.src])
 
@@ -39,7 +47,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     function loadPlayer() {
         if (!loading)
             return;
-        
+
         navigator.mediaSession.metadata = new MediaMetadata({
             title: fileName,
             artwork: [{ src: "/img/icons/music.svg" }]
@@ -95,7 +103,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         }
         setLoading(true)
         let list = random ? randomPlayList : playlist;
-        
+
         let index = list.indexOf(src)
         if (index < 0 || (index + 1) >= list.length) {
             setSrc(list[0]);
@@ -141,7 +149,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         let isRandom = !random;
         if (!playlist || playlist.length <= 2)
             return
-        
+
         if (isRandom) {
             let list = randomPlayList == null ? playlist.map(a => a) : randomPlayList;
             setRandomPlaylist(list.sort(() => Math.random() - 0.5));
@@ -152,9 +160,9 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
     return (
         <AudioContent>
-            <PlayList 
-                open={playlistOpened} 
-                playlist={playlist.map(src => srcToFileName(src))} 
+            <PlayList
+                open={playlistOpened}
+                playlist={playlist.map(src => srcToFileName(src))}
                 playing={src ? playlist.indexOf(src) : null}
                 onClick={updateSongPlaying}
             />
@@ -175,14 +183,14 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                         <FontAwesomeIcon icon={faForwardStep} />
                     </ControlButton>
                     <ControlButton onClick={updateRandon}>
-                        <FontAwesomeIcon icon={faShuffle} style={{color: random ? "lightgray" : "white"}} />
+                        <FontAwesomeIcon icon={faShuffle} style={{ color: random ? "lightgray" : "white" }} />
                     </ControlButton>
                     <VolumeControl>
                         <ControlButton style={{ display: 'flex' }} onClick={updateMuted}>
                             <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
                         </ControlButton>
                         <VolumeProgress>
-                            <Range percent={audioVolume} onInput={updateAudioVolume} live={true}/>
+                            <Range percent={audioVolume} onInput={updateAudioVolume} live={true} />
                         </VolumeProgress>
                     </VolumeControl>
                     <AudioTitle>
@@ -192,7 +200,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                 <AudioDurationContent>
                     <AudioDurationCount>{audioCurrentTime}/{audioDuration}</AudioDurationCount>
                     <AudioProgress>
-                        <Range percent={progressPercent} follower={true} onInput={updateAudioTime}/>
+                        <Range percent={progressPercent} follower={true} onInput={updateAudioTime} />
                     </AudioProgress>
                 </AudioDurationContent>
                 <audio
