@@ -1,6 +1,7 @@
 export interface FileModel {
     name: string,
     is_dir: boolean,
+    created_at: Date,
     icon?: string,
     type?: string,
     href?: string, 
