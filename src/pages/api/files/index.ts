@@ -49,7 +49,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
 function statsToFile(file: fs.Stats, name: string, open: boolean = false): FileModel {
     let is_dir = file.isDirectory();
-    return { name, is_dir, icon: null, open: open }
+    let created_at = file.ctime;
+    return { name, is_dir, icon: null, open: open, created_at: created_at }
 }
 
 function getFileIcon(url_path: string):string | null {

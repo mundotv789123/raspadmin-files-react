@@ -32,12 +32,13 @@ const Text = styled.h1`
 `
 
 export default function FilesBlock(props: { files: Array<FileModel> | null, text: string, search?: string, fileLoading: number }) {
+    var text = props.text;
     if (props.files?.length == 0 ?? false)
-        props.text = "Essa pasta está vazia!"
+        text = "Essa pasta está vazia!"
 
     return (
         <Panel>
-            {props.files === null ? <Loading /> : props.text ? <Text>{props.text}</Text> :
+            {props.files === null ? <Loading /> : text ? <Text>{text}</Text> :
                 props.files.map((file: FileModel, index: number) => {
                     return <>{(!props.search || file.name.toLowerCase().includes(props.search.toLowerCase())) && <FileBlock file={file} key={index} loading={props.fileLoading == index}/>}</>
                 })

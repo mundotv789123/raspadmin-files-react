@@ -54,7 +54,7 @@ const Nav = styled.nav`
     grid-area: n;
     display: flex;
     background: rgba(0, 0, 0, 0.5);
-    overflow-x: scroll;
+    overflow-x: auto;
     white-space: nowrap;
 `
 
@@ -139,16 +139,21 @@ export default function App() {
 
     function loadMainFiles(hashPath: string = location.hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
         if (mainFiles !== null) {
-            let fileFind = mainFiles.filter(f => decodeURIComponent(f.href) == decodeURIComponent(hash));
-            if (fileFind.length == 1 && !fileFind[0].is_dir) {
-                setFileLoading(mainFiles.indexOf(fileFind[0]));
-            } else {
-                setSearch("");
-                setMainFiles(null);
+            if (openedAudio == null || openedAudio.parent != decodeURIComponent(hashPath)) {
+                console.log(openedAudio?.parent)
+                let fileFind = mainFiles.filter(f => decodeURIComponent(f.href) == decodeURIComponent(hash));
+                if (fileFind.length == 1 && !fileFind[0].is_dir) {
+                    setFileLoading(mainFiles.indexOf(fileFind[0]));
+                } else {
+                    setSearch("");
+                    setMainFiles(null);
+                }
             }
         }
 
         setText(null);
+        if (openedAudio)
+            openedAudio.src = null;
 
         service.getFiles(hashPath, (files, path) => {
             setFileLoading(-1);
@@ -184,10 +189,8 @@ export default function App() {
             if (isAudio(file.type)) {
                 setOpenendAudio(file);
                 setAudioPlaylist(main_files ? main_files.filter(f => f.type && isAudio(f.type))
-                    .map(
-                        f => service.getFileSrc(`${file.parent}/${f.name}`)
-                    )
-                    : []);
+                    .map(f => service.getFileSrc(`${file.parent}/${f.name}`)) : []);
+                location.hash = file.parent;
                 return;
             }
             if (isImage(file.type)) {
@@ -264,7 +267,7 @@ export default function App() {
                 <FilesList files={tabFiles.filter(e => e.is_dir)} />
             </Main>
             <Aside>
-                <FilesBlocks files={mainFiles} text={text} search={search} fileLoading={fileLoading}/>
+                <FilesBlocks files={mainFiles} text={text} search={search} fileLoading={fileLoading} />
             </Aside>
             {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
             {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
