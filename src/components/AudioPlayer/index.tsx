@@ -33,17 +33,17 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     useEffect(() => {
         if (props.src == null)
             return;
-
-        if (props.src != src) {
-            setLoading(true);
-            if (random)
-                updateRandon();
-        } else {
+        if (props.src == src)
             audio_element.current.currentTime = 0;
-        }
-
-        setSrc(props.src);
+        else
+            setSrc(props.src);
     }, [props.src])
+
+    useEffect(() => {
+        setLoading(true);
+        if (random)
+            updateRandon();
+    }, [src])
 
     const fileName = srcToFileName(src);
 
