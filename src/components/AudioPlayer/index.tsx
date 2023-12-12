@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
-import { faAngleDown, faAngleUp, faBackwardStep, faForwardStep, faPause, faPlay, faShuffle, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDown, faAngleUp, faBackwardStep, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faShuffle, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
 import Range from "../../elements/range";
@@ -24,6 +24,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
     const [playlistOpened, setPlayerlistOpened] = useState(false);
     const [randomPlayList, setRandomPlaylist] = useState<Array<string> | null>(null);
+
+    const [hideTitle, setHideTitle] = useState(false);
 
     const audio_element = useRef<HTMLAudioElement>();
 
@@ -49,7 +51,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
             return;
 
         navigator.mediaSession.metadata = new MediaMetadata({
-            title: fileName,
+            title: hideTitle ? "Raspadmin Music Player" : fileName,
             artwork: [{ src: "/img/icons/music.svg" }]
         });
         navigator.mediaSession.setActionHandler('previoustrack', backSong);
@@ -190,11 +192,14 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                             <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
                         </ControlButton>
                         <VolumeProgress>
-                            <Range percent={audioVolume} onInput={updateAudioVolume} live={true} />
+                            <Range percent={audioVolume} onInput={updateAudioVolume} live={true}/>
                         </VolumeProgress>
                     </VolumeControl>
+                    <ControlButton>
+                        <FontAwesomeIcon icon={hideTitle ? faEye : faEyeSlash} onClick={() => setHideTitle(!hideTitle)} style={{fontSize: '16pt'}}/>
+                    </ControlButton>
                     <AudioTitle>
-                        {fileName}
+                        {hideTitle ? "..." : fileName}
                     </AudioTitle>
                 </ControlContent>
                 <AudioDurationContent>
