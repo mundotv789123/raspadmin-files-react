@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
 import Range from "../../elements/range";
 import { numberClockTime, srcToFileName } from "../../services/helpers/ConverterHelper";
-import { sources } from "next/dist/compiled/webpack/webpack";
 
 export default function AudioPlayer(props: { src: string, playlist: Array<string> }) {
     const playlist = props.playlist;
