@@ -140,7 +140,6 @@ export default function App() {
     function loadMainFiles(hashPath: string = location.hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
         if (mainFiles !== null) {
             if (openedAudio == null || openedAudio.parent != decodeURIComponent(hashPath)) {
-                console.log(openedAudio?.parent)
                 let fileFind = mainFiles.filter(f => decodeURIComponent(f.href) == decodeURIComponent(hash));
                 if (fileFind.length == 1 && !fileFind[0].is_dir) {
                     setFileLoading(mainFiles.indexOf(fileFind[0]));

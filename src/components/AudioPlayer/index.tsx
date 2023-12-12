@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
 import Range from "../../elements/range";
 import { numberClockTime, srcToFileName } from "../../services/helpers/ConverterHelper";
+import { sources } from "next/dist/compiled/webpack/webpack";
 
 export default function AudioPlayer(props: { src: string, playlist: Array<string> }) {
     const playlist = props.playlist;
@@ -35,8 +36,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
         if (props.src != src) {
             setLoading(true);
-            setRandom(false);
-            setRandomPlaylist(null);
+            if (random)
+                updateRandon();
         } else {
             audio_element.current.currentTime = 0;
         }
@@ -64,6 +65,11 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
         setLoading(false);
         setAudioDuration(numberClockTime(audio_element.current.duration));
+    }
+
+    function updateHideTitle() {
+        navigator.mediaSession.metadata.title = !hideTitle ? "Raspadmin Music Player" : fileName;
+        setHideTitle(!hideTitle);
     }
 
     function updatePlaying() {
@@ -147,14 +153,23 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         setMuted(isMuted);
     }
 
-    function updateRandon() {
+    function toggleRandon() {
         let isRandom = !random;
+        setRandom(isRandom);
+        updateRandon(isRandom);
+    }
+
+    function updateRandon(isRandom = random) {
         if (!playlist || playlist.length <= 2)
             return
 
         if (isRandom) {
-            let list = randomPlayList == null ? playlist.map(a => a) : randomPlayList;
-            setRandomPlaylist(list.sort(() => Math.random() - 0.5));
+            if (randomPlayList == null || randomPlayList.length != playlist.length || !playlist.includes(src)) {
+                let list = randomPlayList == null ? playlist.map(a => a) : randomPlayList;
+                setRandomPlaylist(list.sort(() => Math.random() - 0.5));
+            }
+        } else {
+            setRandomPlaylist(null);
         }
 
         setRandom(isRandom);
@@ -184,7 +199,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                     <ControlButton onClick={nextSong} disabled={playlist.length <= 0}>
                         <FontAwesomeIcon icon={faForwardStep} />
                     </ControlButton>
-                    <ControlButton onClick={updateRandon}>
+                    <ControlButton onClick={toggleRandon}>
                         <FontAwesomeIcon icon={faShuffle} style={{ color: random ? "lightgray" : "white" }} />
                     </ControlButton>
                     <VolumeControl>
@@ -192,11 +207,11 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                             <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
                         </ControlButton>
                         <VolumeProgress>
-                            <Range percent={audioVolume} onInput={updateAudioVolume} live={true}/>
+                            <Range percent={audioVolume} onInput={updateAudioVolume} live={true} />
                         </VolumeProgress>
                     </VolumeControl>
-                    <ControlButton>
-                        <FontAwesomeIcon icon={hideTitle ? faEye : faEyeSlash} onClick={() => setHideTitle(!hideTitle)} style={{fontSize: '16pt'}}/>
+                    <ControlButton onClick={updateHideTitle}>
+                        <FontAwesomeIcon icon={hideTitle ? faEye : faEyeSlash} style={{ fontSize: '16pt' }} />
                     </ControlButton>
                     <AudioTitle>
                         {hideTitle ? "..." : fileName}
