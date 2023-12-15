@@ -184,8 +184,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
             />
             <AudioElement>
                 <ContentHeader>
-                    <ControlButton style={{ height: '16px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => { setPlayerlistOpened(!playlistOpened) }}>
-                        <FontAwesomeIcon icon={playlistOpened ? faAngleDown : faAngleUp} style={{ fontSize: '16pt', margin: 'auto' }} />
+                    <ControlButton style={{ height: '16px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => { setPlayerlistOpened(!playlistOpened) }} className="playlist-button">
+                        <FontAwesomeIcon icon={faAngleUp} style={{ fontSize: '16pt', margin: 'auto' }} className={"icon "+(playlistOpened ? "down" : "")}/>
                     </ControlButton>
                 </ContentHeader>
                 <ControlContent>
