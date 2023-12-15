@@ -163,10 +163,9 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
             return
 
         if (isRandom) {
-            if (randomPlayList == null || randomPlayList.length != playlist.length || !playlist.includes(src)) {
-                let list = randomPlayList == null ? playlist.map(a => a) : randomPlayList;
-                setRandomPlaylist(list.sort(() => Math.random() - 0.5));
-            }
+            let notHasRandomList = (randomPlayList == null || randomPlayList.length != playlist.length || !playlist.includes(src));
+            let list = notHasRandomList ? playlist.map(a => a) : randomPlayList;
+            setRandomPlaylist(list.sort(() => Math.random() - 0.5));
         } else {
             setRandomPlaylist(null);
         }
