@@ -38,6 +38,14 @@ export const AudioElement = styled.div`
 
 export const ContentHeader = styled.div`
     display: flex;
+    & .playlist-button {
+        & .icon {
+            transition: transform 500ms;
+        }
+        & .down {
+            transform: rotate(-180deg);
+        }
+    }
 `
 
 export const ControlContent = styled.div`
@@ -53,8 +61,8 @@ export const ControlButton = styled.button`
     margin: auto 6px;
     font-size: 22pt;
     transition: 200ms;
-    width: 22px;
-    min-width: 22px;
+    width: 25px;
+    min-width: 25px;
     &:hover {
         color: #d9d9d9;
         transform: translateY(-1px);

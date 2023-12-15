@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
-import { faAngleDown, faAngleUp, faBackwardStep, faForwardStep, faPause, faPlay, faShuffle, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDown, faAngleUp, faBackwardStep, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faShuffle, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
 import Range from "../../elements/range";
@@ -25,22 +25,24 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     const [playlistOpened, setPlayerlistOpened] = useState(false);
     const [randomPlayList, setRandomPlaylist] = useState<Array<string> | null>(null);
 
+    const [hideTitle, setHideTitle] = useState(false);
+
     const audio_element = useRef<HTMLAudioElement>();
 
     useEffect(() => {
         if (props.src == null)
             return;
-
-        if (props.src != src) {
-            setLoading(true);
-            setRandom(false);
-            setRandomPlaylist(null);
-        } else {
+        if (props.src == src)
             audio_element.current.currentTime = 0;
-        }
-
-        setSrc(props.src);
+        else
+            setSrc(props.src);
     }, [props.src])
+
+    useEffect(() => {
+        setLoading(true);
+        if (random)
+            updateRandon();
+    }, [src])
 
     const fileName = srcToFileName(src);
 
@@ -49,7 +51,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
             return;
 
         navigator.mediaSession.metadata = new MediaMetadata({
-            title: fileName,
+            title: hideTitle ? "Raspadmin Music Player" : fileName,
             artwork: [{ src: "/img/icons/music.svg" }]
         });
         navigator.mediaSession.setActionHandler('previoustrack', backSong);
@@ -62,6 +64,11 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
         setLoading(false);
         setAudioDuration(numberClockTime(audio_element.current.duration));
+    }
+
+    function updateHideTitle() {
+        navigator.mediaSession.metadata.title = !hideTitle ? "Raspadmin Music Player" : fileName;
+        setHideTitle(!hideTitle);
     }
 
     function updatePlaying() {
@@ -145,14 +152,23 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         setMuted(isMuted);
     }
 
-    function updateRandon() {
+    function toggleRandon() {
         let isRandom = !random;
+        setRandom(isRandom);
+        updateRandon(isRandom);
+    }
+
+    function updateRandon(isRandom = random) {
         if (!playlist || playlist.length <= 2)
             return
 
         if (isRandom) {
-            let list = randomPlayList == null ? playlist.map(a => a) : randomPlayList;
-            setRandomPlaylist(list.sort(() => Math.random() - 0.5));
+            if (randomPlayList == null || randomPlayList.length != playlist.length || !playlist.includes(src)) {
+                let list = randomPlayList == null ? playlist.map(a => a) : randomPlayList;
+                setRandomPlaylist(list.sort(() => Math.random() - 0.5));
+            }
+        } else {
+            setRandomPlaylist(null);
         }
 
         setRandom(isRandom);
@@ -168,8 +184,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
             />
             <AudioElement>
                 <ContentHeader>
-                    <ControlButton style={{ height: '16px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => { setPlayerlistOpened(!playlistOpened) }}>
-                        <FontAwesomeIcon icon={playlistOpened ? faAngleDown : faAngleUp} style={{ fontSize: '16pt', margin: 'auto' }} />
+                    <ControlButton style={{ height: '16px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => { setPlayerlistOpened(!playlistOpened) }} className="playlist-button">
+                        <FontAwesomeIcon icon={faAngleUp} style={{ fontSize: '16pt', margin: 'auto' }} className={"icon "+(playlistOpened ? "down" : "")}/>
                     </ControlButton>
                 </ContentHeader>
                 <ControlContent>
@@ -182,7 +198,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                     <ControlButton onClick={nextSong} disabled={playlist.length <= 0}>
                         <FontAwesomeIcon icon={faForwardStep} />
                     </ControlButton>
-                    <ControlButton onClick={updateRandon}>
+                    <ControlButton onClick={toggleRandon}>
                         <FontAwesomeIcon icon={faShuffle} style={{ color: random ? "lightgray" : "white" }} />
                     </ControlButton>
                     <VolumeControl>
@@ -193,8 +209,11 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                             <Range percent={audioVolume} onInput={updateAudioVolume} live={true} />
                         </VolumeProgress>
                     </VolumeControl>
+                    <ControlButton onClick={updateHideTitle}>
+                        <FontAwesomeIcon icon={hideTitle ? faEye : faEyeSlash} style={{ fontSize: '16pt' }} />
+                    </ControlButton>
                     <AudioTitle>
-                        {fileName}
+                        {hideTitle ? "..." : fileName}
                     </AudioTitle>
                 </ControlContent>
                 <AudioDurationContent>
