@@ -40,8 +40,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
 
     useEffect(() => {
         setLoading(true);
-        if (random)
-            updateRandon();
+        if (random && !playListIsSameOfRandomList())
+            randomizeList(true);
     }, [src])
 
     const fileName = srcToFileName(src);
@@ -155,23 +155,25 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     function toggleRandon() {
         let isRandom = !random;
         setRandom(isRandom);
-        updateRandon(isRandom);
+        if (isRandom)
+            randomizeList();
+        else
+            setRandomPlaylist(null);
     }
 
-    function updateRandon(isRandom = random) {
+    function randomizeList(reset = false) {
         if (!playlist || playlist.length <= 2)
             return
 
-        if (isRandom) {
-            if (randomPlayList == null || randomPlayList.length != playlist.length || !playlist.includes(src)) {
-                let list = randomPlayList == null ? playlist.map(a => a) : randomPlayList;
-                setRandomPlaylist(list.sort(() => Math.random() - 0.5));
-            }
-        } else {
-            setRandomPlaylist(null);
-        }
+        let list = (!reset && randomPlayList != null) ? randomPlayList : playlist.map(a => a);
+        setRandomPlaylist(list.sort(() => Math.random() - 0.5));
+    }
 
-        setRandom(isRandom);
+    function playListIsSameOfRandomList(): boolean {
+        if (randomPlayList == null || randomPlayList.length != playlist.length)
+            return false;
+
+        return playlist.filter(s => !randomPlayList.includes(s)).length == 0;
     }
 
     return (
