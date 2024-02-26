@@ -9,6 +9,6 @@ services:
     - './files:/app/files'
     environment:
       NEXT_PUBLIC_APP_NAME: 'RaspAdmin'
-      API_AUTH_KEY: 'abc'
+      API_AUTH_KEY: ''
       API_USERNAME: 'admin'
       API_PASSWORD: 'admin'
