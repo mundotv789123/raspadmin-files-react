@@ -1,22 +1,14 @@
 version: '3.1'
 services:
   raspadmin:
-    image: 'node:18'
-    working_dir: '/app'
+    image: 'mundotv789123/raspadmin:1.2.11'
     container_name: 'raspadmin_files'
-    command: 'sh -c "chmod 755 ./setup.sh && ./setup.sh start"'
     ports:
     - '8080:3000'
     volumes:
-    - './:/app'
-    - './files:/mnt/files'
+    - './files:/app/files'
     environment:
       NEXT_PUBLIC_APP_NAME: 'RaspAdmin'
-      NEXT_PUBLIC_API_URL: '/api'
-      NEXT_PUBLIC_API_QUERY: '?path=/{0}'
-      NEXT_PUBLIC_SRC_QUERY: '?path=/{0}'
-      # Coloque aqui uma chave aleatória para encriptação da chave jwt
-      API_AUTH_KEY: ''
+      API_AUTH_KEY: 'abc'
       API_USERNAME: 'admin'
       API_PASSWORD: 'admin'
-      API_DIR: '/mnt/files'

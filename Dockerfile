@@ -1,5 +1,10 @@
-FROM node:16.15.0
+FROM node:18
+
 WORKDIR /app
-COPY . .
-RUN sh build.sh
-CMD ["bash", "setup.sh", "start"]
+RUN apt install -y git
+RUN git clone https://github.com/mundotv789123/raspadmin-files-react.git .
+RUN cp .env.example .env
+RUN npm install
+RUN npm run build
+
+CMD ["npm", "run", "start"]
