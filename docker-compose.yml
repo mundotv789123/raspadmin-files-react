@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   raspadmin:
-    image: 'mundotv789123/raspadmin:1.2.11'
+    image: 'mundotv789123/raspadmin'
     container_name: 'raspadmin_files'
     ports:
     - '8080:3000'
