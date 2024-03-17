@@ -19,6 +19,7 @@ const Container = styled.div`
     grid-template-areas: "h n" "m a";
     height: 100vh;
     transition: grid-template-columns .2s;
+    background: radial-gradient(transparent, rgba(0, 0, 0, 0.4));
     @media(max-width:950px) {
         grid-template-columns: 0 auto;
     }
@@ -56,12 +57,14 @@ const Nav = styled.nav`
     background: rgba(0, 0, 0, 0.5);
     overflow-x: auto;
     white-space: nowrap;
+    backdrop-filter: blur(2px);
 `
 
 const Main = styled.main`
     grid-area: m;
     overflow-y: scroll;
     background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
 `
 
 const Aside = styled.aside`
@@ -92,8 +95,15 @@ const SearchInput = styled.input`
     border: none;
     padding: 5px;
     outline: none;
+    border-radius: 7px;
+    border: solid 1px gray;
     color: white;
     font-size: 12pt;
+    width: 150px;
+    transition: width 100ms;
+    &:focus {
+        width: 250px;
+    }
 `
 
 export default function App() {
