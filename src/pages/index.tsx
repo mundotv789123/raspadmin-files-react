@@ -26,6 +26,7 @@ const Container = styled.div`
 `
 
 const Header = styled.header`
+    backdrop-filter: blur(5px);
     grid-area: h;
     display: flex;
     overflow: hidden;
