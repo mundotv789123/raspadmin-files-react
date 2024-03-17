@@ -5,7 +5,7 @@ import styled from "styled-components";
 
 const PlayListContent = styled.div`
     backdrop-filter: blur(5px);
-    background-color: rgba(0, 0, 0, 0.35);
+    background-color: rgba(0, 0, 0, 0.7);
     box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;

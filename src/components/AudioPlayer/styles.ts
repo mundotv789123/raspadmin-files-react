@@ -28,7 +28,7 @@ export const AudioContent = styled.div`
 
 export const AudioElement = styled.div`
     backdrop-filter: blur(5px);
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8));
     border: solid 1px gray;
     box-shadow: 0 4px 4px 0px rgba(0, 0, 0, 0.25);
     display: flex;
