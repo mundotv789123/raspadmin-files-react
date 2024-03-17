@@ -57,14 +57,14 @@ const Nav = styled.nav`
     background: rgba(0, 0, 0, 0.5);
     overflow-x: auto;
     white-space: nowrap;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(5px);
 `
 
 const Main = styled.main`
     grid-area: m;
     overflow-y: scroll;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(5px);
 `
 
 const Aside = styled.aside`
