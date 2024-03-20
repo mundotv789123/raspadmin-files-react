@@ -9,7 +9,6 @@ html, body {
     color: white;
 }
 body {
-    background-image: url('/img/wallpaper.jpg');
     background-size: cover;
     background-position: center;
 }
