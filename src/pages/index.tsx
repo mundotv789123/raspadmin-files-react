@@ -77,13 +77,25 @@ const Aside = styled.aside`
 const PathLink = styled.div`
     font-size: 11pt;
     font-weight: bold;
-    margin: auto 25px;
+    margin-left: 25px;
+    margin-right: auto;
     color: white;
+    display: flex;
+    overflow-x: scroll;
+    & p, a {
+        display: block;
+        align-self: center;
+    }
     & a {
         color: white;
         margin: 0 2px;
         padding: 2px;
         border-radius: 5px;
+        max-width: 120px;
+        min-width: 40px;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
         &:hover {
             background-color: rgba(255, 255, 255, 0.3);
         }
@@ -92,8 +104,8 @@ const PathLink = styled.div`
 
 const SearchInput = styled.input`
     background-color: rgba(0, 0, 0, 0.3);
-    margin: auto 25px auto auto;
-    border: none;
+    align-self: center;
+    margin-right: 25px;
     padding: 5px;
     outline: none;
     border-radius: 7px;
@@ -264,11 +276,11 @@ export default function App() {
                     <FontAwesomeIcon icon={faBars} />
                 </CollapseButtom>
                 <PathLink>
-                    /<a href="#/">home</a>
+                    <p>/</p><a href="#/">home</a>
                     {path && path.split("/").map((p, i) => {
                         let link = '';
                         path.split('/').forEach((l, li) => { if (li <= i) link += `/${l}` });
-                        return (<>/<a key={i} href={`#${link}`}>{p}</a></>)
+                        return (<><p>/</p><a key={i} href={`#${link}`}>{p}</a></>)
                     })}
                 </PathLink>
                 <SearchInput placeholder="Pesquisar" onChange={(e) => setSearch(e.currentTarget.value)} value={search} />
