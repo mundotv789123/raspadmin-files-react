@@ -151,7 +151,7 @@ export default function App() {
     function loadMainFiles(hashPath: string = location.hash.substring(1), callback: ((files: Array<FileModel>) => void) | null = null) {
         if (mainFiles !== null) {
             if (openedAudio == null || openedAudio.parent != decodeURIComponent(hashPath)) {
-                let fileFind = mainFiles.filter(f => f.href == decodeURIComponent(hash));
+                let fileFind = mainFiles.filter(f => decodeURIComponent(f.href) == decodeURIComponent(hash));
                 if (fileFind.length == 1 && !fileFind[0].is_dir) {
                     setFileLoading(mainFiles.indexOf(fileFind[0]));
                 } else {
@@ -165,7 +165,7 @@ export default function App() {
         if (openedAudio)
             openedAudio.src = null;
 
-        service.getFiles(hashPath, (files, path) => {
+        service.getFiles(decodeURIComponent(hashPath), (files, path) => {
             setFileLoading(-1);
             if (files.length == 1 && files[0].open) {
                 let link = service.openFile(files[0], path);
@@ -175,7 +175,7 @@ export default function App() {
 
             setPath(path);
             let main_files = files.map(file => {
-                file.href = path ? `#/${path}/${file.name}` : `#/${file.name}`;
+                file.href = `#/${encodeURIComponent(path ? `${path}/${file.name}` : `${file.name}`)}`;
                 return file;
             });
 
