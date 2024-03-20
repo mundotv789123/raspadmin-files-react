@@ -47,6 +47,7 @@ const FileCont = styled.a`
     overflow: hidden;
     font-weight: 600;
     word-wrap: break-word;
+    text-shadow: 0 1px 5px black;
     transition: background-color 0.5s;
     border-radius: 5px;
     &:hover {
