@@ -154,7 +154,7 @@ export default function App() {
         if (openedAudio)
             openedAudio.src = null;
 
-        service.getFiles(hashPath, (files, path) => {
+        service.getFiles(decodeURIComponent(hashPath), (files, path) => {
             setFileLoading(-1);
             if (files.length == 1 && files[0].open) {
                 let link = service.openFile(files[0], path);
@@ -164,7 +164,7 @@ export default function App() {
 
             setPath(path);
             let main_files = files.map(file => {
-                file.href = path ? `#/${path}/${file.name}` : `#/${file.name}`;
+                file.href = `#/${encodeURIComponent(path ? `${path}/${file.name}` : `${file.name}`)}`;
                 return file;
             });
 
