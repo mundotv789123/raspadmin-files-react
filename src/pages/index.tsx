@@ -92,7 +92,7 @@ const PathLink = styled.div`
         padding: 2px;
         border-radius: 5px;
         max-width: 120px;
-        min-width: 40px;
+        min-width: 25px;
         white-space: nowrap;
         overflow-x: hidden;
         text-overflow: ellipsis;
