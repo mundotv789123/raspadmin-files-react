@@ -75,13 +75,11 @@ export class FilesService {
     private clearPath(path: string | null): string {
         if (path == null)
             return "";
-        return decodeURI(
-            path
-                .replace(/\/\/+/, '/')
-                .replace(/^\/+/, '')
-                .replace(/\/+$/, '')
-                .trim()
-        );
+        return path
+            .replace(/\/\/+/, '/')
+            .replace(/^\/+/, '')
+            .replace(/\/+$/, '')
+            .trim();
     }
 
     private getErrorMessage(code: number): string {
