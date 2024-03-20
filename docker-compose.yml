@@ -2,10 +2,10 @@ version: '3.1'
 services:
   frontend:
     image: 'mundotv789123/raspadmin:front'
+    ports:
+      - '8080:80'
 
   backend:
     image: 'mundotv789123/raspadmin:java'
-    ports:
-      - '8080:8080'
     volumes:
       - './data:/app/data'
