@@ -1,14 +1,11 @@
 version: '3.1'
 services:
-  raspadmin:
-    image: 'mundotv789123/raspadmin'
-    container_name: 'raspadmin_files'
+  frontend:
+    image: 'mundotv789123/raspadmin:front'
     ports:
-    - '8080:3000'
+      - '8080:80'
+
+  backend:
+    image: 'mundotv789123/raspadmin:java'
     volumes:
-    - './files:/app/files'
-    environment:
-      NEXT_PUBLIC_APP_NAME: 'RaspAdmin'
-      API_AUTH_KEY: ''
-      API_USERNAME: 'admin'
-      API_PASSWORD: 'admin'
+      - './data:/app/data'

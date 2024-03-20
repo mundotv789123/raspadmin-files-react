@@ -1,10 +1,12 @@
-FROM node:18
+FROM node:18 AS build
 
 WORKDIR /app
-RUN apt install -y git
-RUN git clone https://github.com/mundotv789123/raspadmin-files-react.git .
+COPY . .
 RUN cp .env.example .env
 RUN npm install
 RUN npm run build
 
-CMD ["npm", "run", "start"]
+FROM nginx
+RUN mkdir -p /var/www
+COPY --from=build /app/out /var/www/html
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
