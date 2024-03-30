@@ -38,7 +38,7 @@ export default function FilesBlock(props: { files: Array<FileModel> | null, text
 
     return (
         <Panel>
-            {props.files === null ? <Loading /> : text ? <Text>{text}</Text> :
+            {text ? <Text>{text}</Text> : props.files === null ? <Loading /> : 
                 props.files.map((file: FileModel, index: number) => {
                     return <>{(!props.search || file.name.toLowerCase().includes(props.search.toLowerCase())) && <FileBlock file={file} key={index} loading={props.fileLoading == index}/>}</>
                 })

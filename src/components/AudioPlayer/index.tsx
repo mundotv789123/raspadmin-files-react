@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
-import { faAngleUp, faBackwardStep, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faShuffle, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, ErrorText, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
+import { faAngleUp, faBackwardStep, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faShuffle, faTimes, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
 import Range from "../../elements/range";
@@ -26,6 +26,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
     const [randomPlayList, setRandomPlaylist] = useState<Array<string> | null>(null);
 
     const [hideTitle, setHideTitle] = useState(false);
+    const [errorText, setErrorText] = useState(null);
 
     const audio_element = useRef<HTMLAudioElement>();
 
@@ -50,6 +51,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         if (!loading)
             return;
 
+        setErrorText(null);
         navigator.mediaSession.metadata = new MediaMetadata({
             title: hideTitle ? "Raspadmin Music Player" : fileName,
             artwork: [{ src: "/img/icons/music.svg" }]
@@ -176,6 +178,11 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
         return playlist.filter(s => !randomPlayList.includes(s)).length == 0;
     }
 
+    function setError() {
+        setLoading(false)
+        setErrorText("Ocorreu um erro ao reproduzir áudio")
+    }
+
     return (
         <AudioContent>
             <PlayList
@@ -194,8 +201,8 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                     <ControlButton onClick={backSong} disabled={playlist.length <= 0}>
                         <FontAwesomeIcon icon={faBackwardStep} />
                     </ControlButton>
-                    <ControlButton onClick={togglePlay}>
-                        {loading ? <LoadingSpin /> : <FontAwesomeIcon icon={playing ? faPause : faPlay} />}
+                    <ControlButton onClick={togglePlay} disabled={errorText != null}>
+                        {loading ? <LoadingSpin /> : <FontAwesomeIcon icon={errorText ? faTimes : playing ? faPause : faPlay} />}
                     </ControlButton>
                     <ControlButton onClick={nextSong} disabled={playlist.length <= 0}>
                         <FontAwesomeIcon icon={faForwardStep} />
@@ -214,9 +221,10 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                     <ControlButton onClick={updateHideTitle}>
                         <FontAwesomeIcon icon={hideTitle ? faEye : faEyeSlash} style={{ fontSize: '16pt' }} />
                     </ControlButton>
-                    <AudioTitle>
-                        {hideTitle ? "..." : fileName}
-                    </AudioTitle>
+                    {errorText ? <ErrorText>{errorText}</ErrorText> : 
+                        <AudioTitle>{hideTitle ? "..." : fileName}</AudioTitle>
+                    }
+                    
                 </ControlContent>
                 <AudioDurationContent>
                     <AudioDurationCount>{audioCurrentTime}/{audioDuration}</AudioDurationCount>
@@ -227,6 +235,7 @@ export default function AudioPlayer(props: { src: string, playlist: Array<string
                 <audio
                     autoPlay={true}
                     src={src}
+                    onError={setError}
                     onPlay={updatePlaying}
                     onPause={updatePlaying}
                     onCanPlay={loadPlayer}

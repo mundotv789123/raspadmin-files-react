@@ -127,3 +127,13 @@ export const AudioDurationCount = styled.p`
 export const AudioProgress = styled.div`
     margin: auto 10px;
 `
+
+export const ErrorText = styled.h5`
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    width: 100%;
+    margin: auto 15px;
+    color: red;
+`
