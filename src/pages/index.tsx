@@ -156,6 +156,13 @@ export default function App() {
         }, (status, message) => {
             if (status == 401)
                 return setLogin(true);
+
+            if(status == 503 || status == 502)
+                setTimeout(() => {
+                    setText(null);
+                    loadPage();
+                }, 5000);
+            console.log(message);
             setText(message);
         });
     }
