@@ -283,11 +283,11 @@ export default function App() {
                     <FontAwesomeIcon icon={faBars} />
                 </CollapseButtom>
                 <PathLink>
-                    <p>/</p><a href="#/">home</a>
+                    <p>/</p><a href="#/" title="home">home</a>
                     {path && path.split("/").map((p, i) => {
                         let link = '';
                         path.split('/').forEach((l, li) => { if (li <= i) link += `/${l}` });
-                        return (<><p>/</p><a key={i} href={`#${link}`}>{p}</a></>)
+                        return (<><p>/</p><a key={i} href={`#${link}`} title={p}>{p}</a></>)
                     })}
                 </PathLink>
                 <SearchInput placeholder="Pesquisar" onChange={(e) => setSearch(e.currentTarget.value)} value={search} />
