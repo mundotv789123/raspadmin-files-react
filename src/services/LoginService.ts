@@ -1,23 +1,14 @@
-import axios, { AxiosInstance } from "axios";
+import HttpClient from "./HttpClient";
 
 export class LoginService {
-    private API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
-
-    private api: AxiosInstance;
-    
-    constructor() {
-        this.api = axios.create({ 
-            baseURL: `${this.API_URL}/auth`,
-            timeout: 5000 
-        })
-    }
+    constructor(private client = new HttpClient()) { }
 
     login(username: string, password: string, callback: (() => void), callbackError?: ((errorMessage: string) => void)) {
         var formData = new URLSearchParams();
         formData.append("username", username);
         formData.append("password", password);
 
-        this.api.post(`/login`, formData, {auth: {username, password}}).then(callback)
+        this.client.api.post(`/auth/login`, formData, {auth: {username, password}}).then(callback)
         .catch((error) => {
             if (!callbackError)
                 return;
