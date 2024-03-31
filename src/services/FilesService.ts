@@ -75,7 +75,7 @@ export class FilesService {
         return a.name.localeCompare(b.name, undefined, { numeric: true });
       return a.is_dir ? -1 : 1;
     });
-  } 
+  }
 
   public static getParentPath = (pathFile: string): string =>
     pathFile.replace(/\/[^\/]+\/?$/, '');

@@ -99,7 +99,6 @@ export default function App() {
       <Header>
         <h2 className={"title"}><a href={"#"}>{process.env.NEXT_PUBLIC_APP_NAME ?? 'RaspAdmin'}</a></h2>
       </Header>
-
       <Nav>
         <CollapseButtom onClick={toggleBar}>
           <FontAwesomeIcon icon={faBars} />
