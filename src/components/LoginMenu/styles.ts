@@ -1,9 +1,6 @@
-import { useState } from "react";
-import styled from "styled-components";
-import { keyframes } from "styled-components";
-import { LoginService } from "../services/LoginService";
+import styled, { keyframes } from "styled-components"
 
-const LoginCont = styled.div`
+export const LoginCont = styled.div`
   display: flex;
   position: fixed;
   top: 0;
@@ -14,7 +11,7 @@ const LoginCont = styled.div`
   background: rgba(9, 9, 9, 1);
 `
 
-const PopUpAnimation = keyframes`
+export const PopUpAnimation = keyframes`
   0% {
     opacity: 0;
     transform: translateY(-500px);
@@ -29,7 +26,7 @@ const PopUpAnimation = keyframes`
   }
 `
 
-const LoginForm = styled.form`
+export const LoginForm = styled.form`
   margin: auto;
   background: rgb(48, 48, 48);
   padding: 15px 25px;
@@ -38,12 +35,12 @@ const LoginForm = styled.form`
   animation: ${PopUpAnimation} 0.8s normal; 
 `
 
-const Title = styled.h2`
+export const Title = styled.h2`
   text-align: center;
   margin: 15px 0;
 `
 
-const Input = styled.input`
+export const Input = styled.input`
   display: block;
   background: rgb(50, 50, 50);
   border: solid 1px gray;
@@ -58,7 +55,7 @@ const Input = styled.input`
   }
 `
 
-const ErrorArea = styled.div`
+export const ErrorArea = styled.div`
   background-color: red;
   text-align: center;
   width: 220px;
@@ -69,7 +66,7 @@ const ErrorArea = styled.div`
   }
 `
 
-const Button = styled.button`
+export const Button = styled.button`
   display: block;
   background: rgb(50, 50, 50);
   border: solid 1px gray;
@@ -91,7 +88,7 @@ const Button = styled.button`
   }
 `
 
-const LoadingAnimation = keyframes`
+export const LoadingAnimation = keyframes`
   0% {
     margin-left: 0;
     width: 0%;
@@ -109,7 +106,7 @@ const LoadingAnimation = keyframes`
   }
 `
 
-const Loading = styled.div`
+export const Loading = styled.div`
   height: 2px;
   display: flex;
   &::before {
@@ -121,43 +118,3 @@ const Loading = styled.div`
     animation: ${LoadingAnimation} 1s infinite;
   }
 `
-
-interface PropsInterface {
-  onSuccess: (() => void) | null 
-}
-
-export default function LoginMenu(props: PropsInterface) {
-  const service = new LoginService();
-
-  const [errorText, setErroText] = useState<string>();
-  const [loading, setLoding] = useState(false);
-
-  function submit(event: any) {
-    event.preventDefault();
-    let username = event.target.username.value;
-    let password = event.target.password.value;
-    if (username === '' || password === '') {
-      setErroText('Preencha todos os campos');
-      return;
-    }
-
-    setLoding(true);
-    service.login(username, password, props.onSuccess, (message) => {
-      setLoding(false);
-      setErroText(message);
-    })
-  }
-
-  return (
-    <LoginCont>
-      <LoginForm onSubmit={submit}>
-        <Title>Login</Title>
-        <Input placeholder={"Username"} id={'username'} required />
-        <Input placeholder={"Password"} id={'password'} type={'password'} required />
-        {errorText && !loading && <ErrorArea><p>{errorText}</p></ErrorArea>}
-        {loading && <Loading />}
-        <Button disabled={loading}>Login</Button>
-      </LoginForm>
-    </LoginCont>
-  )
-}
