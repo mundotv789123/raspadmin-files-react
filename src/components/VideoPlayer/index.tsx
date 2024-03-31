@@ -134,7 +134,7 @@ export default function VideoPlayer(props: PropsInterface) {
     return <></>
   }
 
-  const fileName = srcToFileName(props.src);
+  const fileName = srcToFileName(decodeURIComponent(props.src));
 
   return (
     <VideoCont ref={main_element} onMouseMove={resetCursorTimeout}>
