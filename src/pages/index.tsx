@@ -5,10 +5,11 @@ import LoginMenu from "../components/LoginMenu"
 import { FilesService } from "../services/FilesService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
-import { Aside, CollapseButtom, Container, Header, Main, Nav, PathLink, SearchInput } from "./styles";
+import { Aside, CollapseButtom, Container, Header, Main, Nav, SearchInput } from "./styles";
 import OpenedFile from "../components/OpenedFile";
 import { FileModel } from "../services/models/FilesModel";
 import { FileError } from "../services/exceptions/FilesErros";
+import PathNavigator from "../elements/PathNavigator";
 
 export default function App() {
   const service = FilesService.getInstance();
@@ -82,6 +83,7 @@ export default function App() {
   }
 
   useEffect(() => {
+    setHash(location.hash);
     window.onhashchange = () => setHash(location.hash);
     loadTabFiles();
   }, [])
@@ -102,14 +104,7 @@ export default function App() {
         <CollapseButtom onClick={toggleBar}>
           <FontAwesomeIcon icon={faBars} />
         </CollapseButtom>
-        <PathLink>
-          <p>/</p><a href="#/" title="home">home</a>
-          {path && path.split("/").filter(p => p).map((p, i) => {
-            let link = '';
-            path.split('/').filter(p => p).forEach((l, li) => { if (li <= i) link += `/${l}` });
-            return (<><p>/</p><a key={i} href={`#${encodeURIComponent(link)}`} title={p}>{p}</a></>)
-          })}
-        </PathLink>
+        <PathNavigator path={path}/>
         <SearchInput placeholder="Pesquisar" onChange={(e) => setSearch(e.currentTarget.value)} value={search} />
       </Nav>
       <Main>

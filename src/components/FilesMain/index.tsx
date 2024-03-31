@@ -21,9 +21,8 @@ export default function FilesMain(props: PropsInterface) {
         props.files === null ? <LoadingCont /> :
 
         props.files.map((file: FileModel, index: number) => (
-          <>{(!props.search || file.name.toLowerCase().includes(props.search.toLowerCase())) && 
-            <FileBlock file={file} key={index} loading={props.fileLoading == index} />}
-          </>
+        (!props.search || file.name.toLowerCase().includes(props.search.toLowerCase())) && 
+          <FileBlock file={file} key={index} loading={props.fileLoading == index} />
         ))
       }
     </Panel>
