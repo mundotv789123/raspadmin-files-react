@@ -192,7 +192,7 @@ export default function AudioPlayer(props: PropsInterface) {
     <AudioContent>
       <PlayList
         open={playlistOpened}
-        playlist={playlist.map(src => srcToFileName(src))}
+        playlist={playlist.map(src => srcToFileName(decodeURIComponent(src)))}
         playing={src ? playlist.indexOf(src) : null}
         onClick={updateSongPlaying}
       />
