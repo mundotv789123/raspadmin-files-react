@@ -1,108 +1,79 @@
-import axios, { AxiosInstance } from "axios";
-import { FileLinkModel, FileModel } from "./models/FilesModel";
+import axios, { AxiosError, AxiosInstance } from "axios";
+import { FileResponse, FileModel } from "./models/FilesModel";
 import { lookup } from "mime-types";
+import { FileError } from "./exceptions/FilesErros";
+import path from "path";
+
+interface FileResponseData {
+  files: Array<FileResponse>
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 export class FilesService {
-  private API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
-  private API_QUERY = process.env.NEXT_PUBLIC_API_QUERY ?? "?path={0}"
-  private SRC_QUERY = process.env.NEXT_PUBLIC_SRC_QUERY ?? "?path={0}"
 
   private api: AxiosInstance;
 
   constructor() {
     this.api = axios.create({
-      baseURL: `${this.API_URL}`,
+      baseURL: `${API_URL}`,
       timeout: 5000
     })
   }
 
-  public getFiles(pathFile: string | null, callback: ((files: Array<FileModel>, path: string) => void), callbackError?: ((status: number, errorMessage: string) => void)) {
-    let path = this.clearPath(pathFile);
+  public async getFiles(pathFile: string | null): Promise<Array<FileModel>> {
+    if (pathFile == null)
+      pathFile = "/";
+    try {
+      let result = await this.api.get<FileResponseData>(`/files?path=${encodeURIComponent(pathFile)}`);
+      if (result.status == 204)
+        return [];
 
-    this.api.get(`/files${this.getQuery(path)}`).then(reponse => {
-      if (reponse.status == 204) {
-        return callback([], path);
-      }
-
-      let files: Array<FileModel> = Object.values<FileModel>(reponse.data.files).map(file => {
-        if (!file.type) {
-          let type = lookup(file.name);
-          if (type)
-            file.type = type;
-        }
-        if (file.icon)
-          file.icon = this.getFileSrc(file.icon)
-        return file;
-      });
-      files = files.sort((a: FileModel, b: FileModel) => {
-        if (a.is_dir == b.is_dir)
-          return a.name.localeCompare(b.name, undefined, { numeric: true });
-        return a.is_dir ? -1 : 1;
-      });
-      callback(files, path);
-    }).catch(error => {
-      console.error(error);
-      if (!callbackError)
-        return;
-
-      let status = 500;
-      try {
-        let json = error.toJSON();
-        if (json && json.status)
-          status = json.status;
-      } catch {
-      }
-
-      let message = this.getErrorMessage(status);
-      callbackError(status, message);
-    })
-  }
-
-  public openFile(file: FileModel, path: string): FileLinkModel {
-    let parent = path.replace(/\/[^\/]+\/?$/, '');
-    return {
-      name: file.name,
-      type: file.type,
-      parent: parent,
-      src: this.getFileSrc(path)
+      let response = result.data.files.map(file => this.convertFileModel(file, pathFile));
+      return FilesService.sortNaturalFiles(response);
+    } catch (ex: unknown) {
+      if (ex instanceof AxiosError)
+        throw new FileError(ex.response?.status ?? 500);
     }
   }
 
-  public getFileSrc(path: string): string {
-    return `${this.API_URL}/files/open${this.getSrcQuery(path)}`;
+  private convertFileModel(file: FileResponse, pathFile: string): FileModel {
+    let filePathFull = file.open ? pathFile : `${pathFile}/${file.name}`;
+
+    let fileModel = {
+      ...file,
+      src: FilesService.getSrcFile(filePathFull),
+      href: FilesService.getHrefFile(filePathFull),
+      parent: FilesService.getParentPath(pathFile)
+    };
+    
+    if (!fileModel.type)
+      fileModel.type = FilesService.getType(fileModel.name);
+    if (fileModel.icon)
+      fileModel.icon = FilesService.getSrcFile(fileModel.icon);
+    return fileModel;
   }
 
-  private clearPath(path: string | null): string {
-    if (path == null)
-      return "";
-    return path
-      .replace(/\/\/+/, '/')
-      .replace(/^\/+/, '')
-      .replace(/\/+$/, '')
-      .trim();
+  public static getType(name: string): string | null {
+    let mimeType = lookup(name);
+    if (mimeType)
+      return mimeType;
   }
 
-  private getErrorMessage(code: number): string {
-    switch (code) {
-      case 404:
-        return 'Arquivo ou diretório não encontrado!';
-      case 403:
-        return 'Você não tem permissão para acessar esse arquivo ou diretório!';
-      case 502:
-      case 503:
-        return 'Serviço indisponível no momento, tente novamente mais tarde!';
-      case 500:
-        return 'Erro interno ao processar arquivo!';
-      default:
-        return 'Erro desconhecido ao processar requisição!'
-    }
-  }
+  public static sortNaturalFiles(files: Array<FileModel>): Array<FileModel> {
+    return files.sort((a: FileModel, b: FileModel) => {
+      if (a.is_dir == b.is_dir)
+        return a.name.localeCompare(b.name, undefined, { numeric: true });
+      return a.is_dir ? -1 : 1;
+    });
+  } 
 
-  private getQuery(path: string): string {
-    return this.API_QUERY.replace('{0}', encodeURIComponent(`${path}`));
-  }
+  public static getParentPath = (pathFile: string): string =>
+    pathFile.replace(/\/[^\/]+\/?$/, '');
 
-  private getSrcQuery(path: string): string {
-    return this.SRC_QUERY.replace('{0}', encodeURIComponent(`${path}`));
-  }
+  public static getHrefFile = (pathFile: string): string =>
+    `#${encodeURIComponent(path.normalize(`${pathFile}`))}`;
+
+  public static getSrcFile = (pathFile: string): string =>
+    `${API_URL}/files/open?path=${encodeURIComponent(path.normalize(`${pathFile}`))}`;
 }
