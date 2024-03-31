@@ -50,7 +50,7 @@ export default function AudioPlayer(props: PropsInterface) {
       randomizeList(true);
   }, [src])
 
-  const fileName = srcToFileName(src);
+  const fileName = srcToFileName(decodeURIComponent(src));
 
   function loadPlayer() {
     if (!loading)
