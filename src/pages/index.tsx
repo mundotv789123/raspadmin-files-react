@@ -11,7 +11,7 @@ import { FileModel } from "../services/models/FilesModel";
 import { FileError } from "../services/exceptions/FilesErros";
 
 export default function App() {
-  const service = new FilesService();
+  const service = FilesService.getInstance();
 
   const [hash, setHash] = useState<string>("");
 

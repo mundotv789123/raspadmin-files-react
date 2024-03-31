@@ -13,14 +13,21 @@ const API_QUERY = process.env.NEXT_PUBLIC_API_QUERY ?? "?path={0}"
 const SRC_QUERY = process.env.NEXT_PUBLIC_SRC_QUERY ?? "?path={0}"
 
 export class FilesService {
+  private static instance: FilesService | null = null;
 
   private api: AxiosInstance;
 
-  constructor() {
+  private constructor() {
     this.api = axios.create({
       baseURL: `${API_URL}`,
       timeout: 5000
     })
+  }
+
+  public static getInstance(): FilesService {
+    if (this.instance == null)
+      this.instance = new FilesService();
+    return this.instance;
   }
 
   public async getFiles(pathFile: string | null): Promise<Array<FileModel>> {

@@ -8,7 +8,6 @@ import { srcToFileName } from '../../helpers/ConverterHelper';
 
 var cursorTimeout = 0;
 
-
 interface PropsInterface {
   src: string | undefined, 
   backUrl: string | undefined 
