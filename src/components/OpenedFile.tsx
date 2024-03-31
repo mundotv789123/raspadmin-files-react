@@ -76,6 +76,8 @@ export default function OpenendFile(props: PropsInterface) {
     if (props.file == null) {
       setOpenendVideo(null);
       setOpenendImage(null);
+      if (openedAudio)
+        openedAudio.src = null;
     } else {
       loadFile();
     }

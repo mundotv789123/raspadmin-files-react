@@ -30,9 +30,11 @@ export default function Home() {
     const [search, setSearch] = useState<string>('');
   
     function loadPage() {
+      setLogin(false);
       if (tabFiles == null) {
         loadTabFiles();
       }
+      loadMainFiles();
     }
   
     function loadTabFiles() {
@@ -62,7 +64,9 @@ export default function Home() {
           }
         }
       }
-  
+
+      setText(null);
+
       service.getFiles(path).then((files) => {
         setFileLoading(-1);
         if (files.length == 1 && files[0].open) {
