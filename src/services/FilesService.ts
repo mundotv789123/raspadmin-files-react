@@ -38,7 +38,7 @@ export class FilesService {
       if (result.status == 204)
         return [];
 
-      let response = result.data.files.map(file => this.convertFileModel(file, pathFile));
+      let response = result.data.files.map(file => FilesService.convertFileModel(file, pathFile));
       return FilesService.sortNaturalFiles(response);
     } catch (ex: unknown) {
       if (ex instanceof AxiosError)
@@ -46,7 +46,7 @@ export class FilesService {
     }
   }
 
-  private convertFileModel(file: FileResponse, pathFile: string): FileModel {
+  public static convertFileModel(file: FileResponse, pathFile: string): FileModel {
     let filePathFull = file.open ? pathFile : `${pathFile}/${file.name}`;
 
     let fileModel = {
