@@ -9,6 +9,8 @@ interface FileResponseData {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
+const API_QUERY = process.env.NEXT_PUBLIC_API_QUERY ?? "?path={0}"
+const SRC_QUERY = process.env.NEXT_PUBLIC_SRC_QUERY ?? "?path={0}"
 
 export class FilesService {
 
@@ -25,7 +27,7 @@ export class FilesService {
     if (pathFile == null)
       pathFile = "/";
     try {
-      let result = await this.api.get<FileResponseData>(`/files?path=${encodeURIComponent(pathFile)}`);
+      let result = await this.api.get<FileResponseData>(`/files${FilesService.getQuery(encodeURIComponent(pathFile))}`);
       if (result.status == 204)
         return [];
 
@@ -75,5 +77,11 @@ export class FilesService {
     `#${encodeURIComponent(path.normalize(`${pathFile}`))}`;
 
   public static getSrcFile = (pathFile: string): string =>
-    `${API_URL}/files/open?path=${encodeURIComponent(path.normalize(`${pathFile}`))}`;
+    `${API_URL}/files/open${FilesService.getSrcQuery(encodeURIComponent(path.normalize(`${pathFile}`)))}`;
+
+  public static getQuery = (path: string): string =>
+    API_QUERY.replace('{0}', path);
+
+  public static getSrcQuery = (path: string): string =>
+    SRC_QUERY.replace('{0}', path);
 }
