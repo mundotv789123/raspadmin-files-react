@@ -6,7 +6,12 @@ import PlayList from "./PlayList";
 import Range from "../../elements/range";
 import { numberClockTime, srcToFileName } from "../../helpers/ConverterHelper";
 
-export default function AudioPlayer(props: { src: string, playlist: Array<string> }) {
+interface PropsInterface {
+  src: string, 
+  playlist: Array<string> 
+}
+
+export default function AudioPlayer(props: PropsInterface) {
   const playlist = props.playlist;
 
   const [src, setSrc] = useState(props.src);

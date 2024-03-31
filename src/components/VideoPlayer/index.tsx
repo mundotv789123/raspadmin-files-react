@@ -8,7 +8,13 @@ import { srcToFileName } from '../../helpers/ConverterHelper';
 
 var cursorTimeout = 0;
 
-export default function VideoPlayer(props: { src: string | undefined, backUrl: string | undefined }) {
+
+interface PropsInterface {
+  src: string | undefined, 
+  backUrl: string | undefined 
+}
+
+export default function VideoPlayer(props: PropsInterface) {
 
   const [progressPercent, setProgressPercent] = useState(0);
 

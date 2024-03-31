@@ -31,7 +31,14 @@ const Text = styled.h1`
   width: 100%;
 `
 
-export default function FilesBlock(props: { files: Array<FileModel> | null, text: string, search?: string, fileLoading: number }) {
+interface PropsInterface {
+  files: Array<FileModel> | null, 
+  text: string, 
+  search?: string, 
+  fileLoading: number
+}
+
+export default function FilesBlock(props: PropsInterface) {
   var text = props.text;
   if (props.files?.length == 0 ?? false)
     text = "Essa pasta está vazia!"

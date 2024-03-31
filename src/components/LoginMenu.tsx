@@ -122,7 +122,11 @@ const Loading = styled.div`
   }
 `
 
-export default function LoginMenu(props: { onSuccess: (() => void) | null }) {
+interface PropsInterface {
+  onSuccess: (() => void) | null 
+}
+
+export default function LoginMenu(props: PropsInterface) {
   const service = new LoginService();
 
   const [errorText, setErroText] = useState<string>();

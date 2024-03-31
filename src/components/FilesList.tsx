@@ -17,7 +17,11 @@ const FileRow = styled.a`
   }
 `
 
-export default function FilesList(props: { files: Array<FileModel> }) {
+interface PropsInterface {
+  files: Array<FileModel>
+}
+
+export default function FilesList(props: PropsInterface) {
   if (!props.files)
     return <Column />
 

@@ -2,7 +2,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CloseLink, ControlLink, Controls, ImagemContainer, Img } from "./styles";
 import { faAngleLeft, faAngleRight, faClose } from "@fortawesome/free-solid-svg-icons";
 
-export default function ImageViewer(props: { src: string, closeUrl?: string, backUrl?: string, nextUrl?: string }) {
+interface PropsInterface {
+  src: string, 
+  closeUrl?: string, 
+  backUrl?: string, 
+  nextUrl?: string
+}
+
+export default function ImageViewer(props: PropsInterface) {
   return (
     <ImagemContainer>
       {props.closeUrl && <CloseLink href={props.closeUrl}>

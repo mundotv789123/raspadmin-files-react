@@ -56,7 +56,13 @@ const Loading = styled.div`
   animation: ${Spin} 500ms linear infinite;
 `
 
-export default function FileBlock(props: { file: FileModel, key: number, loading: boolean }) {
+interface PropsInterface {
+  file: FileModel, 
+  key: number, 
+  loading: boolean
+}
+
+export default function FileBlock(props: PropsInterface) {
   return (
     <FileCont href={props.file.href}>
       <FileIcon style={{ backgroundImage: "url('" + (props.file.icon ? props.file.icon : (iconsPath + getFileIcon(props.file.is_dir, props.file.type))) + "')" }}>

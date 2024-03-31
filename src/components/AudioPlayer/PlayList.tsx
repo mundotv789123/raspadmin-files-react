@@ -52,8 +52,14 @@ const MusicRow = styled.div`
     }
   }
 `
+interface PropsInterface {
+  open: boolean, 
+  playlist: Array<string>, 
+  playing?: number
+  onClick?: ((index: number) => void)
+}
 
-export default function PlayList(props: { open: boolean, playlist: Array<string>, onClick?: ((index: number) => void), playing?: number }) {
+export default function PlayList(props: PropsInterface) {
 
   const [playing, setPlaying] = useState(null);
 

@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Progress, ProgressBar, ProgressFollower, RangeElement } from "./styles";
 
-export default function Range(props: { percent?: number, onInput?: ((percent: number) => boolean), follower?: boolean, live?: boolean }) {
+
+interface PropsInterface {
+  percent?: number, 
+  follower?: boolean, 
+  live?: boolean
+  onInput?: ((percent: number) => boolean)
+}
+
+export default function Range(props: PropsInterface) {
 
   const [percent, setPercent] = useState(props.percent ?? 0)
   const [followerPercent, setFollowerPercent] = useState(0)
