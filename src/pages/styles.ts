@@ -62,34 +62,6 @@ export const Aside = styled.aside`
   background: rgba(9, 9, 9, 0.3);
 `
 
-export const PathLink = styled.div`
-  font-size: 11pt;
-  font-weight: bold;
-  margin-left: 25px;
-  margin-right: auto;
-  color: white;
-  display: flex;
-  overflow-x: scroll;
-  & p, a {
-    display: block;
-    align-self: center;
-  }
-  & a {
-    color: white;
-    margin: 0 2px;
-    padding: 2px;
-    border-radius: 5px;
-    max-width: 120px;
-    min-width: 25px;
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-  }
-`
-
 export const SearchInput = styled.input`
   background-color: rgba(0, 0, 0, 0.3);
   align-self: center;
