@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import UsersManager from "../services/admin/UsersManager";
-import { User } from "../services/admin/models/UserModels";
+import UsersManager from "../../services/admin/UsersManager";
+import { User } from "../../services/admin/models/UserModels";
 
 export default function Admin() {
 
