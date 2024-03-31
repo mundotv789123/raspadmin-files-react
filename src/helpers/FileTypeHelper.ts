@@ -4,6 +4,8 @@ export const isAudio = (type: string) => type.match(/audio\/(mpeg|mp3|ogg|(x-(pn
 
 export const isImage = (type: string) => type.match(/image\/(png|jpe?g|svg|webp)/);
 
+export const iconsPath = "/img/icons/";
+
 export function getFileIcon(is_dir: boolean, minetype: string | null): string {
   if (is_dir)
     return 'folder.svg'
