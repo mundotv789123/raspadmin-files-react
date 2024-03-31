@@ -1,4 +1,4 @@
-import FilesBlocks from "../components/FilesBlocks"
+import FilesBlocks from "../components/FilesMain"
 import FilesList from "../components/FilesList"
 import { useEffect, useState } from "react";
 import LoginMenu from "../components/LoginMenu"
