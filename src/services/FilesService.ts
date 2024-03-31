@@ -1,25 +1,18 @@
 import axios, { AxiosInstance } from "axios";
 import { FileLinkModel, FileModel } from "./models/FilesModel";
 import { lookup } from "mime-types";
+import HttpClient from "./HttpClient";
 
 export class FilesService {
-  private API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
   private API_QUERY = process.env.NEXT_PUBLIC_API_QUERY ?? "?path={0}"
   private SRC_QUERY = process.env.NEXT_PUBLIC_SRC_QUERY ?? "?path={0}"
 
-  private api: AxiosInstance;
-
-  constructor() {
-    this.api = axios.create({
-      baseURL: `${this.API_URL}`,
-      timeout: 5000
-    })
-  }
+  constructor(private client = new HttpClient()) { }
 
   public getFiles(pathFile: string | null, callback: ((files: Array<FileModel>, path: string) => void), callbackError?: ((status: number, errorMessage: string) => void)) {
     let path = this.clearPath(pathFile);
 
-    this.api.get(`/files${this.getQuery(path)}`).then(reponse => {
+    this.client.api.get(`/files${this.getQuery(path)}`).then(reponse => {
       if (reponse.status == 204) {
         return callback([], path);
       }
@@ -69,7 +62,7 @@ export class FilesService {
   }
 
   public getFileSrc(path: string): string {
-    return `${this.API_URL}/files/open${this.getSrcQuery(path)}`;
+    return `${this.client.API_URL}/files/open${this.getSrcQuery(path)}`;
   }
 
   private clearPath(path: string | null): string {
