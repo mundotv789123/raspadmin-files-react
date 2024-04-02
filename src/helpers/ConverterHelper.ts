@@ -1,7 +1,7 @@
 
 /* get file name from url, ex: http://exemple.local/video/cool_song.mp3 -> cool_song */
 export function srcToFileName(src: string): string {
-    return decodeURIComponent(src)
+    return src
         .replace(/\/+$/, '') // remove final bar (/)
         .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/+)+/, '') // remove path file and url
         .replace(/\.[a-zA-Z0-9]+$/, ''); // remove extension file
