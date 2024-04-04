@@ -10,7 +10,6 @@ interface PropsInterface {
 }
 
 export default function Range(props: PropsInterface) {
-
   const [percent, setPercent] = useState(props.percent ?? 0)
   const [followerPercent, setFollowerPercent] = useState(0)
   const [keyPressing, setKeyPressing] = useState(false)
@@ -24,31 +23,27 @@ export default function Range(props: PropsInterface) {
     setPercent(props.percent);
   }, [props.percent])
 
-  function callEvent(event: any) {
-    setKeyPressing(false);
-
+  function callEvent(event: any, live = false) {
     let perc = getCursorPercent(event);
     if (props.onInput && props.onInput(perc))
       setPercent(perc);
   }
 
   function updateProgress(event: any) {
-    let kp = event.buttons == 1;
-    setKeyPressing(kp);
-
     let perc = getCursorPercent(event);
-    if (!kp) {
-      setFollowerPercent(props.follower && perc);
-      return;
-    }
 
     if (props.live) {
-      callEvent(event);
+      callEvent(event, true);
       return;
     }
 
     setFollowerPercent(0);
     setPercent(perc);
+  }
+
+  function eventFollowProgress(event: any) {
+    let perc = getCursorPercent(event);
+    setFollowerPercent(props.follower && perc);
   }
 
   function getCursorPercent(event: any): number {
@@ -63,9 +58,18 @@ export default function Range(props: PropsInterface) {
 
   return (
     <RangeElement
-      onMouseUp={callEvent}
-      onMouseMove={updateProgress}
-      onMouseLeave={() => { setFollowerPercent(0); setKeyPressing(false) }}
+      draggable={true}
+      onDragStart={e => {
+        e.dataTransfer.setDragImage(new Image(), 0, 0);
+        setKeyPressing(true)
+      }}
+      onClick={e => callEvent(e, true)}
+      onDragEnd={e => {
+        callEvent(e); 
+        setKeyPressing(false)
+      }}
+      onDrag={updateProgress}
+      onMouseMove={eventFollowProgress}
     >
       <Progress ref={progress}>
         <ProgressBar style={{ width: `${percent}%` }} />

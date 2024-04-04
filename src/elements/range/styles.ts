@@ -25,7 +25,7 @@ export const ProgressBar = styled.div`
     content: "";
     display: block;
     position: relative;
-    margin: -5px -7px 0 auto;
+    margin: -5px -7px 0 calc(100% - 7.5px);
     width: 5px;
     height: 5px;
     background-color: white;
