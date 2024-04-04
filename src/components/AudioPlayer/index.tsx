@@ -57,12 +57,7 @@ export default function AudioPlayer(props: PropsInterface) {
       return;
 
     setErrorText(null);
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: hideTitle ? "Raspadmin Music Player" : fileName,
-      artwork: [{ src: "/img/icons/music.svg" }]
-    });
-    navigator.mediaSession.setActionHandler('previoustrack', backSong);
-    navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+    loadMediaSession();
 
     let volume = getSessionVolume();
     setAudioVolume(volume);
@@ -73,9 +68,21 @@ export default function AudioPlayer(props: PropsInterface) {
     setAudioDuration(numberClockTime(audio_element.current.duration));
   }
 
+  function loadMediaSession() {
+    if (!navigator.mediaSession.metadata) {
+      navigator.mediaSession.metadata = new MediaMetadata();
+    }
+    navigator.mediaSession.metadata.title = hideTitle ? "Raspadmin Music Player" : fileName;
+    navigator.mediaSession.metadata.artwork = [{ src: "/img/icons/music.svg" }];
+    navigator.mediaSession.setActionHandler('previoustrack', backSong);
+    navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+  }
+
   function updateHideTitle() {
-    navigator.mediaSession.metadata.title = !hideTitle ? "Raspadmin Music Player" : fileName;
-    setHideTitle(!hideTitle);
+    setHideTitle(isHidetitle => {
+      navigator.mediaSession.metadata.title = !isHidetitle ? "Raspadmin Music Player" : fileName;
+      return !isHidetitle;
+    });
   }
 
   function updatePlaying() {
@@ -141,11 +148,9 @@ export default function AudioPlayer(props: PropsInterface) {
 
     setLoading(true)
     let index = list.indexOf(src);
-    if (index <= 0) {
-      setSrc(list[playlist.length - 1]);
-      return;
-    }
-    setSrc(list[index - 1]);
+    setSrc(() => {
+      return index <= 0 ? list[playlist.length - 1] : list[index - 1];
+    });
   }
 
   function updateSongPlaying(index: number) {
