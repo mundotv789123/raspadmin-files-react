@@ -183,7 +183,7 @@ export default function VideoPlayer(props: PropsInterface) {
             <FontAwesomeIcon icon={(playing ? faPause : faPlay)} />
           </VideoButton>
           <VideoProgress>
-            <Range percent={progressPercent} onInput={updateVideoTime} follower={true} />
+            <Range percent={progressPercent} onInput={updateVideoTime} follower={true} step='0.25'/>
           </VideoProgress>
           <VideoVolume>
             <div className="volume" ref={volume} onClick={updateVolume}>

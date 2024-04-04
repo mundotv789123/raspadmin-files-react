@@ -230,7 +230,7 @@ export default function AudioPlayer(props: PropsInterface) {
               <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
             </ControlButton>
             <VolumeProgress>
-              <Range percent={audioVolume} onInput={updateAudioVolume} live={true} />
+              <Range percent={audioVolume} onInput={updateAudioVolume} live={true} step={'0.1'}/>
             </VolumeProgress>
           </VolumeControl>
           <ControlButton onClick={updateHideTitle}>
@@ -244,7 +244,7 @@ export default function AudioPlayer(props: PropsInterface) {
         <AudioDurationContent>
           <AudioDurationCount>{audioCurrentTime}/{audioDuration}</AudioDurationCount>
           <AudioProgress>
-            <Range percent={progressPercent} follower={true} onInput={updateAudioTime} />
+            <Range percent={progressPercent} follower={true} onInput={updateAudioTime} step={'0.25'} />
           </AudioProgress>
         </AudioDurationContent>
         <audio
