@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, ErrorText, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
-import { faAngleUp, faBackwardStep, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faShuffle, faTimes, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { faAngleUp, faBackwardStep, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faRotate, faRotateRight, faShuffle, faTimes, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
 import Range from "../../elements/range";
@@ -83,6 +83,11 @@ export default function AudioPlayer(props: PropsInterface) {
   }
 
   function togglePlay() {
+    if (errorText != null) {
+      audio_element.current.load();
+      setLoading(true)
+    }
+
     if (playing) {
       audio_element.current.pause();
     } else {
@@ -206,8 +211,8 @@ export default function AudioPlayer(props: PropsInterface) {
           <ControlButton onClick={backSong} disabled={playlist.length <= 0}>
             <FontAwesomeIcon icon={faBackwardStep} />
           </ControlButton>
-          <ControlButton onClick={togglePlay} disabled={errorText != null}>
-            {loading ? <LoadingSpin /> : <FontAwesomeIcon icon={errorText ? faTimes : playing ? faPause : faPlay} />}
+          <ControlButton onClick={togglePlay}>
+            {loading ? <LoadingSpin /> : <FontAwesomeIcon icon={errorText ? faRotateRight : playing ? faPause : faPlay} />}
           </ControlButton>
           <ControlButton onClick={nextSong} disabled={playlist.length <= 0}>
             <FontAwesomeIcon icon={faForwardStep} />
