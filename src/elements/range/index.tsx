@@ -63,13 +63,14 @@ export default function Range(props: PropsInterface) {
         e.dataTransfer.setDragImage(new Image(), 0, 0);
         setKeyPressing(true)
       }}
-      onClick={e => callEvent(e, true)}
+      onMouseDown={e => callEvent(e, true)}
       onDragEnd={e => {
         callEvent(e); 
         setKeyPressing(false)
       }}
       onDrag={updateProgress}
       onMouseMove={eventFollowProgress}
+      onMouseLeave={e => setFollowerPercent(0)}
     >
       <Progress ref={progress}>
         <ProgressBar style={{ width: `${percent}%` }} />
