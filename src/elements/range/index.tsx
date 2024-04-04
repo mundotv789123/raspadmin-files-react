@@ -23,7 +23,7 @@ export default function Range(props: PropsInterface) {
     setPercent(props.percent);
   }, [props.percent])
 
-  function callEvent(event: any, live = false) {
+  function callEvent(event: any) {
     let perc = getCursorPercent(event);
     if (props.onInput && props.onInput(perc))
       setPercent(perc);
@@ -33,7 +33,7 @@ export default function Range(props: PropsInterface) {
     let perc = getCursorPercent(event);
 
     if (props.live) {
-      callEvent(event, true);
+      callEvent(event);
       return;
     }
 
@@ -63,7 +63,7 @@ export default function Range(props: PropsInterface) {
         e.dataTransfer.setDragImage(new Image(), 0, 0);
         setKeyPressing(true)
       }}
-      onMouseDown={e => callEvent(e, true)}
+      onClick={e => callEvent(e)}
       onDragEnd={e => {
         callEvent(e); 
         setKeyPressing(false)
