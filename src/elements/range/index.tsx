@@ -60,12 +60,17 @@ export default function Range(props: PropsInterface) {
       </RangeArea>
       <RangeInput type="range" step={props.step} value={percent} min={0} max={100}
         onInput={updateProgress}
-        onMouseLeave={() => setFollowerPercent(0)}
         onMouseDown={() => setKeyPressing(true)}
-        onMouseUp={e => { 
+        onTouchStart={() => setKeyPressing(true)}
+        onTouchEnd={() => {
           setKeyPressing(false);
           callEvent();
         }}
+        onMouseUp={() => { 
+          setKeyPressing(false);
+          callEvent();
+        }}
+        onMouseLeave={() => setFollowerPercent(0)}
         onMouseMove={e => {
           let perc = getCursorPercent(event);
           setFollowerPercent(props.follower && perc);
