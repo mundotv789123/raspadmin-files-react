@@ -4,7 +4,6 @@ import { FileCont, FileIcon, FileLoading, FileName } from "./styles";
 
 interface PropsInterface {
   file: FileModel, 
-  key: number, 
   loading: boolean
 }
 

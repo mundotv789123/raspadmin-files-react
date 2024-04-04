@@ -1,4 +1,0 @@
-Arquivo de exemplo para mostrar a funcionalidade do sistema.
-
-Esse projeto tem como objetivo o aprendizado.
-Comecei quando estava aprendendo e hoje uso para espalhar conhecimento para todos.
