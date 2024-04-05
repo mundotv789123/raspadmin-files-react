@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled, { keyframes } from "styled-components"
 
 export const Container = styled.div`
   display: grid;
@@ -77,4 +77,31 @@ export const SearchInput = styled.input`
   &:focus {
     width: 250px;
   }
+`
+
+export const SideBarContainer = styled.div`
+  position: fixed;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(1.5px);
+`
+
+const SideBarAnimation = keyframes`
+  from {
+    width: 0;
+  }
+`
+
+export const SideBar = styled.div`
+  width: 320px;
+  max-width: 90%;
+  overflow: hidden;
+  background-color: rgba(10, 10, 10, 0.7);
+  animation: ${SideBarAnimation} 50ms linear;
+  height: 100%;
+  overflow-y: scroll;
 `

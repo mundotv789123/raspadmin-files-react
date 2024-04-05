@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FilesService } from "../../services/FilesService";
 import { FileModel } from "../../services/models/FilesModel";
 import { FileError } from "../../services/exceptions/FilesErros";
-import { Aside, CollapseButtom, Container, Header, Main, Nav, SearchInput } from "./styles";
+import { Aside, CollapseButtom, Container, Header, Main, Nav, SearchInput, SideBar, SideBarContainer } from "./styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PathNavigator from "../../elements/PathNavigator";
 import FilesList from "../FilesList";
@@ -99,7 +99,7 @@ export default function Home() {
     }, [hash]);
   
     return (
-      <Container style={{ gridTemplateColumns: (barOpen ? "220px auto" : null) }}>
+      <Container>
         <Header>
           <h2 className={"title"}><a href={"#"}>{process.env.NEXT_PUBLIC_APP_NAME ?? 'RaspAdmin'}</a></h2>
         </Header>
@@ -113,6 +113,13 @@ export default function Home() {
         <Main>
           {tabFiles && <FilesList files={tabFiles.filter(e => e.is_dir)} />}
         </Main>
+        <SideBarContainer style={{display: (barOpen ? null : "none") }}>
+          <SideBar>
+            {tabFiles && <FilesList files={tabFiles.filter(e => e.is_dir)} />}
+          </SideBar>
+          <div style={{width: "100%"}} onClick={() => setBarOpen(false)}>
+          </div>
+        </SideBarContainer>
         <Aside>
           <FilesMain files={mainFiles} text={text} search={search} fileLoading={fileLoading} />
         </Aside>
