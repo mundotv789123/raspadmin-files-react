@@ -61,6 +61,7 @@ export default function Home() {
         else {
           if (path != openedFile?.parent) {
             setMainFiles(null);
+            setSearch('');
           }
         }
       }
