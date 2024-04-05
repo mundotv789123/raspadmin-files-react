@@ -1,10 +1,10 @@
 
 /* get file name from url, ex: http://exemple.local/video/cool_song.mp3 -> cool_song */
 export function srcToFileName(src: string): string {
-    return decodeURIComponent(src)
-        .replace(/\/+$/, '')
-        .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/)+/, '')
-        .replace(/\.[a-zA-Z0-9]+$/, '');
+    return src
+        .replace(/\/+$/, '') // remove final bar (/)
+        .replace(/^([a-zA-Z]+:\/\/)?\/?([^\/]+\/+)+/, '') // remove path file and url
+        .replace(/\.[a-zA-Z0-9]+$/, ''); // remove extension file
 }
 
 /* convert number time to clock time, ex 75 -> 01:15 */

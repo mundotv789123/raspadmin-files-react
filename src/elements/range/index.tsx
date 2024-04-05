@@ -1,74 +1,81 @@
 import { useEffect, useRef, useState } from "react";
-import { Progress, ProgressBar, ProgressFollower, RangeElement } from "./styles";
+import { RangeArea, RangeInput, RangeMain, RangeProgress, RangeProgressBar, RangeProgressFollower } from "./styles";
 
-export default function Range(props: { percent?: number, onInput?: ((percent: number) => boolean), follower?: boolean, live?: boolean }) {
 
-    const [percent, setPercent] = useState(props.percent ?? 0)
-    const [followerPercent, setFollowerPercent] = useState(0)
-    const [keyPressing, setKeyPressing] = useState(false)
+interface PropsInterface {
+  percent?: number,
+  follower?: boolean,
+  live?: boolean,
+  step?: string
+  onInput?: ((percent: number) => boolean)
+}
 
-    const progress = useRef<HTMLDivElement>();
-    const progress_follower = useRef<HTMLDivElement>();
+export default function Range(props: PropsInterface) {
+  const [percent, setPercent] = useState(props.percent ?? 0)
+  const [followerPercent, setFollowerPercent] = useState(0)
+  const [keyPressing, setKeyPressing] = useState(false)
 
-    useEffect(() => {
-        if (keyPressing)
-            return;
-        setPercent(props.percent);
-    }, [props.percent])
+  const range_area = useRef<HTMLDivElement>();
 
-    function callEvent(event: any) {
-        setKeyPressing(false);
-        
-        let perc = getCursorPercent(event);
-        if (props.onInput && props.onInput(perc)) 
-            setPercent(perc);
-    }
+  useEffect(() => {
+    if (keyPressing)
+      return;
+    setPercent(props.percent);
+  }, [props.percent])
 
-    function updateProgress(event: any) {
-        let kp = event.buttons == 1; 
-        setKeyPressing(kp);
+  function callEvent(perc: number = percent) {
+    if (props.onInput && props.onInput(Number(perc)))
+      setPercent(perc);
+  }
 
-        let perc = getCursorPercent(event);
-        if (!kp) {
-            setFollowerPercent(props.follower && perc);
-            return;
-        }
-        
-        if (props.live) {
-            callEvent(event);
-            return;
-        }
-            
-        setFollowerPercent(0);
-        setPercent(perc);
-    }
+  function updateProgress(event: any) {
+    let perc = event.target.value;
 
-    function getCursorPercent(event: any): number {
-        let rect = progress.current.getBoundingClientRect();
-        let perc = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
-        if (perc < 0)
-            return 0;
-        if (perc > 100)
-            return 100;
-        return perc;
-    }
+    setPercent(() => {
+      if (props.live)
+        callEvent(perc);
+      return perc;
+    });
 
-    return (
-        <RangeElement 
-            onMouseUp={callEvent} 
-            onMouseMove={updateProgress}
-            onMouseLeave={() => {setFollowerPercent(0); setKeyPressing(false)}}
-        >
-            <Progress ref={progress}>
-                <ProgressBar style={{ width: `${percent}%` }} />
-                <ProgressFollower
-                    style={{
-                        marginLeft: `-${percent}%`,
-                        width: `${followerPercent}%`
-                    }}
-                    ref={progress_follower}
-                />
-            </Progress>
-        </RangeElement>
-    )
+    setFollowerPercent(0);
+  }
+
+  function getCursorPercent(event: any): number {
+    let rect = range_area.current.getBoundingClientRect();
+    let perc = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
+    if (perc < 0)
+      return 0;
+    if (perc > 100)
+      return 100;
+    return perc;
+  }
+
+  return (
+    <RangeMain>
+      <RangeArea ref={range_area}>
+        <RangeProgress>
+          <RangeProgressBar style={{width: `${percent}%`}} />
+          <RangeProgressFollower style={{marginLeft: `-${percent}%`, width: `${followerPercent}%`}} />
+        </RangeProgress>
+      </RangeArea>
+      <RangeInput type="range" step={props.step} value={percent} min={0} max={100}
+        onInput={updateProgress}
+        onMouseDown={() => setKeyPressing(true)}
+        onTouchStart={() => setKeyPressing(true)}
+        onTouchEnd={() => {
+          setKeyPressing(false);
+          callEvent();
+        }}
+        onMouseUp={() => { 
+          setKeyPressing(false);
+          callEvent();
+        }}
+        onMouseLeave={() => setFollowerPercent(0)}
+        onMouseMove={e => {
+          let perc = getCursorPercent(event);
+          setFollowerPercent(props.follower && perc);
+        }}
+      />
+    </RangeMain>
+  )
 }

@@ -1,44 +1,59 @@
 import styled from "styled-components"
 
-export const RangeElement = styled.div`
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    flex-direction: column;
+export const RangeMain = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 20px;
 `
 
-export const Progress = styled.div`
-    background-color: #D9D9D9;
-    display: flex;
-    height: 5px;
-    margin: 5px 6px;
-    border-radius: 5px;
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+export const RangeArea = styled.div`
+  height: 100%;
+  width: calc(100% - 16px);
+  position: absolute;
+  display: flex;
+  margin: 0 8px;
+`;
+
+export const RangeProgress = styled.div`
+  background-color: rgb(160, 160, 160);
+  display: flex;
+  height: 25%;
+  margin: auto 0;
+  width: 100%;
+  border-radius: 15px;
 `
 
-export const ProgressBar = styled.div`
+export const RangeProgressBar = styled.div`
+  height: 100%;
+  background-color: white;
+  display: flex;
+  z-index: 1;
+  border-radius: 15px;
+  &::before {
+    content: "";
     background-color: white;
     height: 100%;
-    border-radius: 5px;
-    z-index: 1;
-    &::before {
-        content: "";
-        display: block;
-        position: relative;
-        margin: -5px -7px 0 auto;
-        width: 5px;
-        height: 5px;
-        background-color: white;
-        border: solid 5px white;
-        border-radius: 50%;
-        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
-    }
+    aspect-ratio: 1/1;
+    border: solid 5px white;
+    margin: -5px;
+    border-radius: 50%;
+    margin-left: calc(100% - 5px);
+    transform: translateX(-20%);
+  }
 `
 
-export const ProgressFollower = styled.div`
-    border-radius: 5px 0px 0px 5px;
-    height: 100%;
-    width: 50%;
-    background-color: rgba(0, 0, 0, 0.25);
-    display: flex;
+export const RangeProgressFollower = styled.div`
+  height: 100%;
+  background-color: rgba(0,0,0,0.2);
 `
+
+export const RangeInput = styled.input`
+  display: block;
+  opacity: 0;
+  margin: 0;
+  top: 0;
+  border: none;
+  width: 100%;
+  z-index: 1;
+`;

@@ -1,16 +1,14 @@
-export interface FileModel {
-    name: string,
-    is_dir: boolean,
-    created_at: Date,
-    icon?: string,
-    type?: string,
-    href?: string, 
-    open: boolean
+export interface FileResponse {
+  name: string,
+  is_dir: boolean,
+  open: boolean;
+  created_at: Date,
+  icon?: string,
+  type?: string;
 }
 
-export interface FileLinkModel {
-    name: string,
-    src: string,
-    parent: string,
-    type: string | false
+export interface FileModel extends FileResponse {
+  src: string,
+  href: string,
+  parent: string
 }
