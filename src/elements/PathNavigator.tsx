@@ -3,7 +3,7 @@ import styled from "styled-components"
 const PathLink = styled.div`
   font-size: 11pt;
   font-weight: bold;
-  margin-left: 25px;
+  margin-left: 45px;
   margin-right: auto;
   color: white;
   display: flex;
