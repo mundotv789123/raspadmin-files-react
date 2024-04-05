@@ -87,8 +87,8 @@ export class FilesService {
     `${API_URL}/files/open${FilesService.getSrcQuery(encodeURIComponent(path.normalize(`${pathFile}`)))}`;
 
   public static getQuery = (path: string): string =>
-    API_QUERY.replace('{0}', path);
+    API_QUERY.replace('{0}', path.replace("%2F", "/"));
 
   public static getSrcQuery = (path: string): string =>
-    SRC_QUERY.replace('{0}', path);
+    SRC_QUERY.replace('{0}', path.replace("%2F", "/"));
 }
