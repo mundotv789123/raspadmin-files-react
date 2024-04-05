@@ -88,6 +88,7 @@ export const SideBarContainer = styled.div`
   display: flex;
   background-color: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(1.5px);
+  z-index: 2;
 `
 
 const SideBarAnimation = keyframes`
