@@ -3,7 +3,7 @@ import styled from "styled-components"
 const PathLink = styled.div`
   font-size: 11pt;
   font-weight: bold;
-  margin-left: 45px;
+  margin-left: 25px;
   margin-right: auto;
   color: white;
   display: flex;
@@ -18,7 +18,7 @@ const PathLink = styled.div`
     padding: 2px;
     border-radius: 5px;
     max-width: 120px;
-    min-width: 25px;
+    min-width: 45px;
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
