@@ -4,7 +4,7 @@ export interface FileResponse {
   open: boolean;
   created_at: Date,
   icon?: string,
-  type?: string;
+  type: string | null;
 }
 
 export interface FileModel extends FileResponse {

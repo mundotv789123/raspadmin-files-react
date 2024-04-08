@@ -16,17 +16,17 @@ export default function Home() {
   
     const [hash, setHash] = useState<string>("");
   
-    const [tabFiles, setTabFiles] = useState<Array<FileModel>>(null);
+    const [tabFiles, setTabFiles] = useState<Array<FileModel> | null>(null);
     const [mainFiles, setMainFiles] = useState<FileModel[] | null>(null);
     const [fileLoading, setFileLoading] = useState<number>(-1);
   
     const [login, setLogin] = useState<boolean>(false);
-    const [text, setText] = useState<string>();
+    const [text, setText] = useState<string | null>(null);
   
-    const [openedFile, setOpenedFile] = useState<FileModel>(null);
+    const [openedFile, setOpenedFile] = useState<FileModel | null>(null);
   
     const [barOpen, setBarOpen] = useState(false);
-    const [path, setPath] = useState<string>(null);
+    const [path, setPath] = useState<string>();
     const [search, setSearch] = useState<string>('');
   
     function loadPage() {
@@ -108,13 +108,13 @@ export default function Home() {
           <CollapseButtom onClick={toggleBar}>
             <FontAwesomeIcon icon={faBars} />
           </CollapseButtom>
-          <PathNavigator path={path}/>
+          <PathNavigator path={path ?? ""}/>
           <SearchInput placeholder="Pesquisar" onChange={(e) => setSearch(e.currentTarget.value)} value={search} />
         </Nav>
         <Main>
           {tabFiles && <FilesList files={tabFiles.filter(e => e.is_dir)} />}
         </Main>
-        <SideBarContainer style={{display: (barOpen ? null : "none") }}>
+        <SideBarContainer style={{display: (barOpen ? undefined : "none") }}>
           <SideBar>
             {tabFiles && <FilesList files={tabFiles.filter(e => e.is_dir)} />}
           </SideBar>
@@ -124,7 +124,7 @@ export default function Home() {
         <Aside>
           <FilesMain files={mainFiles} text={text} search={search} fileLoading={fileLoading} />
         </Aside>
-        <OpenendFile file={openedFile} path={path} listedFiles={mainFiles}/>
+        <OpenendFile file={openedFile} path={path ?? ""} listedFiles={mainFiles}/>
         {login && <LoginMenu onSuccess={loadPage} />}
       </Container>
     )

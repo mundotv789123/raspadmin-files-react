@@ -31,7 +31,7 @@ export default function AudioPlayer(props: PropsInterface) {
   const [randomPlayList, setRandomPlaylist] = useState<Array<string> | null>(null);
 
   const [hideTitle, setHideTitle] = useState(false);
-  const [errorText, setErrorText] = useState(null);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   const audio_element = useRef<HTMLAudioElement>();
 
@@ -39,7 +39,7 @@ export default function AudioPlayer(props: PropsInterface) {
     if (props.src == null)
       return;
     if (props.src == src)
-      audio_element.current.currentTime = 0;
+      audio_element.current!.currentTime = 0;
     else
       setSrc(props.src);
   }, [props.src])
@@ -62,10 +62,10 @@ export default function AudioPlayer(props: PropsInterface) {
     let volume = getSessionVolume();
     setAudioVolume(volume);
 
-    audio_element.current.volume = muted ? 0 : volume / 100;
+    audio_element.current!.volume = muted ? 0 : volume / 100;
 
     setLoading(false);
-    setAudioDuration(numberClockTime(audio_element.current.duration));
+    setAudioDuration(numberClockTime(audio_element.current!.duration));
   }
 
   function loadMediaSession() {
@@ -80,43 +80,43 @@ export default function AudioPlayer(props: PropsInterface) {
 
   function updateHideTitle() {
     setHideTitle(isHidetitle => {
-      navigator.mediaSession.metadata.title = !isHidetitle ? "Raspadmin Music Player" : fileName;
+      navigator.mediaSession.metadata!.title = !isHidetitle ? "Raspadmin Music Player" : fileName;
       return !isHidetitle;
     });
   }
 
   function updatePlaying() {
-    setPlaying(!audio_element.current.paused);
+    setPlaying(!audio_element.current!.paused);
   }
 
   function togglePlay() {
     if (errorText != null) {
-      audio_element.current.load();
+      audio_element.current!.load();
       setLoading(true)
     }
 
     if (playing) {
-      audio_element.current.pause();
+      audio_element.current!.pause();
     } else {
-      audio_element.current.play();
+      audio_element.current!.play();
     }
   }
 
   function updateAudioProgress() {
-    let percent = (audio_element.current.currentTime * 100 / audio_element.current.duration);
+    let percent = (audio_element.current!.currentTime * 100 / audio_element.current!.duration);
     setProgressPercent(percent);
-    setAudioCurrentTime(numberClockTime(audio_element.current.currentTime));
+    setAudioCurrentTime(numberClockTime(audio_element.current!.currentTime));
   }
 
   function updateAudioTime(percent: number) {
-    audio_element.current.currentTime = (audio_element.current.duration / 100 * percent);
+    audio_element.current!.currentTime = (audio_element.current!.duration / 100 * percent);
     setProgressPercent(percent);
     return true;
   }
 
   function updateAudioVolume(percent: number) {
     if (!muted)
-      audio_element.current.volume = percent / 100;
+      audio_element.current!.volume = percent / 100;
     localStorage.setItem('audio_volume', percent.toFixed(2));
     setAudioVolume(percent);
     return true;
@@ -124,11 +124,11 @@ export default function AudioPlayer(props: PropsInterface) {
 
   function nextSong() {
     if (playlist.length <= 1) {
-      audio_element.current.currentTime = 0;
+      audio_element.current!.currentTime = 0;
       return;
     }
     setLoading(true)
-    let list = random ? randomPlayList : playlist;
+    let list = (random ? randomPlayList : playlist) ?? [];
 
     let index = list.indexOf(src)
     if (index < 0 || (index + 1) >= list.length) {
@@ -139,12 +139,12 @@ export default function AudioPlayer(props: PropsInterface) {
   }
 
   function backSong() {
-    if (audio_element.current.currentTime > 1 || playlist.length <= 1) {
-      audio_element.current.currentTime = 0;
+    if (audio_element.current!.currentTime > 1 || playlist.length <= 1) {
+      audio_element.current!.currentTime = 0;
       return;
     }
 
-    let list = random ? randomPlayList : playlist;
+    let list = (random ? randomPlayList : playlist) ?? [];
 
     setLoading(true)
     let index = list.indexOf(src);
@@ -165,7 +165,7 @@ export default function AudioPlayer(props: PropsInterface) {
 
   function updateMuted() {
     let isMuted = !muted;
-    audio_element.current.volume = isMuted ? 0 : audioVolume / 100;
+    audio_element.current!.volume = isMuted ? 0 : audioVolume / 100;
     setMuted(isMuted);
   }
 
@@ -203,7 +203,7 @@ export default function AudioPlayer(props: PropsInterface) {
       <PlayList
         open={playlistOpened}
         playlist={playlist.map(src => srcToFileName(decodeURIComponent(src)))}
-        playing={src ? playlist.indexOf(src) : null}
+        playing={src ? playlist.indexOf(src) : undefined}
         onClick={updateSongPlaying}
       />
       <AudioElement>

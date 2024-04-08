@@ -22,7 +22,7 @@ export default function LoginMenu(props: PropsInterface) {
     }
 
     setLoding(true);
-    service.login(username, password, props.onSuccess, (message) => {
+    service.login(username, password, () => props.onSuccess && props.onSuccess(), (message) => {
       setLoding(false);
       setErroText(message);
     })

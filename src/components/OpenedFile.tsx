@@ -7,8 +7,8 @@ import { isAudio, isImage, isVideo } from "../helpers/FileTypeHelper";
 import { FilesService } from "../services/FilesService";
 
 interface PropsInterface {
-  file?: FileModel,
-  listedFiles: Array<FileModel>,
+  file: FileModel | null,
+  listedFiles: Array<FileModel> | null,
   path: string
 }
 

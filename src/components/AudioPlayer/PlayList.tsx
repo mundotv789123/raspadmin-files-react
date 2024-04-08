@@ -61,7 +61,7 @@ interface PropsInterface {
 
 export default function PlayList(props: PropsInterface) {
 
-  const [playing, setPlaying] = useState(null);
+  const [playing, setPlaying] = useState<number|null>(null);
 
   function playSong(index: number) {
     if (props.onClick) {
@@ -70,7 +70,7 @@ export default function PlayList(props: PropsInterface) {
   }
 
   useEffect(() => {
-    setPlaying(props.playing);
+    setPlaying(props.playing ?? null);
   }, [props.playing])
 
   return (
