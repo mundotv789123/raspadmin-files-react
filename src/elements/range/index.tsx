@@ -54,7 +54,7 @@ export default function Range(props: PropsInterface) {
     <RangeMain>
       <RangeArea ref={range_area}>
         <RangeProgress>
-          <RangeProgressBar style={{width: `${percent}%`}} />
+          <RangeProgressBar style={{width: `${percent}%`}} className="progressbar"/>
           <RangeProgressFollower style={{marginLeft: `-${percent}%`, width: `${followerPercent}%`}} />
         </RangeProgress>
       </RangeArea>
