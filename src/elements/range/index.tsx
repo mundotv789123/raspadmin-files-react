@@ -15,12 +15,12 @@ export default function Range(props: PropsInterface) {
   const [followerPercent, setFollowerPercent] = useState(0)
   const [keyPressing, setKeyPressing] = useState(false)
 
-  const range_area = useRef<HTMLDivElement>();
+  const range_area = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (keyPressing)
       return;
-    setPercent(props.percent);
+    setPercent(props.percent ?? 0);
   }, [props.percent])
 
   function callEvent(perc: number = percent) {
@@ -41,6 +41,8 @@ export default function Range(props: PropsInterface) {
   }
 
   function getCursorPercent(event: any): number {
+    if (!range_area.current)
+      return 0;
     let rect = range_area.current.getBoundingClientRect();
     let perc = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
     if (perc < 0)
@@ -73,7 +75,7 @@ export default function Range(props: PropsInterface) {
         onMouseLeave={() => setFollowerPercent(0)}
         onMouseMove={e => {
           let perc = getCursorPercent(event);
-          setFollowerPercent(props.follower && perc);
+          setFollowerPercent(props.follower ? perc : 0);
         }}
       />
     </RangeMain>

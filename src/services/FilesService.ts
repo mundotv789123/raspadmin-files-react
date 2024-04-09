@@ -38,12 +38,13 @@ export class FilesService {
       if (result.status == 204)
         return [];
 
-      let response = result.data.files.map(file => FilesService.convertFileModel(file, pathFile));
+      let response = result.data.files.map(file => FilesService.convertFileModel(file, pathFile as string));
       return FilesService.sortNaturalFiles(response);
     } catch (ex: unknown) {
       if (ex instanceof AxiosError)
         throw new FileError(ex.response?.status ?? 500);
     }
+    throw new FileError(500);
   }
 
   public static convertFileModel(file: FileResponse, pathFile: string): FileModel {
@@ -67,6 +68,7 @@ export class FilesService {
     let mimeType = lookup(name);
     if (mimeType)
       return mimeType;
+    return null;
   }
 
   public static sortNaturalFiles(files: Array<FileModel>): Array<FileModel> {
