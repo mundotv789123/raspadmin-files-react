@@ -32,7 +32,7 @@ export const AudioElement = styled.div`
   box-shadow: 0 4px 4px 0px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  height: 95px;
+  height: 120px;
   border-radius: 15px;
   width: 100%;
 `

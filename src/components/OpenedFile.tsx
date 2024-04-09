@@ -13,12 +13,12 @@ interface PropsInterface {
 }
 
 export default function OpenendFile(props: PropsInterface) {
-  const [openedVideo, setOpenendVideo] = useState<FileModel|null>();
+  const [openedVideo, setOpenendVideo] = useState<FileModel | null>();
 
-  const [openedAudio, setOpenendAudio] = useState<FileModel|null>();
+  const [openedAudio, setOpenendAudio] = useState<FileModel | null>();
   const [audioPlayList, setAudioPlaylist] = useState<Array<string>>([]);
 
-  const [openedImage, setOpenendImage] = useState<FileModel|null>();
+  const [openedImage, setOpenendImage] = useState<FileModel | null>();
   const [imagesList, setImagesList] = useState<Array<string>>([]);
 
   function closeAllFiles() {
@@ -28,10 +28,12 @@ export default function OpenendFile(props: PropsInterface) {
   }
 
   function loadFile() {
-    closeAllFiles();
-
     let fileType = props.file!.type;
+
     if (fileType) {
+      if (!isImage(fileType)) {
+        closeAllFiles();
+      }
       if (isVideo(fileType)) {
         setOpenendVideo(props.file);
         return;
@@ -86,13 +88,16 @@ export default function OpenendFile(props: PropsInterface) {
   return (
     <>
       {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
-      {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
       {openedImage && <ImageViewer
         src={openedImage.src}
         closeUrl={`#${openedImage.parent}`}
         nextUrl={getNextImage()}
         backUrl={getBackImage()}
       />}
+      {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} onClose={() => {
+        setOpenendAudio(null);
+        setAudioPlaylist([]);
+      }}/>}
     </>
   )
 }

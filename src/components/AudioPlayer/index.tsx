@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, ErrorText, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
+import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, ErrorText, LoadingSpin, ShowElement, VolumeControl, VolumeProgress } from "./styles";
 import { faAngleUp, faBackwardStep, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faRotate, faRotateRight, faShuffle, faTimes, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
@@ -7,14 +7,15 @@ import Range from "../../elements/range";
 import { numberClockTime, srcToFileName } from "../../helpers/ConverterHelper";
 
 interface PropsInterface {
-  src: string, 
-  playlist: Array<string> 
+  src: string | null,
+  playlist: Array<string>,
+  onClose?(): void
 }
 
 export default function AudioPlayer(props: PropsInterface) {
   const playlist = props.playlist;
 
-  const [src, setSrc] = useState(props.src);
+  const [src, setSrc] = useState<string>(props.src ?? "");
 
   const [muted, setMuted] = useState(false);
   const [random, setRandom] = useState(false);
@@ -36,7 +37,7 @@ export default function AudioPlayer(props: PropsInterface) {
   const audio_element = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (props.src == null)
+    if (!props.src)
       return;
     if (props.src == src)
       audio_element.current!.currentTime = 0;
@@ -198,6 +199,11 @@ export default function AudioPlayer(props: PropsInterface) {
     setErrorText("Ocorreu um erro ao reproduzir áudio")
   }
 
+  function close() {
+    if (props.onClose)
+      props.onClose();
+  }
+
   return (
     <AudioContent>
       <PlayList
@@ -208,7 +214,10 @@ export default function AudioPlayer(props: PropsInterface) {
       />
       <AudioElement>
         <ContentHeader>
-          <ControlButton style={{ height: '16px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => { setPlayerlistOpened(!playlistOpened) }} className="playlist-button">
+          <ControlButton style={{ height: '30px', display: 'flex', marginRight: 'auto', padding: '5px' }} onClick={() => close()}>
+            <FontAwesomeIcon icon={faTimes} style={{ fontSize: '16pt', margin: 'auto' }}/>
+          </ControlButton>
+          <ControlButton style={{ height: '30px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => setPlayerlistOpened(!playlistOpened)} className="playlist-button">
             <FontAwesomeIcon icon={faAngleUp} style={{ fontSize: '16pt', margin: 'auto' }} className={"icon " + (playlistOpened ? "down" : "")} />
           </ControlButton>
         </ContentHeader>
@@ -230,7 +239,7 @@ export default function AudioPlayer(props: PropsInterface) {
               <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
             </ControlButton>
             <VolumeProgress>
-              <Range percent={audioVolume} onInput={updateAudioVolume} live={true} step={'0.1'}/>
+              <Range percent={audioVolume} onInput={updateAudioVolume} live={true} step={'0.1'} />
             </VolumeProgress>
           </VolumeControl>
           <ControlButton onClick={updateHideTitle}>
