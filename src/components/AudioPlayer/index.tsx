@@ -196,7 +196,7 @@ export default function AudioPlayer(props: PropsInterface) {
 
   function setError() {
     setLoading(false)
-    setErrorText("Ocorreu um erro ao reproduzir áudio")
+    setErrorText(audio_element.current?.error?.message ?? "Ocorreu um erro ao reproduzir áudio")
   }
 
   function close() {
