@@ -33,7 +33,7 @@ export default function AudioPlayer(props: PropsInterface) {
   const [hideTitle, setHideTitle] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
 
-  const audio_element = useRef<HTMLAudioElement>();
+  const audio_element = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (props.src == null)

@@ -15,7 +15,7 @@ export default function Range(props: PropsInterface) {
   const [followerPercent, setFollowerPercent] = useState(0)
   const [keyPressing, setKeyPressing] = useState(false)
 
-  const range_area = useRef<HTMLDivElement>();
+  const range_area = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (keyPressing)
