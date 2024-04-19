@@ -14,7 +14,7 @@ interface PropsInterface {
 }
 
 interface VideoScreenOrientation extends ScreenOrientation {
-  lock(a: string): void
+  lock(a: string): Promise<void>
 }
 
 export default function VideoPlayer(props: PropsInterface) {
