@@ -94,6 +94,7 @@ export default function AudioPlayer(props: PropsInterface) {
     if (errorText != null) {
       audio_element.current!.load();
       setLoading(true)
+      return;
     }
 
     if (playing) {
