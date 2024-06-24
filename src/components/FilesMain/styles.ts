@@ -57,13 +57,16 @@ export const LoadingCont = styled.div`
 export const FileCont = styled.a`
   height: 130px;
   margin: 5px;
-  text-align: center;
-  overflow: hidden;
-  font-weight: 600;
-  word-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-shadow: 0 1px 5px black;
-  transition: background-color 0.5s;
+  text-align: center;
+  word-wrap: break-word;
+  font-weight: 600;
   border-radius: 5px;
+  overflow: hidden;
+  transition: background-color 0.5s;
   &:hover {
     background: rgba(255, 255, 255, 0.3);
     overflow: inherit;
@@ -78,10 +81,15 @@ export const FileIcon = styled.div`
   justify-content: center;
   width: 80px;
   height: 80px;
-  margin: 5px auto;
   border-radius: 5px;
-  background-size: cover;
-  background-position: center;
+`
+
+export const FileIconImg = styled.img`
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `
 
 export const FileName = styled.p`
@@ -103,5 +111,6 @@ export const FileLoading = styled.div`
   border-radius: 50%;
   border: solid 5px transparent;
   border-top: solid 5px cyan;
+  position: absolute;
   animation: ${Spin} 500ms linear infinite;
 `
