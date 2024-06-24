@@ -13,13 +13,17 @@ interface PropsInterface {
   backUrl: string | undefined 
 }
 
+interface VideoScreenOrientation extends ScreenOrientation {
+  lock(a: string): Promise<void>
+}
+
 export default function VideoPlayer(props: PropsInterface) {
 
   const [progressPercent, setProgressPercent] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string|null>(null);
 
   const main_element = useRef<HTMLDivElement>(null);
   const main_video = useRef<HTMLDivElement>(null);
@@ -30,8 +34,8 @@ export default function VideoPlayer(props: PropsInterface) {
   const service = new VideoService();
 
   function resetCursorTimeout() {
-    if (main_video.current.classList)
-      main_video.current.classList.remove('hide');
+    if (main_video.current!.classList)
+      main_video.current!.classList.remove('hide');
     if (cursorTimeout <= 0)
       cursorTimeoutExec();
     cursorTimeout = 3;
@@ -44,7 +48,7 @@ export default function VideoPlayer(props: PropsInterface) {
         cursorTimeoutExec();
         return;
       }
-      if (!main_video.current || video_element.current.paused)
+      if (!main_video.current || video_element.current!.paused)
         return;
       main_video.current.classList.add('hide');
     }, 1000);
@@ -55,55 +59,57 @@ export default function VideoPlayer(props: PropsInterface) {
       return;
     resetCursorTimeout();
     if (playing) {
-      video_element.current.pause();
+      video_element.current!.pause();
     } else {
-      video_element.current.play();
+      video_element.current!.play();
     }
-    setError(false);
+    setError(null);
     setLoading(false);
   }
 
   function togglePauseButton() {
-    setPlaying(!video_element.current.paused);
+    setPlaying(!video_element.current!.paused);
   }
 
   function toggleFullScreen() {
+    let orientation = screen.orientation as VideoScreenOrientation;
     if (!document.fullscreenElement) {
-      main_element.current.requestFullscreen();
-      screen.orientation.lock('landscape');
+      main_element.current!.requestFullscreen();
+      if ((screen.orientation as any).lock)
+        orientation.lock('landscape');
     } else {
       document.exitFullscreen();
-      screen.orientation.unlock();
+      orientation.unlock();
     }
   }
 
   function updateProgress() {
-    let percent = (video_element.current.currentTime * 100 / video_element.current.duration);
+    let percent = (video_element.current!.currentTime * 100 / video_element.current!.duration);
     setProgressPercent(percent);
   }
 
   function updateError() {
     setLoading(false);
-    setError(video_element.current.error.message);
+    setError(video_element.current!.error!.message);
   }
 
   function updateVideoTime(percent: number) {
     if (loading || error)
       return false;
-    video_element.current.currentTime = (video_element.current.duration / 100 * percent);
+    video_element.current!.currentTime = (video_element.current!.duration / 100 * percent);
     setProgressPercent(percent);
     return true;
   }
 
   function updateVolume(event: any) {
-    let rect = volume.current.getBoundingClientRect();
+    let rect = volume.current!.getBoundingClientRect();
     let value = ((rect.bottom - event.clientY) * 1.0 / (rect.bottom - rect.top));
-    video_element.current.volume = value;
-    volume_percent.current.style.height = (value * 100) + '%';
+    video_element.current!.volume = value;
+    volume_percent.current!.style.height = (value * 100) + '%';
   }
 
   function resetVideo() {
-    video_element.current.src = null;
+    video_element.current!.src = "";
     setPlaying(false);
     setProgressPercent(0);
     setLoading(true);
@@ -113,21 +119,21 @@ export default function VideoPlayer(props: PropsInterface) {
     if (!loading) {
       return;
     }
-    volume_percent.current.style.height = (video_element.current.volume * 100) + '%';
-    let videoTime = service.getVideoTime(video_element.current.src);
-    if (videoTime > 0 && (video_element.current.duration - 15) > videoTime) {
-      video_element.current.currentTime = videoTime;
+    volume_percent.current!.style.height = (video_element.current!.volume * 100) + '%';
+    let videoTime = service.getVideoTime(video_element.current!.src);
+    if (videoTime > 0 && (video_element.current!.duration - 15) > videoTime) {
+      video_element.current!.currentTime = videoTime;
     }
     setLoading(false);
-    service.startAutoSaving(video_element.current.src, video_element.current);
+    service.startAutoSaving(video_element.current!.src, video_element.current!);
   }
 
   function forward() {
-    video_element.current.currentTime += 5;
+    video_element.current!.currentTime += 5;
   }
 
   function backward() {
-    video_element.current.currentTime -= 5;
+    video_element.current!.currentTime -= 5;
   }
 
   if (props.src == null) {

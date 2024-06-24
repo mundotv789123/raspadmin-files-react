@@ -5,8 +5,8 @@ import { faAngleLeft, faAngleRight, faClose } from "@fortawesome/free-solid-svg-
 interface PropsInterface {
   src: string, 
   closeUrl?: string, 
-  backUrl?: string, 
-  nextUrl?: string
+  backUrl: string | null, 
+  nextUrl: string | null
 }
 
 export default function ImageViewer(props: PropsInterface) {

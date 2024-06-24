@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, ErrorText, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
+import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, ErrorText, LoadingSpin, ShowElement, VolumeControl, VolumeProgress } from "./styles";
 import { faAngleUp, faBackwardStep, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faRotate, faRotateRight, faShuffle, faTimes, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
@@ -7,14 +7,15 @@ import Range from "../../elements/range";
 import { numberClockTime, srcToFileName } from "../../helpers/ConverterHelper";
 
 interface PropsInterface {
-  src: string, 
-  playlist: Array<string> 
+  src: string | null,
+  playlist: Array<string>,
+  onClose?(): void
 }
 
 export default function AudioPlayer(props: PropsInterface) {
   const playlist = props.playlist;
 
-  const [src, setSrc] = useState(props.src);
+  const [src, setSrc] = useState<string>(props.src ?? "");
 
   const [muted, setMuted] = useState(false);
   const [random, setRandom] = useState(false);
@@ -31,15 +32,15 @@ export default function AudioPlayer(props: PropsInterface) {
   const [randomPlayList, setRandomPlaylist] = useState<Array<string> | null>(null);
 
   const [hideTitle, setHideTitle] = useState(false);
-  const [errorText, setErrorText] = useState(null);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
-  const audio_element = useRef<HTMLAudioElement>();
+  const audio_element = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (props.src == null)
+    if (!props.src)
       return;
     if (props.src == src)
-      audio_element.current.currentTime = 0;
+      audio_element.current!.currentTime = 0;
     else
       setSrc(props.src);
   }, [props.src])
@@ -62,10 +63,10 @@ export default function AudioPlayer(props: PropsInterface) {
     let volume = getSessionVolume();
     setAudioVolume(volume);
 
-    audio_element.current.volume = muted ? 0 : volume / 100;
+    audio_element.current!.volume = muted ? 0 : volume / 100;
 
     setLoading(false);
-    setAudioDuration(numberClockTime(audio_element.current.duration));
+    setAudioDuration(numberClockTime(audio_element.current!.duration));
   }
 
   function loadMediaSession() {
@@ -80,43 +81,44 @@ export default function AudioPlayer(props: PropsInterface) {
 
   function updateHideTitle() {
     setHideTitle(isHidetitle => {
-      navigator.mediaSession.metadata.title = !isHidetitle ? "Raspadmin Music Player" : fileName;
+      navigator.mediaSession.metadata!.title = !isHidetitle ? "Raspadmin Music Player" : fileName;
       return !isHidetitle;
     });
   }
 
   function updatePlaying() {
-    setPlaying(!audio_element.current.paused);
+    setPlaying(!audio_element.current!.paused);
   }
 
   function togglePlay() {
     if (errorText != null) {
-      audio_element.current.load();
+      audio_element.current!.load();
       setLoading(true)
+      return;
     }
 
     if (playing) {
-      audio_element.current.pause();
+      audio_element.current!.pause();
     } else {
-      audio_element.current.play();
+      audio_element.current!.play();
     }
   }
 
   function updateAudioProgress() {
-    let percent = (audio_element.current.currentTime * 100 / audio_element.current.duration);
+    let percent = (audio_element.current!.currentTime * 100 / audio_element.current!.duration);
     setProgressPercent(percent);
-    setAudioCurrentTime(numberClockTime(audio_element.current.currentTime));
+    setAudioCurrentTime(numberClockTime(audio_element.current!.currentTime));
   }
 
   function updateAudioTime(percent: number) {
-    audio_element.current.currentTime = (audio_element.current.duration / 100 * percent);
+    audio_element.current!.currentTime = (audio_element.current!.duration / 100 * percent);
     setProgressPercent(percent);
     return true;
   }
 
   function updateAudioVolume(percent: number) {
     if (!muted)
-      audio_element.current.volume = percent / 100;
+      audio_element.current!.volume = percent / 100;
     localStorage.setItem('audio_volume', percent.toFixed(2));
     setAudioVolume(percent);
     return true;
@@ -124,11 +126,11 @@ export default function AudioPlayer(props: PropsInterface) {
 
   function nextSong() {
     if (playlist.length <= 1) {
-      audio_element.current.currentTime = 0;
+      audio_element.current!.currentTime = 0;
       return;
     }
     setLoading(true)
-    let list = random ? randomPlayList : playlist;
+    let list = (random ? randomPlayList : playlist) ?? [];
 
     let index = list.indexOf(src)
     if (index < 0 || (index + 1) >= list.length) {
@@ -139,12 +141,12 @@ export default function AudioPlayer(props: PropsInterface) {
   }
 
   function backSong() {
-    if (audio_element.current.currentTime > 1 || playlist.length <= 1) {
-      audio_element.current.currentTime = 0;
+    if (audio_element.current!.currentTime > 1 || playlist.length <= 1) {
+      audio_element.current!.currentTime = 0;
       return;
     }
 
-    let list = random ? randomPlayList : playlist;
+    let list = (random ? randomPlayList : playlist) ?? [];
 
     setLoading(true)
     let index = list.indexOf(src);
@@ -165,7 +167,7 @@ export default function AudioPlayer(props: PropsInterface) {
 
   function updateMuted() {
     let isMuted = !muted;
-    audio_element.current.volume = isMuted ? 0 : audioVolume / 100;
+    audio_element.current!.volume = isMuted ? 0 : audioVolume / 100;
     setMuted(isMuted);
   }
 
@@ -195,7 +197,12 @@ export default function AudioPlayer(props: PropsInterface) {
 
   function setError() {
     setLoading(false)
-    setErrorText("Ocorreu um erro ao reproduzir áudio")
+    setErrorText(audio_element.current?.error?.message ?? "Ocorreu um erro ao reproduzir áudio")
+  }
+
+  function close() {
+    if (props.onClose)
+      props.onClose();
   }
 
   return (
@@ -203,12 +210,15 @@ export default function AudioPlayer(props: PropsInterface) {
       <PlayList
         open={playlistOpened}
         playlist={playlist.map(src => srcToFileName(decodeURIComponent(src)))}
-        playing={src ? playlist.indexOf(src) : null}
+        playing={src ? playlist.indexOf(src) : undefined}
         onClick={updateSongPlaying}
       />
       <AudioElement>
         <ContentHeader>
-          <ControlButton style={{ height: '16px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => { setPlayerlistOpened(!playlistOpened) }} className="playlist-button">
+          <ControlButton style={{ height: '30px', display: 'flex', marginRight: 'auto', padding: '5px' }} onClick={() => close()}>
+            <FontAwesomeIcon icon={faTimes} style={{ fontSize: '16pt', margin: 'auto' }}/>
+          </ControlButton>
+          <ControlButton style={{ height: '30px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => setPlayerlistOpened(!playlistOpened)} className="playlist-button">
             <FontAwesomeIcon icon={faAngleUp} style={{ fontSize: '16pt', margin: 'auto' }} className={"icon " + (playlistOpened ? "down" : "")} />
           </ControlButton>
         </ContentHeader>
@@ -230,7 +240,7 @@ export default function AudioPlayer(props: PropsInterface) {
               <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
             </ControlButton>
             <VolumeProgress>
-              <Range percent={audioVolume} onInput={updateAudioVolume} live={true} step={'0.1'}/>
+              <Range percent={audioVolume} onInput={updateAudioVolume} live={true} step={'0.1'} />
             </VolumeProgress>
           </VolumeControl>
           <ControlButton onClick={updateHideTitle}>

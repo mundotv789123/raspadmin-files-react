@@ -5,6 +5,10 @@ export const RangeMain = styled.div`
   flex-direction: column;
   position: relative;
   height: 20px;
+  &:active .progressbar::before {
+    border-width: 7px;
+    margin: -7px -7px -7px calc(100% - 7px);
+  }
 `
 
 export const RangeArea = styled.div`
@@ -22,6 +26,7 @@ export const RangeProgress = styled.div`
   margin: auto 0;
   width: 100%;
   border-radius: 15px;
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.3);
 `
 
 export const RangeProgressBar = styled.div`
@@ -40,6 +45,7 @@ export const RangeProgressBar = styled.div`
     border-radius: 50%;
     margin-left: calc(100% - 5px);
     transform: translateX(-20%);
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.3);
   }
 `
 

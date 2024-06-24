@@ -4,7 +4,7 @@ import { LoadingCont, Panel, Text } from "./styles";
 
 interface PropsInterface {
   files: Array<FileModel> | null, 
-  text: string, 
+  text: string|null, 
   search?: string, 
   fileLoading: number
 }

@@ -7,18 +7,18 @@ import { isAudio, isImage, isVideo } from "../helpers/FileTypeHelper";
 import { FilesService } from "../services/FilesService";
 
 interface PropsInterface {
-  file?: FileModel,
-  listedFiles: Array<FileModel>,
+  file: FileModel | null,
+  listedFiles: Array<FileModel> | null,
   path: string
 }
 
 export default function OpenendFile(props: PropsInterface) {
-  const [openedVideo, setOpenendVideo] = useState<FileModel>();
+  const [openedVideo, setOpenendVideo] = useState<FileModel | null>();
 
-  const [openedAudio, setOpenendAudio] = useState<FileModel>();
+  const [openedAudio, setOpenendAudio] = useState<FileModel | null>();
   const [audioPlayList, setAudioPlaylist] = useState<Array<string>>([]);
 
-  const [openedImage, setOpenendImage] = useState<FileModel>();
+  const [openedImage, setOpenendImage] = useState<FileModel | null>();
   const [imagesList, setImagesList] = useState<Array<string>>([]);
 
   function closeAllFiles() {
@@ -28,10 +28,12 @@ export default function OpenendFile(props: PropsInterface) {
   }
 
   function loadFile() {
-    closeAllFiles();
+    let fileType = props.file!.type;
 
-    let fileType = props.file.type;
     if (fileType) {
+      if (!isImage(fileType)) {
+        closeAllFiles();
+      }
       if (isVideo(fileType)) {
         setOpenendVideo(props.file);
         return;
@@ -39,8 +41,8 @@ export default function OpenendFile(props: PropsInterface) {
       if (isAudio(fileType)) {
         setOpenendAudio(props.file);
         setAudioPlaylist(props.listedFiles ? props.listedFiles.filter(f => f.type && isAudio(f.type))
-          .map(f => FilesService.getSrcFile(`${props.file.parent}/${f.name}`)) : []);
-        location.hash = encodeURIComponent(props.file.parent);
+          .map(f => FilesService.getSrcFile(`${props.file!.parent}/${f.name}`)) : []);
+        location.hash = encodeURIComponent(props.file!.parent);
         return;
       }
       if (isImage(fileType)) {
@@ -49,7 +51,7 @@ export default function OpenendFile(props: PropsInterface) {
         return;
       }
     }
-    location.href = props.file.src;
+    location.href = props.file!.src;
   }
 
   function getNextImage() {
@@ -77,7 +79,7 @@ export default function OpenendFile(props: PropsInterface) {
       setOpenendVideo(null);
       setOpenendImage(null);
       if (openedAudio)
-        openedAudio.src = null;
+        openedAudio.src = "";
     } else {
       loadFile();
     }
@@ -86,13 +88,16 @@ export default function OpenendFile(props: PropsInterface) {
   return (
     <>
       {openedVideo && <VideoPlayer src={openedVideo.src} backUrl={`#${openedVideo.parent}`} />}
-      {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} />}
       {openedImage && <ImageViewer
         src={openedImage.src}
         closeUrl={`#${openedImage.parent}`}
         nextUrl={getNextImage()}
         backUrl={getBackImage()}
       />}
+      {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} onClose={() => {
+        setOpenendAudio(null);
+        setAudioPlaylist([]);
+      }}/>}
     </>
   )
 }
