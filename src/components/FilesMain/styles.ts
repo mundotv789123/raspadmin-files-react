@@ -57,9 +57,6 @@ export const LoadingCont = styled.div`
 export const FileCont = styled.a`
   height: 130px;
   margin: 5px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-shadow: 0 1px 5px black;
   text-align: center;
   word-wrap: break-word;
@@ -79,6 +76,8 @@ export const FileIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  margin: 5px auto;
   width: 80px;
   height: 80px;
   border-radius: 5px;
