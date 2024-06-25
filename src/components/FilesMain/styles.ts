@@ -76,6 +76,7 @@ export const FileIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   overflow: hidden;
   margin: 5px auto;
   width: 80px;
@@ -105,11 +106,20 @@ export const Spin = keyframes`
 `
 
 export const FileLoading = styled.div`
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: solid 5px transparent;
-  border-top: solid 5px cyan;
-  position: absolute;
-  animation: ${Spin} 500ms linear infinite;
+  width: 100%;
+  height: 100%;
+  margin-top: -100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &::before {
+    content: "";
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: solid 5px transparent;
+    border-top: solid 5px cyan;
+    animation: ${Spin} 500ms linear infinite;
+  }
 `

@@ -15,8 +15,8 @@ export default function FileBlock(props: PropsInterface) {
   return (
     <FileCont href={props.file.href}>
       <FileIcon>
-        {props.loading && <FileLoading />}
-        <FileIconImg src={getIcon()}/>
+        <FileIconImg src={getIcon()} />
+        {!props.loading && <FileLoading />}
       </FileIcon>
       <FileName>{props.file.name}</FileName>
     </FileCont>
