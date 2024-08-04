@@ -103,3 +103,18 @@ export const SideBar = styled.div`
   height: 100%;
   overflow-y: scroll;
 `
+
+export const ReloadButton = styled.button`
+  padding: 5px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  font-size: 15pt;
+  display: block;
+  border: none;
+  margin: auto;
+  transition: 100ms;
+  &:hover {
+    font-size: 16pt;
+  }
+`
