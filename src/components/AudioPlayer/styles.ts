@@ -9,8 +9,8 @@ export const ShowElement = keyframes`
 export const AudioContent = styled.div`
   position: fixed;
   max-height: 100vh;
-  bottom: 1px;
-  right: 2px;
+  bottom: 0;
+  right: 0;
   left: 0;
   animation: ${ShowElement} 200ms linear normal;
   display: flex;
@@ -21,8 +21,7 @@ export const AudioContent = styled.div`
 export const AudioElement = styled.div`
   backdrop-filter: blur(5px);
   background: linear-gradient(90deg, rgba(49, 49, 49, 0.5), rgba(0, 0, 0, 0.8));
-  border: solid 1px gray;
-  box-shadow: 0 4px 4px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0px 0px 2px rgba(255, 255, 255, 0.3) inset, 0 4px 4px 0px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   height: 110px;
