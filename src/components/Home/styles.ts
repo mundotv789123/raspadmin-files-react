@@ -14,7 +14,6 @@ export const Container = styled.div`
 `
 
 export const Header = styled.header`
-  backdrop-filter: blur(5px);
   grid-area: h;
   display: flex;
   overflow: hidden;
@@ -46,14 +45,12 @@ export const Nav = styled.nav`
   background: rgba(0, 0, 0, 0.5);
   overflow-x: auto;
   white-space: nowrap;
-  backdrop-filter: blur(5px);
 `
 
 export const Main = styled.main`
   grid-area: m;
   overflow-y: scroll;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
 `
 
 export const Aside = styled.aside`
