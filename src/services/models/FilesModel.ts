@@ -7,8 +7,16 @@ export interface FileResponse {
   type: string | null;
 }
 
+export enum MediaType {
+  AUDIO,
+  VIDEO,
+  IMAGE,
+  UNKNOW
+}
+
 export interface FileModel extends FileResponse {
   src: string,
   href: string,
-  parent: string
+  parent: string,
+  mediaType: MediaType
 }

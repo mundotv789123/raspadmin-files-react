@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
-import { FileResponse, FileModel } from "./models/FilesModel";
+import { FileResponse, FileModel, MediaType } from "./models/FilesModel";
 import { lookup } from "mime-types";
 import { FileError } from "./exceptions/FilesErros";
 import path from "path";
@@ -50,11 +50,12 @@ export class FilesService {
   public static convertFileModel(file: FileResponse, pathFile: string): FileModel {
     let filePathFull = file.open ? pathFile : `${pathFile}/${file.name}`;
 
-    let fileModel = {
+    let fileModel: FileModel = {
       ...file,
       src: FilesService.getSrcFile(filePathFull),
       href: FilesService.getHrefFile(filePathFull),
-      parent: FilesService.getParentPath(pathFile)
+      parent: FilesService.getParentPath(pathFile),
+      mediaType: MediaType.UNKNOW //TODO get media type
     };
     
     if (!fileModel.type)
