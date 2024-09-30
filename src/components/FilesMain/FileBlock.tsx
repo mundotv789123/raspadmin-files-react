@@ -1,6 +1,6 @@
 import { FileModel } from "../../services/models/FilesModel";
 import { getFileIcon, iconsPath } from "../../helpers/FileTypeHelper";
-import { FileCont, FileIcon, FileLoading, FileName } from "./styles";
+import { FileCont, FileIcon, FileIconImg, FileLoading, FileName } from "./styles";
 
 interface PropsInterface {
   file: FileModel, 
@@ -14,7 +14,8 @@ export default function FileBlock(props: PropsInterface) {
 
   return (
     <FileCont href={props.file.href}>
-      <FileIcon style={{ backgroundImage: `url('${getIcon()}')` }}>
+      <FileIcon>
+        <FileIconImg src={getIcon()} />
         {props.loading && <FileLoading />}
       </FileIcon>
       <FileName>{props.file.name}</FileName>

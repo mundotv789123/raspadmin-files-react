@@ -57,13 +57,13 @@ export const LoadingCont = styled.div`
 export const FileCont = styled.a`
   height: 130px;
   margin: 5px;
-  text-align: center;
-  overflow: hidden;
-  font-weight: 600;
-  word-wrap: break-word;
   text-shadow: 0 1px 5px black;
-  transition: background-color 0.5s;
+  text-align: center;
+  word-wrap: break-word;
+  font-weight: 600;
   border-radius: 5px;
+  overflow: hidden;
+  transition: background-color 0.5s;
   &:hover {
     background: rgba(255, 255, 255, 0.3);
     overflow: inherit;
@@ -76,12 +76,20 @@ export const FileIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 5px auto;
   width: 80px;
   height: 80px;
-  margin: 5px auto;
   border-radius: 5px;
-  background-size: cover;
-  background-position: center;
+`
+
+export const FileIconImg = styled.img`
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `
 
 export const FileName = styled.p`
@@ -98,10 +106,20 @@ export const Spin = keyframes`
 `
 
 export const FileLoading = styled.div`
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: solid 5px transparent;
-  border-top: solid 5px cyan;
-  animation: ${Spin} 500ms linear infinite;
+  width: 100%;
+  height: 100%;
+  margin-top: -100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &::before {
+    content: "";
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: solid 5px transparent;
+    border-top: solid 5px cyan;
+    animation: ${Spin} 500ms linear infinite;
+  }
 `
