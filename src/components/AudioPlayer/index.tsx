@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, ContentHeader, ControlButton, ControlContent, ErrorText, LoadingSpin, ShowElement, VolumeControl, VolumeProgress } from "./styles";
-import { faAngleUp, faBackwardStep, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faRotate, faRotateRight, faShuffle, faTimes, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, Col, ContentHeader, ControlButton, ControlContent, ErrorText, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
+import { faBackwardStep, faBars, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faRotateRight, faShuffle, faTimes, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import PlayList from "./PlayList";
 import Range from "../../elements/range";
@@ -215,41 +215,46 @@ export default function AudioPlayer(props: PropsInterface) {
       />
       <AudioElement>
         <ContentHeader>
-          <ControlButton style={{ height: '30px', display: 'flex', marginRight: 'auto', padding: '5px' }} onClick={() => close()}>
-            <FontAwesomeIcon icon={faTimes} style={{ fontSize: '16pt', margin: 'auto' }}/>
-          </ControlButton>
-          <ControlButton style={{ height: '30px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => setPlayerlistOpened(!playlistOpened)} className="playlist-button">
-            <FontAwesomeIcon icon={faAngleUp} style={{ fontSize: '16pt', margin: 'auto' }} className={"icon " + (playlistOpened ? "down" : "")} />
+          <ControlButton style={{ height: '30px', display: 'flex', marginLeft: 'auto', padding: '5px' }} onClick={() => close()}>
+            <FontAwesomeIcon icon={faTimes} style={{ fontSize: '16pt', margin: 'auto' }} />
           </ControlButton>
         </ContentHeader>
         <ControlContent>
-          <ControlButton onClick={backSong} disabled={playlist.length <= 0}>
-            <FontAwesomeIcon icon={faBackwardStep} />
-          </ControlButton>
-          <ControlButton onClick={togglePlay}>
-            {loading ? <LoadingSpin /> : <FontAwesomeIcon icon={errorText ? faRotateRight : playing ? faPause : faPlay} />}
-          </ControlButton>
-          <ControlButton onClick={nextSong} disabled={playlist.length <= 0}>
-            <FontAwesomeIcon icon={faForwardStep} />
-          </ControlButton>
-          <ControlButton onClick={toggleRandon}>
-            <FontAwesomeIcon icon={faShuffle} style={{ color: random ? "lightgray" : "white" }} />
-          </ControlButton>
-          <VolumeControl>
-            <ControlButton style={{ display: 'flex' }} onClick={updateMuted}>
-              <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
+          <Col>
+            {errorText ? <ErrorText>{errorText}</ErrorText> :
+              <AudioTitle>{hideTitle ? "..." : fileName}</AudioTitle>
+            }
+          </Col>
+          <Col>
+            <ControlButton onClick={backSong} disabled={playlist.length <= 0}>
+              <FontAwesomeIcon icon={faBackwardStep} />
             </ControlButton>
-            <VolumeProgress>
-              <Range percent={audioVolume} onInput={updateAudioVolume} live={true} step={'0.1'} />
-            </VolumeProgress>
-          </VolumeControl>
-          <ControlButton onClick={updateHideTitle}>
-            <FontAwesomeIcon icon={hideTitle ? faEye : faEyeSlash} style={{ fontSize: '16pt' }} />
-          </ControlButton>
-          {errorText ? <ErrorText>{errorText}</ErrorText> :
-            <AudioTitle>{hideTitle ? "..." : fileName}</AudioTitle>
-          }
-
+            <ControlButton onClick={togglePlay}>
+              {loading ? <LoadingSpin /> : <FontAwesomeIcon icon={errorText ? faRotateRight : playing ? faPause : faPlay} />}
+            </ControlButton>
+            <ControlButton onClick={nextSong} disabled={playlist.length <= 0}>
+              <FontAwesomeIcon icon={faForwardStep} />
+            </ControlButton>
+          </Col>
+          <Col style={{justifyContent: 'right', paddingRight: '15px'}}>
+            <ControlButton onClick={toggleRandon}>
+              <FontAwesomeIcon icon={faShuffle} style={{ color: random ? "lightgray" : "white" }} />
+            </ControlButton>
+            <VolumeControl>
+              <ControlButton style={{ display: 'flex' }} onClick={updateMuted}>
+                <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
+              </ControlButton>
+              <VolumeProgress>
+                <Range percent={audioVolume} onInput={updateAudioVolume} live={true} step={'0.1'} />
+              </VolumeProgress>
+            </VolumeControl>
+            <ControlButton onClick={updateHideTitle}>
+              <FontAwesomeIcon icon={hideTitle ? faEye : faEyeSlash} style={{ fontSize: '16pt' }} />
+            </ControlButton>
+            <ControlButton onClick={() => setPlayerlistOpened(!playlistOpened)}>
+              <FontAwesomeIcon icon={faBars} style={{ fontSize: '16pt' }} />
+            </ControlButton>
+          </Col>
         </ControlContent>
         <AudioDurationContent>
           <AudioDurationCount>{audioCurrentTime}/{audioDuration}</AudioDurationCount>
