@@ -1,7 +1,13 @@
 import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const ShowElement = keyframes`
+  from {
+    transform: translateX(100%);
+  }
+`
 
 const PlayListContent = styled.div`
   backdrop-filter: blur(5px);
@@ -9,19 +15,20 @@ const PlayListContent = styled.div`
   box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  height: 200px;
-  margin-top: 20px;
-  margin-bottom: -10px;
-  padding-bottom: 15px;
-  border-radius: 15px 15px 0 0;
+  height: calc(100vh - 110px);
+  width: 550px;
+  max-width: 100%;
   overflow-y: hidden;
-  transition: height 500ms;
+  margin-left: auto;
+  top: 0;
+  right: 0;
+  position: fixed;
+  animation: ${ShowElement} 200ms linear normal;
 `
 
 const PlaylistHeader = styled.div`
   padding: 10px;
   text-align: center;
-  border-radius: 15px 15px 0 0;
   background-color: rgba(0, 0, 0, 0.2);
   overflow-y: hidden;
 `
@@ -73,8 +80,12 @@ export default function PlayList(props: PropsInterface) {
     setPlaying(props.playing ?? null);
   }, [props.playing])
 
+  if (!props.open) {
+    return <></>;
+  }
+
   return (
-    <PlayListContent style={!props.open ? { height: 0, padding: 0 } : {}}>
+    <PlayListContent>
       <PlaylistHeader>
         <h3>Lista de músicas</h3>
       </PlaylistHeader>

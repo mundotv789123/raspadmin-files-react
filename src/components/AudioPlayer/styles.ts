@@ -2,38 +2,29 @@ import styled, { keyframes } from "styled-components";
 
 export const ShowElement = keyframes`
   from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateY(0);
+    transform: translateY(100%);
   }
 `
 
 export const AudioContent = styled.div`
   position: fixed;
-  bottom: 10px;
-  right: 10px;
-  width: 580px;
-  transition: 200ms;
+  max-height: 100vh;
+  bottom: 0;
+  right: 0;
+  left: 0;
   animation: ${ShowElement} 200ms linear normal;
   display: flex;
   flex-direction: column;
   z-index: 1;
-  @media(max-width: 780px) {
-    width: auto;
-    left: 10px;
-  }
 `
 
 export const AudioElement = styled.div`
   backdrop-filter: blur(5px);
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8));
-  border: solid 1px gray;
-  box-shadow: 0 4px 4px 0px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(90deg, rgba(49, 49, 49, 0.5), rgba(0, 0, 0, 0.8));
+  box-shadow: 0 0px 0px 2px rgba(255, 255, 255, 0.3) inset, 0 4px 4px 0px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  height: 120px;
-  border-radius: 15px;
+  height: 110px;
   width: 100%;
 `
 
@@ -51,7 +42,15 @@ export const ContentHeader = styled.div`
 
 export const ControlContent = styled.div`
   display: flex;
+  justify-content: space-between;
   margin: 0 0 0 15px;
+`
+
+export const Col = styled.div`
+  width: 33.33%;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
 `
 
 export const ControlButton = styled.button`
@@ -106,9 +105,8 @@ export const AudioTitle = styled.h3`
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
-  text-align: center;
   width: 100%;
-  margin: auto 15px;
+  margin: auto 5px;
 `
 
 export const AudioDurationContent = styled.div`
@@ -120,7 +118,7 @@ export const AudioDurationCount = styled.p`
   color: white;
   font-size: 10pt;
   margin: 0 15px;
-  text-align: right; 
+  margin: 0 20px;
 `
 
 export const AudioProgress = styled.div`

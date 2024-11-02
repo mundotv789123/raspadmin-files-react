@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { FilesService } from "../../services/FilesService";
 import { FileModel } from "../../services/models/FilesModel";
 import { FileError } from "../../services/exceptions/FilesErros";
-import { Aside, CollapseButtom, Container, Header, Main, Nav, SearchInput, SideBar, SideBarContainer } from "./styles";
+import { Aside, CollapseButtom, Container, Header, Main, Nav, ReloadButton, SearchInput, SideBar, SideBarContainer } from "./styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PathNavigator from "../../elements/PathNavigator";
 import FilesList from "../FilesList";
 import FilesMain from "../FilesMain";
 import OpenendFile from "../OpenedFile";
 import LoginMenu from "../LoginMenu";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faRefresh } from "@fortawesome/free-solid-svg-icons";
 
 export default function Home() {
     const service = FilesService.getInstance();
@@ -43,11 +43,6 @@ export default function Home() {
       }).catch((ex: FileError) => {
         if (ex.code == 401) {
           setLogin(true);
-        }
-        if(ex.code == 503 || ex.code == 502) {
-          setTimeout(() => {
-            loadPage();
-          }, 5000);
         }
         setText(ex.message);
       });
@@ -123,6 +118,7 @@ export default function Home() {
         </SideBarContainer>
         <Aside>
           <FilesMain files={mainFiles} text={text} search={search} fileLoading={fileLoading} />
+          { (text != null) && <ReloadButton onClick={loadPage}><FontAwesomeIcon icon={faRefresh}/></ReloadButton>}
         </Aside>
         <OpenendFile file={openedFile} path={path ?? ""} listedFiles={mainFiles}/>
         {login && <LoginMenu onSuccess={loadPage} />}
