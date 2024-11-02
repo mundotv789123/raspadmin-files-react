@@ -42,3 +42,4 @@ jobs:
           context: .
           push: true
           tags: mundotv789123/raspadmin:front
+          platforms: linux/amd64,linux/arm64
