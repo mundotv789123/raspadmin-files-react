@@ -34,11 +34,11 @@ export class FilesService {
     if (pathFile == null)
       pathFile = "/";
     try {
-      let result = await this.api.get<FileResponseData>(`/files${FilesService.getQuery(encodeURIComponent(pathFile))}`);
+      const result = await this.api.get<FileResponseData>(`/files${FilesService.getQuery(encodeURIComponent(pathFile))}`);
       if (result.status == 204)
         return [];
 
-      let response = result.data.files.map(file => FilesService.convertFileModel(file, pathFile as string));
+      const response = result.data.files.map(file => FilesService.convertFileModel(file, pathFile as string));
       return FilesService.sortNaturalFiles(response);
     } catch (ex: unknown) {
       if (ex instanceof AxiosError)
@@ -48,9 +48,9 @@ export class FilesService {
   }
 
   public static convertFileModel(file: FileResponse, pathFile: string): FileModel {
-    let filePathFull = file.open ? pathFile : `${pathFile}/${file.name}`;
+    const filePathFull = file.open ? pathFile : `${pathFile}/${file.name}`;
 
-    let fileModel = {
+    const fileModel = {
       ...file,
       src: FilesService.getSrcFile(filePathFull),
       href: FilesService.getHrefFile(filePathFull),
@@ -65,7 +65,7 @@ export class FilesService {
   }
 
   public static getType(name: string): string | null {
-    let mimeType = lookup(name);
+    const mimeType = lookup(name);
     if (mimeType)
       return mimeType;
     return null;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { LoginService } from "../../services/LoginService";
 import { Button, ErrorArea, Input, Loading, LoginCont, LoginForm, Title } from "./styles";
 
@@ -12,10 +12,13 @@ export default function LoginMenu(props: PropsInterface) {
   const [errorText, setErroText] = useState<string>();
   const [loading, setLoding] = useState(false);
 
-  function submit(event: any) {
+  function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    let username = event.target.username.value;
-    let password = event.target.password.value;
+
+    const form = event.target as HTMLFormElement;
+    const username = form.username.value;
+    const password = form.password.value;
+
     if (username === '' || password === '') {
       setErroText('Preencha todos os campos');
       return;

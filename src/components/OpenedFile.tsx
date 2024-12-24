@@ -28,7 +28,7 @@ export default function OpenendFile(props: PropsInterface) {
   }
 
   function loadFile() {
-    let fileType = props.file!.type;
+    const fileType = props.file!.type;
 
     if (fileType) {
       if (!isImage(fileType)) {
@@ -55,20 +55,20 @@ export default function OpenendFile(props: PropsInterface) {
   }
 
   function getNextImage() {
-    let hashPath = location.hash;
+    const hashPath = location.hash;
     if (!hashPath || !openedImage || !imagesList)
       return null;
-    let index = imagesList.indexOf(hashPath);
+    const index = imagesList.indexOf(hashPath);
     if (index <= (imagesList.length - 1))
       return imagesList[index + 1];
     return null;
   }
 
   function getBackImage() {
-    let hashPath = location.hash;
+    const hashPath = location.hash;
     if (!hashPath || !openedImage || imagesList.length == 0)
       return null;
-    let index = imagesList.indexOf(hashPath);
+    const index = imagesList.indexOf(hashPath);
     if (index > 0)
       return imagesList[index - 1];
     return null;

@@ -12,7 +12,7 @@ export function getFileIcon(is_dir: boolean, minetype: string | null): string {
   if (!minetype)
     return 'document.svg';
 
-  let [type, format] = minetype.toString().split('/');
+  const [type, format] = minetype.toString().split('/');
   switch (type) {
     case 'video':
       return 'video.svg';

@@ -32,14 +32,18 @@ interface PropsInterface {
   path: string
 }
 
+function LinkUrl(props: { href: string, title: string }) {
+  return (<><p>/</p><a href={props.href} title={props.title}>{props.title}</a></>)
+}
+
 export default function PathNavigator(props: PropsInterface) {
   return (
     <PathLink>
-      <p>/</p><a href="#/" title="home">home</a>
+      <LinkUrl title="home" href="#/"/>
       {props.path && props.path.split("/").filter(p => p).map((p, i) => {
         let link = '';
         props.path.split('/').filter(p => p).forEach((l, li) => { if (li <= i) link += `/${l}` });
-        return (<><p>/</p><a key={i} href={`#${encodeURIComponent(link)}`} title={p}>{p}</a></>)
+        return <LinkUrl title={p} href={`#${encodeURIComponent(link)}`} key={i}/>
       })}
     </PathLink>
   )

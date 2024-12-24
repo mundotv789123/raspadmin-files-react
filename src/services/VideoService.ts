@@ -1,13 +1,11 @@
-import md5 from "md5";
-
 export default class VideoService {
 
   setVideoTime(name: string, time: number) {
     if (time <= 0) {
       return;
     }
-    let videos = localStorage['videos'] ? JSON.parse(localStorage['videos']) : {};
-    let uuid = md5(name);
+    const videos = localStorage['videos'] ? JSON.parse(localStorage['videos']) : {};
+    const uuid = btoa(name);
     videos[uuid] = time;
     localStorage['videos'] = JSON.stringify(videos);
   }
@@ -17,8 +15,8 @@ export default class VideoService {
       localStorage['videos'] = JSON.stringify({});
       return 0;
     }
-    let videos = JSON.parse(localStorage['videos']);
-    let uuid = md5(name);
+    const videos = JSON.parse(localStorage['videos']);
+    const uuid = btoa(name);
     return videos[uuid] ? videos[uuid] : 0;
   }
 

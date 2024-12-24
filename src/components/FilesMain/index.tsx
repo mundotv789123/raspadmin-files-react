@@ -10,9 +10,11 @@ interface PropsInterface {
 }
 
 export default function FilesMain(props: PropsInterface) {
-  var text = props.text;
-  if (props.files?.length == 0 ?? false)
+  let text = props.text;
+
+  if (props.files?.length == 0) {
     text = "Essa pasta está vazia!"
+  }
 
   return (
     <Panel>

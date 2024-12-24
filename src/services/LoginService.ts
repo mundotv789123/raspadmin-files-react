@@ -13,7 +13,7 @@ export class LoginService {
   }
 
   login(username: string, password: string, callback: (() => void), callbackError?: ((errorMessage: string) => void)) {
-    var formData = new URLSearchParams();
+    const formData = new URLSearchParams();
     formData.append("username", username);
     formData.append("password", password);
 
@@ -24,7 +24,7 @@ export class LoginService {
 
         let message = 'Erro interno ao processar requisição';
         try {
-          let json = JSON.parse(error.request.response);
+          const json = JSON.parse(error.request.response);
           if (json.message)
             message = json.message;
         } catch {

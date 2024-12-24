@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, MouseEvent, useEffect, useRef, useState } from "react";
 import { RangeArea, RangeInput, RangeMain, RangeProgress, RangeProgressBar, RangeProgressFollower } from "./styles";
-
 
 interface PropsInterface {
   percent?: number,
@@ -28,8 +27,8 @@ export default function Range(props: PropsInterface) {
       setPercent(perc);
   }
 
-  function updateProgress(event: any) {
-    let perc = event.target.value;
+  function updateProgress(event: FormEvent<HTMLInputElement>) {
+    const perc = Number((event.target as HTMLInputElement).value);
 
     setPercent(() => {
       if (props.live)
@@ -40,11 +39,11 @@ export default function Range(props: PropsInterface) {
     setFollowerPercent(0);
   }
 
-  function getCursorPercent(event: any): number {
+  function getCursorPercent(event: MouseEvent<HTMLInputElement, globalThis.MouseEvent>): number {
     if (!range_area.current)
       return 0;
-    let rect = range_area.current.getBoundingClientRect();
-    let perc = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
+    const rect = range_area.current.getBoundingClientRect();
+    const perc = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
     if (perc < 0)
       return 0;
     if (perc > 100)
@@ -73,8 +72,8 @@ export default function Range(props: PropsInterface) {
           callEvent();
         }}
         onMouseLeave={() => setFollowerPercent(0)}
-        onMouseMove={e => {
-          let perc = getCursorPercent(event);
+        onMouseMove={(event) => {
+          const perc = getCursorPercent(event);
           setFollowerPercent(props.follower ? perc : 0);
         }}
       />
