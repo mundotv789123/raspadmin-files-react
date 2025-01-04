@@ -6,19 +6,20 @@ import PlayList from "./PlayList";
 import Range from "../../elements/range";
 import { numberClockTime, srcToFileName } from "../../helpers/ConverterHelper";
 import { getErrorMessage } from "@/services/exceptions/FilesErros";
+import { useLocalStorage } from "@/helpers/HooksHelper";
 
 interface AudioControl {
   muted: boolean,
   random: boolean,
   playing: boolean,
   playlistOpened: boolean,
-  hideTitle: boolean
+  hideTitle: boolean,
+  volume: number
 }
 
 interface AudioProps {
   duration: number,
-  currentTime: number,
-  volume: number
+  currentTime: number
 }
 
 interface PropsInterface {
@@ -33,24 +34,28 @@ export default function AudioPlayer(props: PropsInterface) {
 
   const playlist = props.playlist;
 
-  const [controls, setControls] = useState<AudioControl>({
+  const [controls, setControls] = useLocalStorage<AudioControl>("audio-settings", {
     muted: false,
     random: false,
     playing: false,
     playlistOpened: false,
-    hideTitle: false
+    hideTitle: false,
+    volume: .5
   });
 
   const [audioProps, setAudioProps] = useState<AudioProps>({
     duration: 0,
-    currentTime: 0,
-    volume: 0
+    currentTime: 0
   });
 
   const audioDuration = useMemo(() => numberClockTime(audioProps.duration), [audioProps.duration]);
   const audioCurrentTime = useMemo(() => numberClockTime(audioProps.currentTime), [audioProps.currentTime]);
-  const progressPercent = useMemo(() => audioProps.duration == 0 ? 0 : (audioProps.currentTime * 100 / audioProps.duration), [audioProps.currentTime]);
-  const currentPlayList = useMemo(() => controls.random ? playlist.map(a => a).sort(() => Math.random() - 0.5) : playlist, [controls.random, playlist]);
+  const progressPercent = useMemo(() => 
+    audioProps.duration == 0 ? 0 : (audioProps.currentTime * 100 / audioProps.duration)
+  , [audioProps.currentTime, audioProps.duration]);
+  const currentPlayList = useMemo(() => 
+    controls.random ? playlist.map(a => a).sort(() => Math.random() - 0.5) : playlist
+  , [controls.random, playlist]);
 
   const [errorText, setErrorText] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,7 +67,7 @@ export default function AudioPlayer(props: PropsInterface) {
       audioElement.current!.currentTime = 0;
     else
       setSrc(props.src);
-  }, [props.src])
+  }, [props.src, src])
 
   useEffect(() => {
     setLoading(true);
@@ -78,10 +83,8 @@ export default function AudioPlayer(props: PropsInterface) {
     setErrorText(null);
     loadMediaSession();
 
-    const volume = getSessionVolume();
-    setAudioProps((prev) => ({ ...prev, volume, duration: audioElement.current!.duration }));
-
-    audioElement.current!.volume = controls.muted ? 0 : volume / 100;
+    setAudioProps((prev) => ({ ...prev, duration: audioElement.current!.duration }));
+    audioElement.current!.volume = controls.muted ? 0 : controls.volume;
 
     setLoading(false);
   }
@@ -129,8 +132,7 @@ export default function AudioPlayer(props: PropsInterface) {
   function updateAudioVolume(percent: number) {
     if (!controls.muted)
       audioElement.current!.volume = percent / 100;
-    localStorage.setItem('audio_volume', percent.toFixed(2));
-    setAudioProps((prev) => ({ ...prev, volume: percent }));
+    setControls((prev) => ({ ...prev, volume: audioElement.current!.volume }));
     return true;
   }
 
@@ -167,14 +169,9 @@ export default function AudioPlayer(props: PropsInterface) {
     setSrc(src);
   }
 
-  function getSessionVolume(): number {
-    const volume = localStorage.getItem('audio_volume') ? Number(localStorage.getItem('audio_volume')) : 50;
-    return volume < 0 ? 0 : volume;
-  }
-
   function updateMuted() {
     const isMuted = !controls.muted;
-    audioElement.current!.volume = isMuted ? 0 : audioProps.volume / 100;
+    audioElement.current!.volume = isMuted ? 0 : controls.volume;
     setControls((prev) => ({ ...prev, muted: isMuted }));
   }
 
@@ -236,7 +233,7 @@ export default function AudioPlayer(props: PropsInterface) {
                 <FontAwesomeIcon icon={controls.muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
               </ControlButton>
               <VolumeProgress>
-                <Range percent={audioProps.volume} onInput={updateAudioVolume} live={true} step={'0.1'} />
+                <Range percent={controls.volume * 100} onInput={updateAudioVolume} live={true} step={'0.1'} />
               </VolumeProgress>
             </VolumeControl>
             <ControlButton onClick={updateHideTitle}>
