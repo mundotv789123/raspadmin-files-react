@@ -20,7 +20,7 @@ export default function Range(props: PropsInterface) {
     if (keyPressing)
       return;
     setPercent(props.percent ?? 0);
-  }, [props.percent])
+  }, [props.percent, keyPressing])
 
   function callEvent(perc: number = percent) {
     if (props.onInput && props.onInput(Number(perc)))

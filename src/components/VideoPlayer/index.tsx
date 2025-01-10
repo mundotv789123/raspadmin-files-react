@@ -38,7 +38,7 @@ export default function VideoPlayer(props: PropsInterface) {
     volume: 0
   });
 
-  const progressPercent = useMemo(() => (videoProps.currentTime * 100 / videoProps.duration), [videoProps.currentTime]);
+  const progressPercent = useMemo(() => (videoProps.currentTime * 100 / videoProps.duration), [videoProps.currentTime, videoProps.duration]);
   const playPauseIcon = useMemo(() => controls.playing ? faPause : faPlay, [controls.playing]);
 
   const [loading, setLoading] = useState(true);
