@@ -94,10 +94,14 @@ export default function OpenendFile(props: PropsInterface) {
         nextUrl={getNextImage()}
         backUrl={getBackImage()}
       />}
-      {openedAudio && <AudioPlayer src={openedAudio.src} playlist={audioPlayList} onClose={() => {
-        setOpenendAudio(null);
-        setAudioPlaylist([]);
-      }}/>}
+      {openedAudio && <AudioPlayer 
+        src={openedAudio.src} 
+        playlist={audioPlayList} 
+        onClose={() => {
+          setOpenendAudio(null);
+          setAudioPlaylist([]);
+        }}
+      />}
     </>
   )
 }
