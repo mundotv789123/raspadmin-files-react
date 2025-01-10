@@ -50,7 +50,7 @@ export default function Home() {
   
     function loadMainFiles(path: string = decodeURIComponent(location.hash.substring(1))) {
       if (mainFiles !== null) {
-        let fileFind = mainFiles.filter(f => decodeURIComponent(f.href) == decodeURIComponent(hash));
+        const fileFind = mainFiles.filter(f => decodeURIComponent(f.href) == decodeURIComponent(hash));
         if (fileFind.length == 1 && !fileFind[0].is_dir)
           setFileLoading(mainFiles.indexOf(fileFind[0]));
         else {

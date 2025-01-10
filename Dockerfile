@@ -1,4 +1,5 @@
-FROM nginx
-RUN mkdir -p /var/www
-COPY ./out /var/www/html
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+FROM mundotv789123/raspadmin:java
+
+ENV spring_web_resources_static-locations='file:/app/front'
+
+COPY ./out /app/front

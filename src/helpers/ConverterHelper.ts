@@ -9,9 +9,9 @@ export function srcToFileName(src: string): string {
 
 /* convert number time to clock time, ex 75 -> 01:15 */
 export function numberClockTime(time: number): string {
-    let secs = time % 60;
-    let min = ((time - secs) / 60) % 60;
-    let hours = ((time - secs) / 60) / 60;
+    const secs = time % 60;
+    const min = ((time - secs) / 60) % 60;
+    const hours = ((time - secs) / 60) / 60;
 
     let timer = `${min.toFixed(0).padStart(2, '0')}:${secs.toFixed(0).padStart(2, '0')}`;
     if (hours >= 1) {

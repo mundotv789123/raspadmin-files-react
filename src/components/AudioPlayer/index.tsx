@@ -1,10 +1,26 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AudioContent, AudioDurationContent, AudioDurationCount, AudioElement, AudioProgress, AudioTitle, Col, ContentHeader, ControlButton, ControlContent, ErrorText, LoadingSpin, VolumeControl, VolumeProgress } from "./styles";
 import { faBackwardStep, faBars, faEye, faEyeSlash, faForwardStep, faPause, faPlay, faRotateRight, faShuffle, faTimes, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import PlayList from "./PlayList";
 import Range from "../../elements/range";
 import { numberClockTime, srcToFileName } from "../../helpers/ConverterHelper";
+import { getErrorMessage } from "@/services/exceptions/FilesErros";
+import { useLocalStorage } from "@/helpers/HooksHelper";
+
+interface AudioControl {
+  muted: boolean,
+  random: boolean,
+  playing: boolean,
+  playlistOpened: boolean,
+  hideTitle: boolean,
+  volume: number
+}
+
+interface AudioProps {
+  duration: number,
+  currentTime: number
+}
 
 interface PropsInterface {
   src: string | null,
@@ -13,42 +29,49 @@ interface PropsInterface {
 }
 
 export default function AudioPlayer(props: PropsInterface) {
-  const playlist = props.playlist;
-
+  const audioElement = useRef<HTMLAudioElement>(null);
   const [src, setSrc] = useState<string>(props.src ?? "");
 
-  const [muted, setMuted] = useState(false);
-  const [random, setRandom] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [playing, setPlaying] = useState(false);
+  const playlist = props.playlist;
 
-  const [progressPercent, setProgressPercent] = useState(0);
-  const [audioVolume, setAudioVolume] = useState(0);
+  const [controls, setControls] = useLocalStorage<AudioControl>("audio-settings", {
+    muted: false,
+    random: false,
+    playing: false,
+    playlistOpened: false,
+    hideTitle: false,
+    volume: .5
+  });
 
-  const [audioDuration, setAudioDuration] = useState('00:00');
-  const [audioCurrentTime, setAudioCurrentTime] = useState('00:00');
+  const [audioProps, setAudioProps] = useState<AudioProps>({
+    duration: 0,
+    currentTime: 0
+  });
 
-  const [playlistOpened, setPlayerlistOpened] = useState(false);
-  const [randomPlayList, setRandomPlaylist] = useState<Array<string> | null>(null);
+  const audioDuration = useMemo(() => numberClockTime(audioProps.duration), [audioProps.duration]);
+  const audioCurrentTime = useMemo(() => numberClockTime(audioProps.currentTime), [audioProps.currentTime]);
+  const progressPercent = useMemo(() => 
+    audioProps.duration == 0 ? 0 : (audioProps.currentTime * 100 / audioProps.duration)
+  , [audioProps.currentTime, audioProps.duration]);
+  const currentPlayList = useMemo(() => 
+    controls.random ? playlist.map(a => a).sort(() => Math.random() - 0.5) : playlist
+  , [controls.random, playlist]);
 
-  const [hideTitle, setHideTitle] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
-
-  const audio_element = useRef<HTMLAudioElement>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!props.src)
       return;
     if (props.src == src)
-      audio_element.current!.currentTime = 0;
+      audioElement.current!.currentTime = 0;
     else
       setSrc(props.src);
-  }, [props.src])
+  }, [props.src, src])
 
   useEffect(() => {
     setLoading(true);
-    if (random && !playListIsSameOfRandomList())
-      randomizeList(true);
+    audioElement.current!.load();
   }, [src])
 
   const fileName = srcToFileName(decodeURIComponent(src));
@@ -60,144 +83,109 @@ export default function AudioPlayer(props: PropsInterface) {
     setErrorText(null);
     loadMediaSession();
 
-    let volume = getSessionVolume();
-    setAudioVolume(volume);
-
-    audio_element.current!.volume = muted ? 0 : volume / 100;
+    setAudioProps((prev) => ({ ...prev, duration: audioElement.current!.duration }));
+    audioElement.current!.volume = controls.muted ? 0 : controls.volume;
 
     setLoading(false);
-    setAudioDuration(numberClockTime(audio_element.current!.duration));
   }
 
   function loadMediaSession() {
     if (!navigator.mediaSession.metadata) {
       navigator.mediaSession.metadata = new MediaMetadata();
     }
-    navigator.mediaSession.metadata.title = hideTitle ? "Raspadmin Music Player" : fileName;
+    navigator.mediaSession.metadata.title = controls.hideTitle ? "Raspadmin Music Player" : fileName;
     navigator.mediaSession.metadata.artwork = [{ src: "/img/icons/music.svg" }];
     navigator.mediaSession.setActionHandler('previoustrack', backSong);
     navigator.mediaSession.setActionHandler('nexttrack', nextSong);
   }
 
   function updateHideTitle() {
-    setHideTitle(isHidetitle => {
-      navigator.mediaSession.metadata!.title = !isHidetitle ? "Raspadmin Music Player" : fileName;
-      return !isHidetitle;
+    setControls((prev) => {
+      navigator.mediaSession.metadata!.title = !prev.hideTitle ? "Raspadmin Music Player" : fileName;
+      return { ...prev, hideTitle: !prev.hideTitle };
     });
   }
 
   function updatePlaying() {
-    setPlaying(!audio_element.current!.paused);
+    setControls((prev) => ({ ...prev, playing: !audioElement.current!.paused }));
   }
 
   function togglePlay() {
-    if (errorText != null) {
-      audio_element.current!.load();
-      setLoading(true)
+    if (errorText !== null) {
+      audioElement.current!.load();
+      setLoading(true);
       return;
     }
 
-    if (playing) {
-      audio_element.current!.pause();
+    if (controls.playing) {
+      audioElement.current!.pause();
     } else {
-      audio_element.current!.play();
+      audioElement.current!.play();
     }
   }
 
-  function updateAudioProgress() {
-    let percent = (audio_element.current!.currentTime * 100 / audio_element.current!.duration);
-    setProgressPercent(percent);
-    setAudioCurrentTime(numberClockTime(audio_element.current!.currentTime));
-  }
-
   function updateAudioTime(percent: number) {
-    audio_element.current!.currentTime = (audio_element.current!.duration / 100 * percent);
-    setProgressPercent(percent);
+    audioElement.current!.currentTime = (audioElement.current!.duration / 100 * percent);
     return true;
   }
 
   function updateAudioVolume(percent: number) {
-    if (!muted)
-      audio_element.current!.volume = percent / 100;
-    localStorage.setItem('audio_volume', percent.toFixed(2));
-    setAudioVolume(percent);
+    if (!controls.muted)
+      audioElement.current!.volume = percent / 100;
+    setControls((prev) => ({ ...prev, volume: audioElement.current!.volume }));
     return true;
   }
 
   function nextSong() {
-    if (playlist.length <= 1) {
-      audio_element.current!.currentTime = 0;
+    if (currentPlayList.length <= 1) {
+      audioElement.current!.currentTime = 0;
       return;
     }
-    setLoading(true)
-    let list = (random ? randomPlayList : playlist) ?? [];
+    setLoading(true);
 
-    let index = list.indexOf(src)
-    if (index < 0 || (index + 1) >= list.length) {
-      setSrc(list[0]);
+    const index = currentPlayList.indexOf(src)
+    if (index < 0 || (index + 1) >= currentPlayList.length) {
+      setSrc(currentPlayList[0]);
       return;
     }
-    setSrc(list[index + 1]);
+    setSrc(currentPlayList[index + 1]);
   }
 
   function backSong() {
-    if (audio_element.current!.currentTime > 1 || playlist.length <= 1) {
-      audio_element.current!.currentTime = 0;
+    if (audioElement.current!.currentTime > 1 || currentPlayList.length <= 1) {
+      audioElement.current!.currentTime = 0;
       return;
     }
 
-    let list = (random ? randomPlayList : playlist) ?? [];
-
-    setLoading(true)
-    let index = list.indexOf(src);
+    setLoading(true);
+    const index = currentPlayList.indexOf(src);
     setSrc(() => {
-      return index <= 0 ? list[playlist.length - 1] : list[index - 1];
+      return index <= 0 ? currentPlayList[currentPlayList.length - 1] : currentPlayList[index - 1];
     });
   }
 
   function updateSongPlaying(index: number) {
-    let src = playlist[index];
+    const src = playlist[index];
     setSrc(src);
   }
 
-  function getSessionVolume(): number {
-    let volume = localStorage.getItem('audio_volume') ? Number(localStorage.getItem('audio_volume')) : 50;
-    return volume < 0 ? 0 : volume;
-  }
-
   function updateMuted() {
-    let isMuted = !muted;
-    audio_element.current!.volume = isMuted ? 0 : audioVolume / 100;
-    setMuted(isMuted);
+    const isMuted = !controls.muted;
+    audioElement.current!.volume = isMuted ? 0 : controls.volume;
+    setControls((prev) => ({ ...prev, muted: isMuted }));
   }
 
   function toggleRandon() {
-    let isRandom = !random;
-    setRandom(isRandom);
-    if (isRandom)
-      randomizeList();
-    else
-      setRandomPlaylist(null);
-  }
-
-  function randomizeList(reset = false) {
-    if (!playlist || playlist.length <= 2)
-      return
-
-    let list = (!reset && randomPlayList != null) ? randomPlayList : playlist.map(a => a);
-    setRandomPlaylist(list.sort(() => Math.random() - 0.5));
-  }
-
-  function playListIsSameOfRandomList(): boolean {
-    if (randomPlayList == null || randomPlayList.length != playlist.length)
-      return false;
-
-    return playlist.filter(s => !randomPlayList.includes(s)).length == 0;
+    const isRandom = !controls.random;
+    setControls((prev) => ({ ...prev, random: isRandom }));
   }
 
   function setError() {
-    setLoading(false)
-    setErrorText(audio_element.current?.error?.message ?? "Ocorreu um erro ao reproduzir áudio")
+    setLoading(false);
+    const code = audioElement.current?.error?.code;
+    const message = audioElement.current?.error?.message;
+    const errorMessage = code ? getErrorMessage(code) : message ?? "Ocorreu um erro ao reproduzir áudio";
+    setErrorText(errorMessage)
   }
 
   function close() {
@@ -208,7 +196,7 @@ export default function AudioPlayer(props: PropsInterface) {
   return (
     <AudioContent>
       <PlayList
-        open={playlistOpened}
+        open={controls.playlistOpened}
         playlist={playlist.map(src => srcToFileName(decodeURIComponent(src)))}
         playing={src ? playlist.indexOf(src) : undefined}
         onClick={updateSongPlaying}
@@ -222,7 +210,7 @@ export default function AudioPlayer(props: PropsInterface) {
         <ControlContent>
           <Col>
             {errorText ? <ErrorText>{errorText}</ErrorText> :
-              <AudioTitle>{hideTitle ? "..." : fileName}</AudioTitle>
+              <AudioTitle>{controls.hideTitle ? "..." : fileName}</AudioTitle>
             }
           </Col>
           <Col>
@@ -230,28 +218,28 @@ export default function AudioPlayer(props: PropsInterface) {
               <FontAwesomeIcon icon={faBackwardStep} />
             </ControlButton>
             <ControlButton onClick={togglePlay}>
-              {loading ? <LoadingSpin /> : <FontAwesomeIcon icon={errorText ? faRotateRight : playing ? faPause : faPlay} />}
+              {loading ? <LoadingSpin /> : <FontAwesomeIcon icon={errorText ? faRotateRight : controls.playing ? faPause : faPlay} />}
             </ControlButton>
             <ControlButton onClick={nextSong} disabled={playlist.length <= 0}>
               <FontAwesomeIcon icon={faForwardStep} />
             </ControlButton>
           </Col>
-          <Col style={{justifyContent: 'right', paddingRight: '15px'}}>
+          <Col style={{ justifyContent: 'right', paddingRight: '15px' }}>
             <ControlButton onClick={toggleRandon}>
-              <FontAwesomeIcon icon={faShuffle} style={{ color: random ? "lightgray" : "white" }} />
+              <FontAwesomeIcon icon={faShuffle} style={{ color: controls.random ? "lightgray" : "white" }} />
             </ControlButton>
             <VolumeControl>
               <ControlButton style={{ display: 'flex' }} onClick={updateMuted}>
-                <FontAwesomeIcon icon={muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
+                <FontAwesomeIcon icon={controls.muted ? faVolumeMute : faVolumeUp} style={{ fontSize: '16pt' }} />
               </ControlButton>
               <VolumeProgress>
-                <Range percent={audioVolume} onInput={updateAudioVolume} live={true} step={'0.1'} />
+                <Range percent={controls.volume * 100} onInput={updateAudioVolume} live={true} step={'0.1'} />
               </VolumeProgress>
             </VolumeControl>
             <ControlButton onClick={updateHideTitle}>
-              <FontAwesomeIcon icon={hideTitle ? faEye : faEyeSlash} style={{ fontSize: '16pt' }} />
+              <FontAwesomeIcon icon={controls.hideTitle ? faEye : faEyeSlash} style={{ fontSize: '16pt' }} />
             </ControlButton>
-            <ControlButton onClick={() => setPlayerlistOpened(!playlistOpened)}>
+            <ControlButton onClick={() => setControls((prev) => ({ ...prev, playlistOpened: !prev.playlistOpened }))}>
               <FontAwesomeIcon icon={faBars} style={{ fontSize: '16pt' }} />
             </ControlButton>
           </Col>
@@ -269,9 +257,9 @@ export default function AudioPlayer(props: PropsInterface) {
           onPlay={updatePlaying}
           onPause={updatePlaying}
           onCanPlay={loadPlayer}
-          onTimeUpdate={updateAudioProgress}
           onEnded={nextSong}
-          ref={audio_element}
+          onTimeUpdate={(e) => setAudioProps((prev) => ({ ...prev, currentTime: (e.target as HTMLAudioElement | null)?.currentTime ?? 0 }))}
+          ref={audioElement}
         />
       </AudioElement>
     </AudioContent>

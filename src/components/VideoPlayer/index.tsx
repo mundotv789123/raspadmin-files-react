@@ -1,41 +1,59 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faVolumeUp, faExpand, faAngleLeft, faPause, faRotateRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
-import { useRef, useState } from "react";
+import { MouseEvent, useMemo, useRef, useState } from "react";
 import { CenterButtons, Error, VideoBottom, VideoButton, VideoCenter, VideoCloseButton, VideoCont, VideoElement, VideoLoading, VideoMain, VideoProgress, VideoTitle, VideoTop, VideoVolume } from './styles';
 import VideoService from '../../services/VideoService';
 import Range from '../../elements/range';
 import { srcToFileName } from '../../helpers/ConverterHelper';
 
-var cursorTimeout = 0;
+let cursorTimeout = 0;
+
+interface VideoControl {
+  playing: boolean
+}
+
+interface VideoProps {
+  duration: number,
+  currentTime: number,
+  volume: number
+}
 
 interface PropsInterface {
-  src: string | undefined, 
-  backUrl: string | undefined 
+  src: string | null,
+  backUrl: string | null
 }
 
 interface VideoScreenOrientation extends ScreenOrientation {
-  lock(a: string): Promise<void>
+  lock?(a: string): Promise<void>
 }
 
 export default function VideoPlayer(props: PropsInterface) {
+  const [controls, setControls] = useState<VideoControl>({
+    playing: false
+  });
 
-  const [progressPercent, setProgressPercent] = useState(0);
+  const [videoProps, setVideoProps] = useState<VideoProps>({
+    duration: 0,
+    currentTime: 0,
+    volume: 0
+  });
+
+  const progressPercent = useMemo(() => (videoProps.currentTime * 100 / videoProps.duration), [videoProps.currentTime]);
+  const playPauseIcon = useMemo(() => controls.playing ? faPause : faPlay, [controls.playing]);
 
   const [loading, setLoading] = useState(true);
-  const [playing, setPlaying] = useState(false);
-  const [error, setError] = useState<string|null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const main_element = useRef<HTMLDivElement>(null);
-  const main_video = useRef<HTMLDivElement>(null);
-  const volume = useRef<HTMLDivElement>(null);
-  const volume_percent = useRef<HTMLDivElement>(null);
-  const video_element = useRef<HTMLVideoElement>(null);
+  const videoContElement = useRef<HTMLDivElement>(null);
+  const videoMainElement = useRef<HTMLDivElement>(null);
+  const volumeElement = useRef<HTMLDivElement>(null);
+  const videoElement = useRef<HTMLVideoElement>(null);
 
   const service = new VideoService();
 
   function resetCursorTimeout() {
-    if (main_video.current!.classList)
-      main_video.current!.classList.remove('hide');
+    if (videoMainElement.current!.classList)
+      videoMainElement.current!.classList.remove('hide');
     if (cursorTimeout <= 0)
       cursorTimeoutExec();
     cursorTimeout = 3;
@@ -48,9 +66,9 @@ export default function VideoPlayer(props: PropsInterface) {
         cursorTimeoutExec();
         return;
       }
-      if (!main_video.current || video_element.current!.paused)
+      if (!videoMainElement.current || videoElement.current!.paused)
         return;
-      main_video.current.classList.add('hide');
+      videoMainElement.current.classList.add('hide');
     }, 1000);
   }
 
@@ -58,24 +76,24 @@ export default function VideoPlayer(props: PropsInterface) {
     if (loading || error)
       return;
     resetCursorTimeout();
-    if (playing) {
-      video_element.current!.pause();
+    if (controls.playing) {
+      videoElement.current!.pause();
     } else {
-      video_element.current!.play();
+      videoElement.current!.play();
     }
     setError(null);
     setLoading(false);
   }
 
   function togglePauseButton() {
-    setPlaying(!video_element.current!.paused);
+    setControls(prev => ({ ...prev, playing: !videoElement.current!.paused }));
   }
 
   function toggleFullScreen() {
-    let orientation = screen.orientation as VideoScreenOrientation;
+    const orientation = screen.orientation as VideoScreenOrientation;
     if (!document.fullscreenElement) {
-      main_element.current!.requestFullscreen();
-      if ((screen.orientation as any).lock)
+      videoContElement.current!.requestFullscreen();
+      if (orientation.lock)
         orientation.lock('landscape');
     } else {
       document.exitFullscreen();
@@ -83,35 +101,29 @@ export default function VideoPlayer(props: PropsInterface) {
     }
   }
 
-  function updateProgress() {
-    let percent = (video_element.current!.currentTime * 100 / video_element.current!.duration);
-    setProgressPercent(percent);
-  }
-
   function updateError() {
     setLoading(false);
-    setError(video_element.current!.error!.message);
+    setError(videoElement.current!.error!.message);
   }
 
   function updateVideoTime(percent: number) {
     if (loading || error)
       return false;
-    video_element.current!.currentTime = (video_element.current!.duration / 100 * percent);
-    setProgressPercent(percent);
+    videoElement.current!.currentTime = (videoElement.current!.duration / 100 * percent);
     return true;
   }
 
-  function updateVolume(event: any) {
-    let rect = volume.current!.getBoundingClientRect();
-    let value = ((rect.bottom - event.clientY) * 1.0 / (rect.bottom - rect.top));
-    video_element.current!.volume = value;
-    volume_percent.current!.style.height = (value * 100) + '%';
+  function updateVolume(event: MouseEvent<HTMLDivElement>) {
+    const rect = volumeElement.current!.getBoundingClientRect();
+    const value = ((rect.bottom - event.clientY) * 1.0 / (rect.bottom - rect.top));
+    videoElement.current!.volume = value;
+    setVideoProps(prev => ({ ...prev, volume: videoElement.current!.volume }));
   }
 
   function resetVideo() {
-    video_element.current!.src = "";
-    setPlaying(false);
-    setProgressPercent(0);
+    videoElement.current!.src = "";
+    setControls(prev => ({ ...prev, playing: false }));
+    videoElement.current!.currentTime = 0;
     setLoading(true);
   }
 
@@ -119,21 +131,28 @@ export default function VideoPlayer(props: PropsInterface) {
     if (!loading) {
       return;
     }
-    volume_percent.current!.style.height = (video_element.current!.volume * 100) + '%';
-    let videoTime = service.getVideoTime(video_element.current!.src);
-    if (videoTime > 0 && (video_element.current!.duration - 15) > videoTime) {
-      video_element.current!.currentTime = videoTime;
+
+    const videoTime = service.getVideoTime(videoElement.current!.src);
+    if (videoTime > 0 && (videoElement.current!.duration - 15) > videoTime) {
+      videoElement.current!.currentTime = videoTime;
     }
+
+    setVideoProps({
+      currentTime: videoElement.current!.currentTime,
+      duration: videoElement.current!.duration,
+      volume: videoElement.current!.volume
+    });
+
     setLoading(false);
-    service.startAutoSaving(video_element.current!.src, video_element.current!);
+    service.startAutoSaving(videoElement.current!.src, videoElement.current!);
   }
 
   function forward() {
-    video_element.current!.currentTime += 5;
+    videoElement.current!.currentTime += 5;
   }
 
   function backward() {
-    video_element.current!.currentTime -= 5;
+    videoElement.current!.currentTime -= 5;
   }
 
   if (props.src == null) {
@@ -143,57 +162,54 @@ export default function VideoPlayer(props: PropsInterface) {
   const fileName = srcToFileName(decodeURIComponent(props.src));
 
   return (
-    <VideoCont ref={main_element} onMouseMove={resetCursorTimeout}>
+    <VideoCont ref={videoContElement} onMouseMove={resetCursorTimeout}>
       <VideoElement
         onPlay={togglePauseButton}
         onPause={togglePauseButton}
-        onTimeUpdate={updateProgress}
+        onTimeUpdate={(e) => setVideoProps((prev) => ({ ...prev, currentTime: (e.target as HTMLVideoElement | null)?.currentTime ?? 0 }))}
         onError={updateError}
         onCanPlay={playVideo}
         src={props.src}
         autoPlay={true}
         controls={false}
-        ref={video_element}
+        ref={videoElement}
       />
-      <VideoMain ref={main_video}>
+      <VideoMain ref={videoMainElement}>
         <VideoTop>
           <VideoTitle>{fileName}</VideoTitle>
-          <VideoCloseButton
-            style={{
-              display: (props.backUrl ? '' : 'none')
-            }}
-            href={props.backUrl}
-            onClick={resetVideo}
-          >
-            <FontAwesomeIcon icon={faAngleLeft} />
-          </VideoCloseButton>
+          {props.backUrl && (
+            <VideoCloseButton href={props.backUrl} onClick={resetVideo}>
+              <FontAwesomeIcon icon={faAngleLeft} />
+            </VideoCloseButton>
+          )}
         </VideoTop>
         <VideoCenter>
           {loading && <VideoLoading />}
           {error && <Error>Erro ao carregar vídeo</Error>}
-          {(!loading && !error) &&
+          {(!loading && !error) && (
             <CenterButtons>
               <button className='buttonSmall' onClick={backward}>
                 <FontAwesomeIcon icon={faRotateLeft} />
               </button>
               <button className='buttonBig' onClick={togglePauseVideo}>
-                <FontAwesomeIcon icon={(playing ? faPause : faPlay)} />
+                <FontAwesomeIcon icon={playPauseIcon} />
               </button>
               <button className='buttonSmall' onClick={forward}>
                 <FontAwesomeIcon icon={faRotateRight} />
               </button>
-            </CenterButtons>}
+            </CenterButtons>
+          )}
         </VideoCenter>
         <VideoBottom>
           <VideoButton onClick={togglePauseVideo}>
-            <FontAwesomeIcon icon={(playing ? faPause : faPlay)} />
+            <FontAwesomeIcon icon={playPauseIcon} />
           </VideoButton>
           <VideoProgress>
-            <Range percent={progressPercent} onInput={updateVideoTime} follower={true} step='0.25'/>
+            <Range percent={progressPercent} onInput={updateVideoTime} follower={true} step='0.25' />
           </VideoProgress>
           <VideoVolume>
-            <div className="volume" ref={volume} onClick={updateVolume}>
-              <div className="volume_percent" ref={volume_percent} />
+            <div className="volume" ref={volumeElement} onClick={updateVolume}>
+              <div className="volume_percent" style={{ height: `${(videoProps.volume * 100)}%` }} />
             </div>
             <VideoButton>
               <FontAwesomeIcon icon={faVolumeUp} />

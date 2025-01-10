@@ -67,7 +67,6 @@ interface PropsInterface {
 }
 
 export default function PlayList(props: PropsInterface) {
-
   const [playing, setPlaying] = useState<number|null>(null);
 
   function playSong(index: number) {

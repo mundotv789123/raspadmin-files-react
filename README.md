@@ -1,5 +1,7 @@
 ## Raspadmin files react
 
+[![Docker Image CI](https://github.com/mundotv789123/raspadmin-files-react/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mundotv789123/raspadmin-files-react/actions/workflows/docker-image.yml)
+
 Um visualizador de arquivos web, tem como objetivo facilitar a listagem de arquivos em servidores remoto
 Reproduz media como vídeos e áudios, visualiza imagens, faz downloads.
 

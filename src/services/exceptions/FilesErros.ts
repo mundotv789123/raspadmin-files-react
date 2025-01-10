@@ -1,5 +1,5 @@
 
-function getErrorMessage(code: number): string {
+export function getErrorMessage(code: number): string {
   switch (code) {
     case 404:
       return 'Arquivo ou diretório não encontrado!';
