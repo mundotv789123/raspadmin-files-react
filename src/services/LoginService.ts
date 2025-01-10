@@ -12,25 +12,28 @@ export class LoginService {
     })
   }
 
-  login(username: string, password: string, callback: (() => void), callbackError?: ((errorMessage: string) => void)) {
+  async login(username: string, password: string) {
     const formData = new URLSearchParams();
     formData.append("username", username);
     formData.append("password", password);
 
-    this.api.post(`/login`, formData, { auth: { username, password } }).then(callback)
-      .catch((error) => {
-        if (!callbackError)
-          return;
+    try {
+      return await this.api.post(`/login`, formData, { auth: { username, password } });
+    } catch (error: unknown) {
+      let message = 'Erro interno ao processar requisição';
 
-        let message = 'Erro interno ao processar requisição';
-        try {
-          const json = JSON.parse(error.request.response);
-          if (json.message)
-            message = json.message;
-        } catch {
-        }
+      const errorObj = error as {request?: {response?: string}} | null;
+      if (!errorObj?.request?.response) {
+        throw message;
+      }
 
-        callbackError(message);
-      })
+      try {
+        const json = JSON.parse(errorObj?.request?.response);
+        if (json.message)
+          message = json.message;
+      } catch {
+      }
+      throw message;
+    }
   }
 }

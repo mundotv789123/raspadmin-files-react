@@ -25,7 +25,11 @@ export default function LoginMenu(props: PropsInterface) {
     }
 
     setLoding(true);
-    service.login(username, password, () => props.onSuccess && props.onSuccess(), (message) => {
+    service.login(username, password).then(() => {
+      if(props.onSuccess) {
+        props.onSuccess();
+      }
+    }).catch(message => {
       setLoding(false);
       setErroText(message);
     })
