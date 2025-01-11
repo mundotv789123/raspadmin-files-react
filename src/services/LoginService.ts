@@ -13,12 +13,8 @@ export class LoginService {
   }
 
   async login(username: string, password: string) {
-    const formData = new URLSearchParams();
-    formData.append("username", username);
-    formData.append("password", password);
-
     try {
-      return await this.api.post(`/login`, formData, { auth: { username, password } });
+      return await this.api.post(`/login`, { username, password }, { auth: { username, password } });
     } catch (error: unknown) {
       let message = 'Erro interno ao processar requisição';
 
