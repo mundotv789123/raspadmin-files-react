@@ -14,13 +14,13 @@ Execute o container
 
 ```sh
 # Rodando container mínimo
-docker run -d -p 8080:8080 -v ./files:/app/data/files --name raspadmin mundotv789123/raspadmin
+docker run -d -p 8080:8080 -v ./files:/home/app/data/files --name raspadmin mundotv789123/raspadmin
 
 # Rodando com usuário e senha
-docker run -d -p 8080:8080 -v ./files:/app/data/files -e AUTH_ENABLED=true -e USERNAME=admin -e PASSWORD=admin --name raspadmin mundotv789123/raspadmin
+docker run -d -p 8080:8080 -v ./files:/home/app/data/files -e AUTH_ENABLED=true -e USERNAME=admin -e PASSWORD=admin --name raspadmin mundotv789123/raspadmin
 
 # Ativar geração de thumbnail em vídeos e músicas
-docker run -d -p 8080:8080 -v ./files:/app/data/files -e MEDIA_THUMB=true --name raspadmin mundotv789123/raspadmin
+docker run -d -p 8080:8080 -v ./files:/home/app/data/files -e MEDIA_THUMB=true --name raspadmin mundotv789123/raspadmin
 ```
 
 ## Docker compose
