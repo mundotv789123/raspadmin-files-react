@@ -8,9 +8,9 @@ export class FileSrcTransformer extends Decorator {
 
   public transform(): FileDTO {
     const file = super.transform();
-    const fullpath = encodeURIComponent(`${file.path}`);
+    const fullpath = encodeURIComponent(`${file.path}`).replaceAll("%2F", "/");
     file.src = `${this.apiUrl.replace("{0}", fullpath)}`;
-    file.href = `#${fullpath.replaceAll("%2F", "/")}`;
+    file.href = `#${fullpath}`;
     return file;
   }
 }
