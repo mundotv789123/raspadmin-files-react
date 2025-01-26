@@ -10,7 +10,7 @@ services:
   app:
     image: 'mundotv789123/raspadmin'
     environment:
-      - 'FILES_PATH=/app/files'
+      - 'FILES_PATH=/home/app/files'
       - 'MEDIA_THUMB=true'
 
       - 'AUTH_ENABLED=false'
@@ -23,7 +23,7 @@ services:
       - 'MYSQL_USER=root'
       - 'MYSQL_PASSWORD=secret'
     volumes:
-      - './data:/app/data'
-      - './files:/app/files'
+      - './data:/home/app/data'
+      - './files:/home/app/files'
     ports:
       - '8080:8080'

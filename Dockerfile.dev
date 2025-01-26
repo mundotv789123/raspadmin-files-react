@@ -1,4 +1,4 @@
-FROM mundotv789123/raspadmin:java
+FROM mundotv789123/raspadmin:java-dev
 
 ENV spring_web_resources_static-locations='file:/home/app/front'
 
