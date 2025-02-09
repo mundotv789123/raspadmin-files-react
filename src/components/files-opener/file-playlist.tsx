@@ -28,7 +28,7 @@ export default function Playlist(props: { classList?: string, title: string, pla
   return (
     <div className={`flex flex-grow justify-end overflow-hidden bg-zinc-700 bg-opacity-30 backdrop-blur-sm ${props.classList}`}>
       <div className="flex-grow" onClick={handlerClose} />
-      <div className="flex flex-col w-full max-w-xl bg-black bg-opacity-35">
+      <div className="flex flex-col w-full max-w-xl bg-black bg-opacity-35 animate-transform-from-end">
         <div className="bg-black bg-opacity-30 text-center flex py-1">
           <p className="w-full text-lg">{props.title}</p>
           <button className="float-end end-0 mx-2 absolute text-lg">

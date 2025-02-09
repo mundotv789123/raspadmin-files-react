@@ -117,7 +117,7 @@ export default function Home() {
           )}
         </div>
         <div className={`fixed top-0 bottom-0 left-0 right-0 transform md:hidden bg-black bg-opacity-30 backdrop-blur-sm flex z-30 ${filesBar ? '' : 'hidden'}`}>
-          <div className={`w-56 flex flex-col bg-black h-screen bg-opacity-40`}>
+          <div className={`w-56 flex flex-col bg-black h-screen bg-opacity-40 ${filesBar ? 'animate-transform-from-start' : ''}`}>
             {filesTab?.map((file, key) =>
               (<a href={file.href} className="text-lg font-bold hover:bg-white hover:bg-opacity-30 p-2" key={key}>{file.name}</a>)
             )}
