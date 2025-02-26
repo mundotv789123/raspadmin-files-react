@@ -69,10 +69,7 @@ export default function Home() {
         location.href = `#/${files[0].parent}`
         return;
       }
-
-      const sortStrategy = SortFactory(localStorage.getItem('sort_by') ?? 'name')
-      fileUpdateEvent.emit("list", sortStrategy.sort(files));
-      
+      fileUpdateEvent.emit("list", files);
       setFilter("");
       if (filterInputRef.current) 
         filterInputRef.current.value = "";
