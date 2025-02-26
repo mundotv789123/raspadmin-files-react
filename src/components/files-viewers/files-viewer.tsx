@@ -3,27 +3,28 @@ import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import EventEmitter from "events";
 import Image from "next/image";
 import moment from "moment";
-import { SortFactory, SortStrategy } from "@/services/strategies/order-by-strategies";
+import { SortFactory } from "@/services/strategies/order-by-strategies";
+import { useLocalStorage } from "@/app-hooks/local-storange-hook";
 
 export default function FilesViewer(props: { filesEvent: EventEmitter, hidden: boolean, filter?: string }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [fileSelected, setFileSelected] = useState<FileDTO | null>(null);
 
   const [filesListOrig, setFileListOrig] = useState<Array<FileDTO>>();
-  const [sortStrategy, setSortStrategy] = useState<SortStrategy>(SortFactory(localStorage.getItem('sort_by') ?? 'name'));
+  const [sortStrategyName, setSortStrategyName] = useLocalStorage<string>('sort_by', 'name');
 
   const filesList= useMemo(() => {
+    const sortStrategy = SortFactory(sortStrategyName);
     if (filesListOrig) {
       return sortStrategy.sort(filesListOrig.filter(file => 
         !props.filter || file.name.toLowerCase().includes(props.filter.toLowerCase())
       ));
     }
     return []
-  }, [filesListOrig, sortStrategy, props.filter]);
+  }, [filesListOrig, sortStrategyName, props.filter]);
 
   function changeSortStrategy(sort: string) {
-    localStorage.setItem('sort_by', sort)
-    setSortStrategy(SortFactory(sort));
+    setSortStrategyName(sort);
   }
 
   useEffect(() => {
@@ -92,7 +93,7 @@ export default function FilesViewer(props: { filesEvent: EventEmitter, hidden: b
         <div className="flex gap-1">
           <select 
             className="bg-black bg-opacity-25 p-1 rounded-sm w-full my-1 border-gray-400 border"
-            onChange={e => changeSortStrategy(e.target.value)} value={localStorage.getItem('sort_by') ?? 'name'}>
+            onChange={e => changeSortStrategy(e.target.value)} value={sortStrategyName}>
             <option value={'name'}>Nome</option>
             <option value={'date'}>Data</option>
           </select>
