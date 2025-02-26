@@ -17,11 +17,11 @@ class SortByNameNaturalStrategy implements SortStrategy {
 class SortByDateStrategy implements SortStrategy {
   public sort(files: Array<FileDTO>) {
     return files.sort((a: FileDTO, b: FileDTO) => {
-      if (!a.created_at) return 1;
-      if (!b.created_at) return -1;
+      if (!a.updated_at) return 1;
+      if (!b.updated_at) return -1;
 
       if (a.is_dir == b.is_dir)
-        return a.created_at > b.created_at ? -1 : 1;
+        return a.updated_at > b.updated_at ? -1 : 1;
       return a.is_dir ? -1 : 1;
     });
   }
