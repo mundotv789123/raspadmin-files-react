@@ -12,16 +12,8 @@ export default class FilesService extends ApiBaseService {
 
     const url = `${this.baseUri}/files/open${SRC_QUERY}`;
     
-    const responseTransforme = this.sortNaturalFiles(response.files.map(file => TranformeFileDTO(file, url)));
-    console.log(responseTransforme);
+    const responseTransforme = response.files.map(file => TranformeFileDTO(file, url));
     return responseTransforme;
   }
 
-  private sortNaturalFiles(files: Array<FileDTO>): Array<FileDTO> {
-    return files.sort((a: FileDTO, b: FileDTO) => {
-      if (a.is_dir == b.is_dir)
-        return a.name.localeCompare(b.name, undefined, { numeric: true });
-      return a.is_dir ? -1 : 1;
-    });
-  }
 }

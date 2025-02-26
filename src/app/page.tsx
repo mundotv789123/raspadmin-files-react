@@ -5,6 +5,7 @@ import FilesViewer from "@/components/files-viewers/files-viewer";
 import LoginFormModal from "@/components/login-form-modal/login-form-modal";
 import { FileDTO } from "@/services/models/files-model";
 import FilesService from "@/services/services/files-service";
+import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EventEmitter from "events";
@@ -34,7 +35,7 @@ export default function Home() {
 
   useEffect(() => {
     filesService.getFiles("/").then(files => {
-      setFilesTab(files);
+      setFilesTab(SortFactory().sort(files));
     }).catch(error => {
       if (error.status == 401) {
         setLoginRequired(true);
@@ -43,7 +44,10 @@ export default function Home() {
 
     updateHashHandler();
     window.addEventListener('hashchange', updateHashHandler);
-    return () => window.removeEventListener('hashchange', updateHashHandler);
+
+    return () =>{
+      window.removeEventListener('hashchange', updateHashHandler);
+    }
   }, []);
 
   useEffect(() => {
