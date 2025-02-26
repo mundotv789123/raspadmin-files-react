@@ -51,15 +51,32 @@ export default function FilesViewer(props: { filesEvent: EventEmitter, hidden: b
   }
 
   function showDropDown(event: globalThis.MouseEvent | MouseEvent, file: FileDTO | null = null) {
-    const element = dropdownRef.current;
-    if (!element)
+    const dropdown = dropdownRef.current;
+    if (!dropdown)
       return;
+    event.preventDefault();
 
     setFileSelected(file);
-    event.preventDefault();
-    element.classList.remove("hidden");
-    element.style.left = event.pageX + 'px';
-    element.style.top = event.pageY + 'px';
+    dropdown.classList.remove("hidden");
+
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const dropdownWidth = dropdown.offsetWidth;
+    const dropdownHeight = dropdown.offsetHeight;
+
+    let posX = event.pageX;
+    let posY = event.pageY;
+
+    if (posX + dropdownWidth > screenWidth) {
+      posX = posX - dropdownWidth;
+    }
+
+    if (posY + dropdownHeight > screenHeight) {
+      posY = posY - dropdownHeight;
+    }
+
+    dropdown.style.left = posX + 'px';
+    dropdown.style.top = posY + 'px';
   }
 
   function hideDropDown(event: globalThis.MouseEvent | MouseEvent) {
