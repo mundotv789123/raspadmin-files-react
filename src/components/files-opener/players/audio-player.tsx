@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Playlist from "../file-playlist";
 import EventEmitter from "events";
 import Image from "next/image";
+import { SortFactory } from "@/services/strategies/order-by-strategies";
 
 const isAudio = (type: string) => type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
 
@@ -55,6 +56,7 @@ export default function AudioPlayer(props: { filesEvent: EventEmitter, filesList
       ...prev,
       loading: false,
       playing: true,
+      error: null,
       duration: audioRef.current!.duration
     }));
 
@@ -189,13 +191,19 @@ export default function AudioPlayer(props: { filesEvent: EventEmitter, filesList
       setFile(openFile);
     }
 
+    const changeFileSort = (sort: string) => {
+      setPlaylist(playlist => playlist && SortFactory(sort).sort(playlist));
+    }
+
     if (playlist == null && file != null && props.filesList != null) {
       setPlaylist(props.filesList.filter(file => file.type && isAudio(file.type)))
     }
 
     props.filesEvent.addListener("open", handerOpen);
+    props.filesEvent.addListener("change-sort", changeFileSort);
     return () => {
       props.filesEvent.removeListener("open", handerOpen);
+      props.filesEvent.removeListener("change-sort", changeFileSort);
     }
   }, [playlist, file, props.filesEvent, props.filesList])
 

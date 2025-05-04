@@ -45,7 +45,7 @@ export default function Home() {
     updateHashHandler();
     window.addEventListener('hashchange', updateHashHandler);
 
-    return () =>{
+    return () => {
       window.removeEventListener('hashchange', updateHashHandler);
     }
   }, []);
@@ -71,7 +71,7 @@ export default function Home() {
       }
       fileUpdateEvent.emit("list", files);
       setFilter("");
-      if (filterInputRef.current) 
+      if (filterInputRef.current)
         filterInputRef.current.value = "";
     }).catch(error => {
       if (error.status == 401) {

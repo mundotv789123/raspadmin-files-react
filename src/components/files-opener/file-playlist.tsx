@@ -32,7 +32,7 @@ export default function Playlist(props: { classList?: string, title: string, pla
         <div className="bg-black bg-opacity-30 text-center flex py-1">
           <p className="w-full text-lg">{props.title}</p>
           <button className="float-end end-0 mx-2 absolute text-lg">
-            <FontAwesomeIcon icon={faClose} onClick={handlerClose}/>
+            <FontAwesomeIcon icon={faClose} onClick={handlerClose} />
           </button>
         </div>
         <div className="flex flex-col p-2 overflow-y-auto gap-2">

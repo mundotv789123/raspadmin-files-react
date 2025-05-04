@@ -13,10 +13,10 @@ export default function FilesViewer(props: { filesEvent: EventEmitter, hidden: b
   const [filesListOrig, setFileListOrig] = useState<Array<FileDTO>>();
   const [sortStrategyName, setSortStrategyName] = useLocalStorage<string>('sort_by', 'name');
 
-  const filesList= useMemo(() => {
+  const filesList = useMemo(() => {
     const sortStrategy = SortFactory(sortStrategyName);
     if (filesListOrig) {
-      return sortStrategy.sort(filesListOrig.filter(file => 
+      return sortStrategy.sort(filesListOrig.filter(file =>
         !props.filter || file.name.toLowerCase().includes(props.filter.toLowerCase())
       ));
     }
@@ -25,6 +25,7 @@ export default function FilesViewer(props: { filesEvent: EventEmitter, hidden: b
 
   function changeSortStrategy(sort: string) {
     setSortStrategyName(sort);
+    props.filesEvent.emit('change-sort', sort);
   }
 
   useEffect(() => {
@@ -108,7 +109,7 @@ export default function FilesViewer(props: { filesEvent: EventEmitter, hidden: b
         <hr className="my-2" />
         <p><b>Ordenar por:</b></p>
         <div className="flex gap-1">
-          <select 
+          <select
             className="bg-black bg-opacity-25 p-1 rounded-sm w-full my-1 border-gray-400 border"
             onChange={e => changeSortStrategy(e.target.value)} value={sortStrategyName}>
             <option value={'name'}>Nome</option>

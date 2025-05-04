@@ -5,7 +5,7 @@ import EventEmitter from "events";
 import VideoPlayer from "./players/video-player";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 
-export default function FileOpener(props: { filesEvent: EventEmitter}) {
+export default function FileOpener(props: { filesEvent: EventEmitter }) {
   const [filesList, setFileList] = useState<Array<FileDTO>>();
 
   useEffect(() => {
@@ -23,8 +23,8 @@ export default function FileOpener(props: { filesEvent: EventEmitter}) {
 
   return (
     <>
-      <AudioPlayer filesEvent={props.filesEvent} filesList={filesList}/>
-      <VideoPlayer filesEvent={props.filesEvent} filesList={filesList}/>
+      <AudioPlayer filesEvent={props.filesEvent} filesList={filesList} />
+      <VideoPlayer filesEvent={props.filesEvent} filesList={filesList} />
     </>
   )
 }

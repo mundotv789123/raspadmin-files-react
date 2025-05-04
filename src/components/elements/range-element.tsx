@@ -18,7 +18,7 @@ export default function Range(props: PropsInterface) {
   function handlerChange() {
     const newValue = Number(inputRef.current!.value ?? '0');
     if (props.onChange) {
-      if(!props.onChange(newValue)) {
+      if (!props.onChange(newValue)) {
         return;
       }
     }
