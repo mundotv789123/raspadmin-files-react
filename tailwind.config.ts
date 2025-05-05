@@ -22,11 +22,23 @@ export default {
           '0%': { marginLeft: '0', width: '0' },
           '50%': { marginLeft: '0', width: '100%' },
           '100%': { marginLeft: '100%', width: '0' }
-        }
+        },
+        'transform-from-end': {
+          'from': { transform: 'translateX(100%)' },
+        },
+        'transform-from-start': {
+          'from': { transform: 'translateX(-100%)' },
+        },
+        'transform-from-bottom': {
+          'from': { transform: 'translateY(100%)' },
+        },
       },
       animation: {
         'modal-down': 'modal-down 0.8s normal',
-        'loading': 'loading 1s ease infinite'
+        'loading': 'loading 1s ease infinite',
+        'transform-from-end': 'transform-from-end 250ms ease',
+        'transform-from-start': 'transform-from-start 250ms ease' ,
+        'transform-from-bottom': 'transform-from-bottom 250ms ease'
       },
     },
   },

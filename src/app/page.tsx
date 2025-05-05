@@ -5,6 +5,7 @@ import FilesViewer from "@/components/files-viewers/files-viewer";
 import LoginFormModal from "@/components/login-form-modal/login-form-modal";
 import { FileDTO } from "@/services/models/files-model";
 import FilesService from "@/services/services/files-service";
+import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EventEmitter from "events";
@@ -34,7 +35,7 @@ export default function Home() {
 
   useEffect(() => {
     filesService.getFiles("/").then(files => {
-      setFilesTab(files);
+      setFilesTab(SortFactory().sort(files));
     }).catch(error => {
       if (error.status == 401) {
         setLoginRequired(true);
@@ -43,7 +44,10 @@ export default function Home() {
 
     updateHashHandler();
     window.addEventListener('hashchange', updateHashHandler);
-    return () => window.removeEventListener('hashchange', updateHashHandler);
+
+    return () => {
+      window.removeEventListener('hashchange', updateHashHandler);
+    }
   }, []);
 
   useEffect(() => {
@@ -67,7 +71,7 @@ export default function Home() {
       }
       fileUpdateEvent.emit("list", files);
       setFilter("");
-      if (filterInputRef.current) 
+      if (filterInputRef.current)
         filterInputRef.current.value = "";
     }).catch(error => {
       if (error.status == 401) {
@@ -117,7 +121,7 @@ export default function Home() {
           )}
         </div>
         <div className={`fixed top-0 bottom-0 left-0 right-0 transform md:hidden bg-black bg-opacity-30 backdrop-blur-sm flex z-30 ${filesBar ? '' : 'hidden'}`}>
-          <div className={`w-56 flex flex-col bg-black h-screen bg-opacity-40`}>
+          <div className={`w-56 flex flex-col bg-black h-screen bg-opacity-40 ${filesBar ? 'animate-transform-from-start' : ''}`}>
             {filesTab?.map((file, key) =>
               (<a href={file.href} className="text-lg font-bold hover:bg-white hover:bg-opacity-30 p-2" key={key}>{file.name}</a>)
             )}

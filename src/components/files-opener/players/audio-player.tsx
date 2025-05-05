@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Playlist from "../file-playlist";
 import EventEmitter from "events";
 import Image from "next/image";
+import { SortFactory } from "@/services/strategies/order-by-strategies";
 
 const isAudio = (type: string) => type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
 
@@ -55,6 +56,7 @@ export default function AudioPlayer(props: { filesEvent: EventEmitter, filesList
       ...prev,
       loading: false,
       playing: true,
+      error: null,
       duration: audioRef.current!.duration
     }));
 
@@ -189,13 +191,19 @@ export default function AudioPlayer(props: { filesEvent: EventEmitter, filesList
       setFile(openFile);
     }
 
+    const changeFileSort = (sort: string) => {
+      setPlaylist(playlist => playlist && SortFactory(sort).sort(playlist));
+    }
+
     if (playlist == null && file != null && props.filesList != null) {
       setPlaylist(props.filesList.filter(file => file.type && isAudio(file.type)))
     }
 
     props.filesEvent.addListener("open", handerOpen);
+    props.filesEvent.addListener("change-sort", changeFileSort);
     return () => {
       props.filesEvent.removeListener("open", handerOpen);
+      props.filesEvent.removeListener("change-sort", changeFileSort);
     }
   }, [playlist, file, props.filesEvent, props.filesList])
 
@@ -220,7 +228,7 @@ export default function AudioPlayer(props: { filesEvent: EventEmitter, filesList
   return (
     file && <div className={`fixed bottom-0 left-0 right-0 flex flex-col z-20 ${audioControls.playlistOpened ? 'top-0' : ''}`}>
       {playlist && <Playlist playlist={playlist} title="Lista de áudios" onClick={setFile} onClose={togglePlaylist} playing={file} classList={audioControls.playlistOpened ? '' : 'hidden'} />}
-      <div className="grid grid-cols-[calc(100%_-2rem)_2rem] bg-black bg-opacity-45 border-2 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 ps-4 backdrop-blur-sm">
+      <div className="grid grid-cols-[calc(100%_-2rem)_2rem] bg-black bg-opacity-45 border-2 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 ps-4 backdrop-blur-sm animate-transform-from-bottom">
         <div className="w-full flex flex-col flex-grow">
           <div className="w-full flex flex-col md:flex-row my-2 md:my-4">
             <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center mb-3 md:mb-0">
