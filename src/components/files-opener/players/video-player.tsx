@@ -46,12 +46,13 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
     playing: boolean,
     duration: number,
     currentTime: number,
+    thumbTime?: number,
   }>({
     loading: true,
     speedOpen: false,
     playing: true,
     duration: 0,
-    currentTime: 0
+    currentTime: 0,
   });
 
   function resetCursorTimeout() {
@@ -94,7 +95,7 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
       speedOpen: false,
       playing: !videoRef.current!.paused,
       duration: videoRef.current!.duration,
-      currentTime: videoRef.current!.currentTime
+      currentTime: videoRef.current!.currentTime,
     });
   }
 
@@ -113,7 +114,6 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
     const dropdown = videoThumbRef.current;
     if (!dropdown)
       return;
-    event.preventDefault();
 
     dropdown.classList.remove("hidden");
 
@@ -131,6 +131,11 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
     }
 
     dropdown.style.left = posX + 'px';
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
+    const time = (videoProps.duration / 100 * percent);
+    setVideoProps(props => ({...props, thumbTime: time}))
   }
 
   function handlerThumbMouseLeave() {
@@ -292,7 +297,7 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
         </div>
         <div className="bg-opacity-30 flex flex-col px-4 justify-center bg-gradient-to-t from-black/70 to-transparent">
           <div className="w-full">
-            <ThumbGenerator ref={videoThumbRef} />
+            <ThumbGenerator ref={videoThumbRef} src={file.src} time={videoProps.thumbTime}/>
             <div className="w-full">
               <Range
                 percent={videoProps.currentTime / videoProps.duration * 100}
