@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from "react"
+import React, { MouseEventHandler, useEffect, useRef, useState } from "react"
 
-interface PropsInterface {
+type PropsInterface = {
   percent?: number,
   className?: string,
-  onChange?: ((percent: number) => boolean)
+  onChange?: ((percent: number) => boolean),
+  onMouseMove?: MouseEventHandler<HTMLInputElement>,
+  onMouseEnter?: MouseEventHandler<HTMLInputElement>,
+  onMouseLeave?: MouseEventHandler<HTMLInputElement>
 }
 
 export default function Range(props: PropsInterface) {
@@ -17,10 +20,8 @@ export default function Range(props: PropsInterface) {
 
   function handlerChange() {
     const newValue = Number(inputRef.current!.value ?? '0');
-    if (props.onChange) {
-      if (!props.onChange(newValue)) {
-        return;
-      }
+    if (props.onChange && !props.onChange(newValue)) {
+      return;
     }
     setPercent(newValue);
   }
@@ -41,6 +42,9 @@ export default function Range(props: PropsInterface) {
             type="range"
             min={0} max={100}
             onChange={handlerChange}
+            onMouseMove={props.onMouseMove}
+            onMouseEnter={props.onMouseEnter}
+            onMouseLeave={props.onMouseLeave}
           />
         </div>
       </div>
