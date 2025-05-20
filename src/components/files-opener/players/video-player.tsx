@@ -122,7 +122,7 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
 
     let posX = event.pageX - (dropdownWidth / 2);
 
-    if (posX <= 0 ){
+    if (posX <= 0) {
       posX = 0;
     }
 
@@ -131,6 +131,13 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
     }
 
     dropdown.style.left = posX + 'px';
+  }
+
+  function handlerThumbMouseLeave() {
+    const dropdown = videoThumbRef.current;
+    if (!dropdown)
+      return;
+    dropdown.classList.add("hidden");
   }
 
   function updateVideoPercent(percent: number) {
@@ -285,12 +292,12 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
         </div>
         <div className="bg-opacity-30 flex flex-col px-4 justify-center bg-gradient-to-t from-black/70 to-transparent">
           <div className="w-full">
-            <ThumbGenerator ref={videoThumbRef}/>
+            <ThumbGenerator ref={videoThumbRef} />
             <div className="w-full">
               <Range
-                percent={videoProps.currentTime / videoProps.duration * 100} 
-                onChange={updateVideoPercent} 
-                onMouseLeave={() => {/* hidden */}}
+                percent={videoProps.currentTime / videoProps.duration * 100}
+                onChange={updateVideoPercent}
+                onMouseLeave={handlerThumbMouseLeave}
                 onMouseMove={handlerThumbMouseMove}
               />
             </div>
