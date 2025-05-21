@@ -12,12 +12,16 @@ export function ThumbGenerator({ ref, src, time }: PropsType) {
   useEffect(() => {
     if (time && videoRef.current) {
       videoRef.current.currentTime = time;
+      videoRef.current!.load();
+      setTimeout(() => {
+        videoRef.current!.currentTime = time;
+      }, 100);
     }
   }, [time])
 
   return (
     <div className="fixed bottom-24 bg-black bg-opacity-50 p-3 hidden backdrop-blur-sm shadow-sm border-gray-400 border" ref={ref}>
-      <video className="bg-gray-50 w-32 h-16" src={src} ref={videoRef}>
+      <video className="w-32 h-16" src={src} ref={videoRef} preload="none">
 
       </video>
     </div>
