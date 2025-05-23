@@ -12,10 +12,8 @@ export function ThumbGenerator({ ref, src, time }: PropsType) {
   useEffect(() => {
     if (time && videoRef.current) {
       videoRef.current.currentTime = time;
-      videoRef.current!.load();
-      setTimeout(() => {
-        videoRef.current!.currentTime = time;
-      }, 100);
+      videoRef.current.load();
+      videoRef.current.currentTime = time;
     }
   }, [time])
 
