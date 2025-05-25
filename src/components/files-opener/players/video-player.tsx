@@ -20,7 +20,12 @@ interface VideoScreenOrientation extends ScreenOrientation {
   lock?(a: string): Promise<void>
 }
 
-export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList?: Array<FileDTO> }) {
+type PropsType = {
+  filesEvent: EventEmitter
+  filesList?: Array<FileDTO>
+}
+
+export default function VideoPlayer({ filesEvent, filesList }: PropsType) {
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
 
@@ -136,7 +141,7 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
     const rect = event.currentTarget.getBoundingClientRect();
     const percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
     const time = (videoProps.duration / 100 * percent);
-    setVideoProps(props => ({...props, thumbTime: time}))
+    setVideoProps(props => ({ ...props, thumbTime: time }))
   }
 
   function handlerThumbMouseLeave() {
@@ -237,8 +242,8 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
 
       event.eventCalled = true;
       setFile(event.file);
-      if (props.filesList) {
-        setPlaylist(props.filesList.filter(file => file.type && isVideo(file.type)))
+      if (filesList) {
+        setPlaylist(filesList.filter(file => file.type && isVideo(file.type)))
       }
     }
 
@@ -246,13 +251,13 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
       setPlaylist(playlist => playlist && SortFactory(sort).sort(playlist));
     }
 
-    props.filesEvent.addListener("open", handlerOpen);
-    props.filesEvent.addListener("change-sort", changeFileSort);
+    filesEvent.addListener("open", handlerOpen);
+    filesEvent.addListener("change-sort", changeFileSort);
     return () => {
-      props.filesEvent.removeListener("open", handlerOpen);
-      props.filesEvent.removeListener("change-sort", changeFileSort);
+      filesEvent.removeListener("open", handlerOpen);
+      filesEvent.removeListener("change-sort", changeFileSort);
     }
-  }, [props.filesEvent, props.filesList])
+  }, [filesEvent, filesList])
 
   useEffect(() => {
     if (!videoRef.current) {
@@ -299,7 +304,7 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
         </div>
         <div className="bg-opacity-30 flex flex-col px-4 justify-center bg-gradient-to-t from-black/70 to-transparent">
           <div className="w-full">
-            <ThumbGenerator ref={videoThumbRef} src={file.src} time={videoProps.thumbTime}/>
+            <ThumbGenerator ref={videoThumbRef} src={file.src} time={videoProps.thumbTime} />
             <div className="w-full">
               <Range
                 percent={videoProps.currentTime / videoProps.duration * 100}
