@@ -17,6 +17,7 @@ export function ThumbGenerator({ ref, src, time }: PropsType) {
         return;
       }
 
+      videoRef.current.pause();
       videoRef.current.currentTime = timeRounded;
     }
   }, [time]);
