@@ -6,9 +6,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EventEmitter from "events";
 import { MouseEvent, useEffect, useRef, useState } from "react";
 import Playlist from "../file-playlist";
-import { useLocalStorage } from "@/app-hooks/local-storange-hook";
+import { useLocalStorage } from "@/hooks/local-storange-hook";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { ThumbGenerator } from "@/components/elements/thumb-generator";
+import { FileOpenEvent } from "@/app/page";
 
 const isVideo = (type: string) => type.match(/video\/(mp4|webm|ogg|mkv)/);
 const speedsSelector = [0.25, 0.50, 0.75, 1, 1.25, 1.50, 1.75, 2];
@@ -228,13 +229,14 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
   }
 
   useEffect(() => {
-    const handlerOpen = (file: FileDTO) => {
-      if (!file.type || !isVideo(file.type)) {
+    const handlerOpen = (event: FileOpenEvent) => {
+      if (!event.file.type || !isVideo(event.file.type)) {
         setFile(null);
         return;
       }
 
-      setFile(file);
+      event.eventCalled = true;
+      setFile(event.file);
       if (props.filesList) {
         setPlaylist(props.filesList.filter(file => file.type && isVideo(file.type)))
       }

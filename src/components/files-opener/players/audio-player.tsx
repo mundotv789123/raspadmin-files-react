@@ -1,4 +1,4 @@
-import { useLocalStorage } from "@/app-hooks/local-storange-hook";
+import { useLocalStorage } from "@/hooks/local-storange-hook";
 import Range from "@/components/elements/range-element";
 import { FileDTO } from "@/services/models/files-model";
 import { faBackwardFast, faBars, faEye, faEyeSlash, faForwardFast, faPause, faPlay, faRotateRight, faShuffle, faVolumeHigh, faVolumeMute, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +8,7 @@ import Playlist from "../file-playlist";
 import EventEmitter from "events";
 import Image from "next/image";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
+import { FileOpenEvent } from "@/app/page";
 
 const isAudio = (type: string) => type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
 
@@ -172,13 +173,14 @@ export default function AudioPlayer(props: { filesEvent: EventEmitter, filesList
   }
 
   useEffect(() => {
-    const handerOpen = (openFile: FileDTO) => {
-      if (!openFile.type || !isAudio(openFile.type)) {
+    const handerOpen = (event: FileOpenEvent) => {
+      if (!event.file.type || !isAudio(event.file.type)) {
         setFile(null);
         return;
       }
 
-      if (openFile.src == file?.src) {
+      event.eventCalled = true;
+      if (event.file.src == file?.src) {
         audioRef.current!.currentTime = 0;
         return;
       }
@@ -188,7 +190,7 @@ export default function AudioPlayer(props: { filesEvent: EventEmitter, filesList
       }
 
       setAudioProps(prev => ({ ...prev, loading: true }));
-      setFile(openFile);
+      setFile(event.file);
     }
 
     const changeFileSort = (sort: string) => {

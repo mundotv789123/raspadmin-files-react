@@ -15,5 +15,4 @@ export default class FilesService extends ApiBaseService {
     const responseTransforme = response.files.map(file => TranformeFileDTO(file, url));
     return responseTransforme;
   }
-
 }

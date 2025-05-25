@@ -3,6 +3,7 @@
 import FileOpener from "@/components/files-opener/file-opener";
 import FilesViewer from "@/components/files-viewers/files-viewer";
 import LoginFormModal from "@/components/login-form-modal/login-form-modal";
+import { FileDownloadHelper } from "@/helpers/file-download-helper";
 import { FileDTO } from "@/services/models/files-model";
 import FilesService from "@/services/services/files-service";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
@@ -10,6 +11,11 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EventEmitter from "events";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+export type FileOpenEvent = {
+  eventCalled: boolean
+  file: FileDTO
+}
 
 const fileUpdateEvent = new EventEmitter();
 const filesService = new FilesService();
@@ -65,8 +71,15 @@ export default function Home() {
         return;
       }
       if (files.length == 1 && files[0].open) {
-        fileUpdateEvent.emit("open", files[0]);
-        location.href = `#/${files[0].parent}`
+        const fileOpenEvent: FileOpenEvent = {
+          eventCalled: false,
+          file: files[0]
+        }
+        fileUpdateEvent.emit("open", fileOpenEvent);
+        if (!fileOpenEvent.eventCalled) {
+          FileDownloadHelper.downloadFile(fileOpenEvent.file);
+        }
+        location.href = `#/${fileOpenEvent.file.parent}`
         return;
       }
       fileUpdateEvent.emit("list", files);

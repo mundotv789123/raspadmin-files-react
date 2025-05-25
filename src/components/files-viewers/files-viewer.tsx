@@ -4,7 +4,9 @@ import EventEmitter from "events";
 import Image from "next/image";
 import moment from "moment";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
-import { useLocalStorage } from "@/app-hooks/local-storange-hook";
+import { useLocalStorage } from "@/hooks/local-storange-hook";
+import { FileOpenEvent } from "@/app/page";
+import { FileDownloadHelper } from "@/helpers/file-download-helper";
 
 export default function FilesViewer(props: { filesEvent: EventEmitter, hidden: boolean, filter?: string }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -48,7 +50,14 @@ export default function FilesViewer(props: { filesEvent: EventEmitter, hidden: b
     }
 
     event.preventDefault();
-    props.filesEvent.emit("open", file);
+    const fileOpenEvent: FileOpenEvent = {
+      eventCalled: false,
+      file: file
+    }
+    props.filesEvent.emit("open", fileOpenEvent);
+    if (!fileOpenEvent.eventCalled) {
+      FileDownloadHelper.downloadFile(fileOpenEvent.file);
+    }
   }
 
   function showDropDown(event: globalThis.MouseEvent | MouseEvent, file: FileDTO | null = null) {
@@ -116,6 +125,9 @@ export default function FilesViewer(props: { filesEvent: EventEmitter, hidden: b
             <option value={'date'}>Data</option>
           </select>
         </div>
+        {fileSelected && !fileSelected.is_dir && <button className="bg-black bg-opacity-25 w-full p-1 border-gray-400 border hover:bg-opacity-40" onClick={() => fileSelected && FileDownloadHelper.downloadFile(fileSelected)}>
+          Download
+        </button>}
       </div>
       <div className='grid grid-cols-2 lg:grid-cols-7 md:grid-cols-5 sm:grid-cols-3 gap-4 p-2'>
         {(props.hidden ? [] : filesList).map((file, index) =>
