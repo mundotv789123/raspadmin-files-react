@@ -11,9 +11,14 @@ export function ThumbGenerator({ ref, src, time }: PropsType) {
 
   useEffect(() => {
     if (time && videoRef.current) {
-      videoRef.current.currentTime = time;
-      videoRef.current.load();
-      videoRef.current.currentTime = time;
+      const timeRounded = Math.round(time / 2);
+
+      if (videoRef.current.currentTime == timeRounded) {
+        return;
+      }
+
+      videoRef.current.pause();
+      videoRef.current.currentTime = timeRounded;
     }
   }, [time]);
 
@@ -26,7 +31,7 @@ export function ThumbGenerator({ ref, src, time }: PropsType) {
         className="w-32 h-16"
         src={src}
         ref={videoRef}
-        preload="none"
+        preload="metadata"
       ></video>
     </div>
   );
