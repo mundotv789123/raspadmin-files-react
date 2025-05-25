@@ -43,6 +43,7 @@ export class FileIconTransformer extends Decorator {
             return 'iso.svg';
           case 'x-msdownload':
           case 'x-sh':
+          case 'pdf':
             return 'document.svg';
         }
         return 'compact.svg';

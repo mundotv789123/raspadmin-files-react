@@ -4,9 +4,12 @@ import { faBackwardFast, faBars, faClock, faExpand, faForwardFast, faPause, faPl
 import { faRotateForward } from "@fortawesome/free-solid-svg-icons/faRotateForward";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EventEmitter from "events";
-import { useEffect, useRef, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import Playlist from "../file-playlist";
-import { useLocalStorage } from "@/app-hooks/local-storange-hook";
+import { useLocalStorage } from "@/hooks/local-storange-hook";
+import { SortFactory } from "@/services/strategies/order-by-strategies";
+import { ThumbGenerator } from "@/components/elements/thumb-generator";
+import { FileOpenEvent } from "@/app/page";
 
 const isVideo = (type: string) => type.match(/video\/(mp4|webm|ogg|mkv)/);
 const speedsSelector = [0.25, 0.50, 0.75, 1, 1.25, 1.50, 1.75, 2];
@@ -17,10 +20,17 @@ interface VideoScreenOrientation extends ScreenOrientation {
   lock?(a: string): Promise<void>
 }
 
-export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList?: Array<FileDTO> }) {
+type PropsType = {
+  filesEvent: EventEmitter
+  filesList?: Array<FileDTO>
+}
+
+export default function VideoPlayer({ filesEvent, filesList }: PropsType) {
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
+
   const videoRef = useRef<HTMLVideoElement>(null);
+  const videoThumbRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
 
@@ -42,12 +52,13 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
     playing: boolean,
     duration: number,
     currentTime: number,
+    thumbTime?: number,
   }>({
     loading: true,
     speedOpen: false,
     playing: true,
     duration: 0,
-    currentTime: 0
+    currentTime: 0,
   });
 
   function resetCursorTimeout() {
@@ -90,7 +101,7 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
       speedOpen: false,
       playing: !videoRef.current!.paused,
       duration: videoRef.current!.duration,
-      currentTime: videoRef.current!.currentTime
+      currentTime: videoRef.current!.currentTime,
     });
   }
 
@@ -103,6 +114,41 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
       playing: !videoRef.current!.paused,
       currentTime: videoRef.current!.currentTime
     }));
+  }
+
+  function handlerThumbMouseMove(event: MouseEvent<HTMLDivElement>) {
+    const dropdown = videoThumbRef.current;
+    if (!dropdown)
+      return;
+
+    dropdown.classList.remove("hidden");
+
+    const screenWidth = window.innerWidth;
+    const dropdownWidth = dropdown.offsetWidth;
+
+    let posX = event.pageX - (dropdownWidth / 2);
+
+    if (posX <= 0) {
+      posX = 0;
+    }
+
+    if (posX + dropdownWidth > screenWidth) {
+      posX = screenWidth - dropdownWidth;
+    }
+
+    dropdown.style.left = posX + 'px';
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const percent = ((event.clientX - rect.left) * 100 / (rect.right - rect.left));
+    const time = (videoProps.duration / 100 * percent);
+    setVideoProps(props => ({ ...props, thumbTime: time }))
+  }
+
+  function handlerThumbMouseLeave() {
+    const dropdown = videoThumbRef.current;
+    if (!dropdown)
+      return;
+    dropdown.classList.add("hidden");
   }
 
   function updateVideoPercent(percent: number) {
@@ -188,23 +234,30 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
   }
 
   useEffect(() => {
-    const handler = (file: FileDTO) => {
-      if (!file.type || !isVideo(file.type)) {
+    const handlerOpen = (event: FileOpenEvent) => {
+      if (!event.file.type || !isVideo(event.file.type)) {
         setFile(null);
         return;
       }
 
-      setFile(file);
-      if (props.filesList) {
-        setPlaylist(props.filesList.filter(file => file.type && isVideo(file.type)))
+      event.eventCalled = true;
+      setFile(event.file);
+      if (filesList) {
+        setPlaylist(filesList.filter(file => file.type && isVideo(file.type)))
       }
     }
 
-    props.filesEvent.addListener("open", handler);
-    return () => {
-      props.filesEvent.removeListener("open", handler);
+    const changeFileSort = (sort: string) => {
+      setPlaylist(playlist => playlist && SortFactory(sort).sort(playlist));
     }
-  }, [props.filesEvent, props.filesList])
+
+    filesEvent.addListener("open", handlerOpen);
+    filesEvent.addListener("change-sort", changeFileSort);
+    return () => {
+      filesEvent.removeListener("open", handlerOpen);
+      filesEvent.removeListener("change-sort", changeFileSort);
+    }
+  }, [filesEvent, filesList])
 
   useEffect(() => {
     if (!videoRef.current) {
@@ -251,8 +304,14 @@ export default function VideoPlayer(props: { filesEvent: EventEmitter, filesList
         </div>
         <div className="bg-opacity-30 flex flex-col px-4 justify-center bg-gradient-to-t from-black/70 to-transparent">
           <div className="w-full">
+            <ThumbGenerator ref={videoThumbRef} src={file.src} time={videoProps.thumbTime} />
             <div className="w-full">
-              <Range percent={videoProps.currentTime / videoProps.duration * 100} onChange={updateVideoPercent} />
+              <Range
+                percent={videoProps.currentTime / videoProps.duration * 100}
+                onChange={updateVideoPercent}
+                onMouseLeave={handlerThumbMouseLeave}
+                onMouseMove={handlerThumbMouseMove}
+              />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 w-full px-2">
               <div className="hidden md:block"></div>
