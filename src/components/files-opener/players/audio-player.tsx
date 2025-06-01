@@ -108,11 +108,20 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
   }
 
   function handlerAudioTimeUpdate() {
+    const audioElement = audioRef.current;
+    if (!audioElement) {
+      return;
+    }
     setAudioProps((prev) => ({
       ...prev,
-      currentTime: audioRef.current!.currentTime,
-      playing: !audioRef.current!.paused,
+      currentTime: audioElement.currentTime,
+      playing: !audioElement.paused,
     }));
+    navigator.mediaSession.setPositionState({
+      duration: audioElement.duration,
+      playbackRate: audioElement.playbackRate,
+      position: audioElement.currentTime,
+    });
   }
 
   function handlerError() {
