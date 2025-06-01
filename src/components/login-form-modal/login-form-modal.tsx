@@ -35,7 +35,7 @@ export default function LoginFormModal() {
 
   return (
     <div className="fixed h-screen w-screen flex justify-center items-center p-5 bg-zinc-950">
-      <div className="bg-zinc-700 p-6 rounded-xl w-screen md:w-64 animate-modal-down text-center">
+      <div className="bg-zinc-700 p-6 rounded-xl w-screen md:max-w-80 max-w-64 animate-modal-down text-center">
         <h2 className="font-bold text-2xl mb-4">Login</h2>
         <form className="max-w-sm mx-auto" onSubmit={submit}>
           <div className="mb-4">
@@ -61,7 +61,7 @@ export default function LoginFormModal() {
           <div className="text-center">
             <button
               type="submit"
-              className="text-white border border-white bg-zinc-700 hover:bg-zinc-800 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2 text-center"
+              className="bg-white text-zinc-700 border border-white hover:bg-gray-300 hover:text-black focus:ring-4 focus:outline-none font-medium rounded-lg text-sm w-full px-5 py-2 text-center"
               disabled={loading}
             >
               Login
