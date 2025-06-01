@@ -103,8 +103,18 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
             : file!.icon,
       },
     ];
+    navigator.mediaSession.metadata.album = file?.parent ?? "";
+    navigator.mediaSession.setPositionState({
+      duration: audioRef.current!.duration
+    });
+
     navigator.mediaSession.setActionHandler("previoustrack", backSong);
     navigator.mediaSession.setActionHandler("nexttrack", nextSong);
+    navigator.mediaSession.setActionHandler("seekto", function (details) {
+      if (details.seekTime) {
+        audioRef.current!.currentTime = details.seekTime;
+      }
+    });
   }
 
   function handlerAudioTimeUpdate() {
@@ -252,15 +262,25 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
       setPlaylist((playlist) => playlist && SortFactory(sort).sort(playlist));
     };
 
+    const handlerReloadPage = (event: BeforeUnloadEvent) => {
+      if (file) {
+        const message = "Você tem certeza que deseja atualizar a página?";
+        event.preventDefault();
+        return message;
+      }
+    };
+
     if (playlist == null && file != null && filesList != null) {
       setPlaylist(filesList.filter((file) => file.type && isAudio(file.type)));
     }
 
     filesEvent.addListener("open", handerOpen);
     filesEvent.addListener("change-sort", changeFileSort);
+    window.addEventListener("beforeunload", handlerReloadPage);
     return () => {
       filesEvent.removeListener("open", handerOpen);
       filesEvent.removeListener("change-sort", changeFileSort);
+      window.removeEventListener("beforeunload", handlerReloadPage);
     };
   }, [playlist, file, filesEvent, filesList]);
 
@@ -289,7 +309,10 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
         ];
       }
     }
-  }, [audioControls, audioProps.loading, file]);
+    navigator.mediaSession.playbackState = audioProps.playing
+      ? "playing"
+      : "paused";
+  }, [audioControls, audioProps.loading, audioProps.playing, file]);
 
   return (
     file && (
@@ -424,6 +447,7 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
               src={file.src}
               ref={audioRef}
               className="hidden"
+              controls={false}
               onCanPlay={handlerAudioLoaded}
               onTimeUpdate={handlerAudioTimeUpdate}
               onEnded={nextSong}
