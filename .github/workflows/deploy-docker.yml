@@ -1,0 +1,31 @@
+name: Docker Image Deploy
+
+on:
+  workflow_run:
+    workflows: ["Docker Image CI"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      tag:
+        default: 'develop'
+        required: false
+        type: string
+
+jobs:
+  deploy-dev:
+    runs-on: self-hosted
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'develop' }}
+    steps:
+      - name: executing remote ssh commands
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_KEY }}
+          port: 22
+          script: |
+            cd /srv/raspadmin
+            docker compose pull && docker compose down
+            docker compose up -d
+            docker image prune
