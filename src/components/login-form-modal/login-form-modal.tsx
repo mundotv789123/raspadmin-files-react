@@ -5,25 +5,27 @@ import { useActionState, useState } from "react";
 export default function LoginFormModal() {
   const loginService = new AuthService();
 
-  const [errorMessage, formAction, loading] = useActionState<string | null,FormData>(login, null);
+  const [errorMessage, formAction, loading] = useActionState<
+    string | null,
+    FormData
+  >(login, null);
   const [formState, setFormState] = useState<LoginRequest>();
 
-  async function login(status: string | null, payload: FormData) {
+  async function login(_status: string | null, payload: FormData) {
     try {
       const data = {
-        username: payload.get('username') as string,
-        password: payload.get('password') as string
-      }
-      setFormState(data)
+        username: payload.get("username") as string,
+        password: payload.get("password") as string,
+      };
       await loginService.login(data);
       location.reload();
     } catch (error) {
-      console.log(error)
-      const defaultMessage = 'Ocorreu um erro ao enviar requisição';
+      console.log(error);
+      const defaultMessage = "Ocorreu um erro ao enviar requisição";
       if (error instanceof Error) {
         return error.message ?? defaultMessage;
       }
-      return defaultMessage
+      return defaultMessage;
     }
 
     return null;
@@ -37,12 +39,18 @@ export default function LoginFormModal() {
           className="max-w-sm mx-auto"
           method="post"
           action={formAction}
+          onChange={(e) => {
+            setFormState({
+              username: e.currentTarget.username.value as string,
+              password: e.currentTarget.password.value as string,
+            });
+          }}
         >
           <div className="mb-4">
             <input
               type="text"
               name="username"
-              value={formState?.username ?? ''}
+              value={formState?.username ?? ""}
               className="outline-none bg-zinc-700 border text-white border-gray-300  text-sm rounded-lg block w-full p-2 text-center"
               placeholder="username"
             />
@@ -51,7 +59,7 @@ export default function LoginFormModal() {
             <input
               type="password"
               name="password"
-              value={formState?.password ?? ''}
+              value={formState?.password ?? ""}
               className="outline-none bg-zinc-700 text-white border border-gray-300 text-sm rounded-lg block w-full p-2 text-center"
               placeholder="password"
             />
