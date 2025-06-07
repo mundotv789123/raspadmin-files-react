@@ -1,15 +1,9 @@
 import { LoginRequest } from "@/services/models/auth-models";
-import AuthService from "@/services/services/auth-service";
+import useAuthService from "@/services/services/auth-service";
 import { useActionState, useState } from "react";
 
 export default function LoginFormModal() {
-  const loginService = new AuthService();
-
-  const [errorMessage, formAction, loading] = useActionState<
-    string | null,
-    FormData
-  >(login, null);
-  const [formState, setFormState] = useState<LoginRequest>();
+  const loginService = useAuthService();
 
   async function login(_status: string | null, payload: FormData) {
     try {
@@ -30,6 +24,12 @@ export default function LoginFormModal() {
 
     return null;
   }
+
+  const [errorMessage, formAction, loading] = useActionState<
+    string | null,
+    FormData
+  >(login, null);
+  const [formState, setFormState] = useState<LoginRequest>();
 
   return (
     <div className="fixed h-screen w-screen flex justify-center items-center p-5 bg-zinc-950">
