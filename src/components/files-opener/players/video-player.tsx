@@ -3,13 +3,12 @@ import { FileDTO } from "@/services/models/files-model";
 import { faBackwardFast, faBars, faClock, faExpand, faForwardFast, faPause, faPlay, faRotateBack, faVolumeHigh, faVolumeMute, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faRotateForward } from "@fortawesome/free-solid-svg-icons/faRotateForward";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import EventEmitter from "events";
 import { MouseEvent, useEffect, useRef, useState } from "react";
 import Playlist from "../file-playlist";
 import { useLocalStorage } from "@/hooks/local-storange-hook";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { ThumbGenerator } from "@/components/elements/thumb-generator";
-import { FileOpenEvent } from "@/app/page";
+import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 
 const isVideo = (type: string) => type.match(/video\/(mp4|webm|ogg|mkv)/);
 const speedsSelector = [0.25, 0.50, 0.75, 1, 1.25, 1.50, 1.75, 2];
@@ -21,11 +20,10 @@ interface VideoScreenOrientation extends ScreenOrientation {
 }
 
 type PropsType = {
-  filesEvent: EventEmitter
   filesList?: Array<FileDTO>
 }
 
-export default function VideoPlayer({ filesEvent, filesList }: PropsType) {
+export default function VideoPlayer({ filesList }: PropsType) {
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
 
@@ -251,13 +249,13 @@ export default function VideoPlayer({ filesEvent, filesList }: PropsType) {
       setPlaylist(playlist => playlist && SortFactory(sort).sort(playlist));
     }
 
-    filesEvent.addListener("open", handlerOpen);
-    filesEvent.addListener("change-sort", changeFileSort);
+    fileUpdateEvent.addListener("open", handlerOpen);
+    fileUpdateEvent.addListener("change-sort", changeFileSort);
     return () => {
-      filesEvent.removeListener("open", handlerOpen);
-      filesEvent.removeListener("change-sort", changeFileSort);
+      fileUpdateEvent.removeListener("open", handlerOpen);
+      fileUpdateEvent.removeListener("change-sort", changeFileSort);
     }
-  }, [filesEvent, filesList])
+  }, [filesList])
 
   useEffect(() => {
     if (!videoRef.current) {

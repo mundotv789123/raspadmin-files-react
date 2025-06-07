@@ -135,7 +135,7 @@ export default function Home() {
         </div>
       </aside>
       <main className="overflow-y-auto bg-zinc-800 bg-opacity-30">
-        <FileOpener filesEvent={fileUpdateEvent} />
+        <FileOpener />
         {!loading && errorMessage && <h1 className="text-xl font-bold text-center mt-1">{errorMessage}</h1>}
         {loading && <div className="m-2"><div className="bg-white h-2 animate-loading"></div></div>}
         <FilesViewer hidden={loading || errorMessage != null} filter={filter} />
