@@ -28,4 +28,4 @@ jobs:
             cd /srv/raspadmin
             docker compose pull app && docker compose down app
             docker compose up -d
-            docker image prune
+            docker image prune -f
