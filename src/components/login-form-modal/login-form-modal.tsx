@@ -29,7 +29,7 @@ export default function LoginFormModal() {
     string | null,
     FormData
   >(login, null);
-  const [formState, setFormState] = useState<LoginRequest>();
+  const [formState, setFormState] = useState<LoginRequest>({username: '', password: ''});
 
   return (
     <div className="fixed h-screen w-screen flex justify-center items-center p-5 bg-zinc-950">
@@ -37,7 +37,6 @@ export default function LoginFormModal() {
         <h2 className="font-bold text-2xl mb-4">Login</h2>
         <form
           className="max-w-sm mx-auto"
-          method="post"
           action={formAction}
           onChange={(e) => {
             setFormState({
@@ -50,7 +49,7 @@ export default function LoginFormModal() {
             <input
               type="text"
               name="username"
-              value={formState?.username ?? ""}
+              defaultValue={formState.username}
               className="outline-none bg-zinc-700 border text-white border-gray-300  text-sm rounded-lg block w-full p-2 text-center"
               placeholder="username"
             />
@@ -59,7 +58,7 @@ export default function LoginFormModal() {
             <input
               type="password"
               name="password"
-              value={formState?.password ?? ""}
+              defaultValue={formState.password}
               className="outline-none bg-zinc-700 text-white border border-gray-300 text-sm rounded-lg block w-full p-2 text-center"
               placeholder="password"
             />
