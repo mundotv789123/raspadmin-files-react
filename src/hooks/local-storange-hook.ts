@@ -3,7 +3,10 @@
 import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, Dispatch<SetStateAction<T>>] {
+  const isClient = typeof window !== 'undefined';
+
   const [state, setState] = useState<T>(() => {
+    if (!isClient) return initialValue;
     try {
       const storedValue = localStorage.getItem(key);
       return storedValue ? JSON.parse(storedValue) : initialValue;
