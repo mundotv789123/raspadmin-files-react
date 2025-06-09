@@ -1,17 +1,12 @@
-import { FileOpenEvent } from "@/app/page";
+import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 import { FileDTO } from "@/services/models/files-model";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
-import { EventEmitter } from "stream";
 
 const isDocument = (type: string) => type.match(/application\/(pdf)/);
 
-type PropsType = {
-  filesEvent: EventEmitter;
-};
-
-export default function DocumentViewer({ filesEvent }: PropsType) {
+export default function DocumentViewer() {
   const [file, setFile] = useState<FileDTO | null>(null);
   const documentRef = useRef<HTMLIFrameElement>(null);
 
@@ -33,11 +28,11 @@ export default function DocumentViewer({ filesEvent }: PropsType) {
       setFile(event.file);
     };
 
-    filesEvent.addListener("open", handlerOpen);
+    fileUpdateEvent.addListener("open", handlerOpen);
     return () => {
-      filesEvent.removeListener("open", handlerOpen);
+      fileUpdateEvent.removeListener("open", handlerOpen);
     };
-  }, [filesEvent]);
+  }, []);
 
   return (
     file && (

@@ -1,21 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
-import { FileOpenEvent } from "@/app/page";
+import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 import { FileDTO } from "@/services/models/files-model";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons/faXmark";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
-import { EventEmitter } from "stream";
 
 const isImage = (type: string) => type.match(/image\/([a-z]{1,4})/);
 
 type PropsType = {
-  filesEvent: EventEmitter;
   filesList?: Array<FileDTO>;
 };
 
-export default function ImageViewer({ filesEvent, filesList }: PropsType) {
+export default function ImageViewer({ filesList }: PropsType) {
   const [file, setFile] = useState<FileDTO | null>(null);
   const [imagesList, setImagesList] = useState<Array<FileDTO> | null>(null);
 
@@ -50,13 +48,13 @@ export default function ImageViewer({ filesEvent, filesList }: PropsType) {
       setImagesList((playlist) => playlist && SortFactory(sort).sort(playlist));
     };
 
-    filesEvent.addListener("open", handlerOpen);
-    filesEvent.addListener("change-sort", changeFileSort);
+    fileUpdateEvent.addListener("open", handlerOpen);
+    fileUpdateEvent.addListener("change-sort", changeFileSort);
     return () => {
-      filesEvent.removeListener("open", handlerOpen);
-      filesEvent.removeListener("change-sort", changeFileSort);
+      fileUpdateEvent.removeListener("open", handlerOpen);
+      fileUpdateEvent.removeListener("change-sort", changeFileSort);
     };
-  }, [filesEvent, filesList]);
+  }, [filesList]);
 
   function handlerScrollToLeft() {
     imagesRef.current?.scrollBy({

@@ -18,20 +18,18 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Playlist from "../file-playlist";
-import EventEmitter from "events";
 import Image from "next/image";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
-import { FileOpenEvent } from "@/app/page";
+import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 
 const isAudio = (type: string) =>
   type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
 
 type PropsType = {
-  filesEvent: EventEmitter;
   filesList?: Array<FileDTO>;
 };
 
-export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
+export default function AudioPlayer({ filesList }: PropsType) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [file, setFile] = useState<FileDTO | null>(null);
@@ -274,15 +272,15 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
       setPlaylist(filesList.filter((file) => file.type && isAudio(file.type)));
     }
 
-    filesEvent.addListener("open", handerOpen);
-    filesEvent.addListener("change-sort", changeFileSort);
+    fileUpdateEvent.addListener("open", handerOpen);
+    fileUpdateEvent.addListener("change-sort", changeFileSort);
     window.addEventListener("beforeunload", handlerReloadPage);
     return () => {
-      filesEvent.removeListener("open", handerOpen);
-      filesEvent.removeListener("change-sort", changeFileSort);
+      fileUpdateEvent.removeListener("open", handerOpen);
+      fileUpdateEvent.removeListener("change-sort", changeFileSort);
       window.removeEventListener("beforeunload", handlerReloadPage);
     };
-  }, [playlist, file, filesEvent, filesList]);
+  }, [playlist, file, filesList]);
 
   useEffect(() => {
     if (!file) {

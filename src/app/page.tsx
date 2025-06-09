@@ -3,25 +3,17 @@
 import FileOpener from "@/components/files-opener/file-opener";
 import FilesViewer from "@/components/files-viewers/files-viewer";
 import LoginFormModal from "@/components/login-form-modal/login-form-modal";
+import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 import { FileDownloadHelper } from "@/helpers/file-download-helper";
 import { FileDTO } from "@/services/models/files-model";
-import FilesService from "@/services/services/files-service";
+import useFilesService from "@/services/services/files-service";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import EventEmitter from "events";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-export type FileOpenEvent = {
-  eventCalled: boolean
-  file: FileDTO
-}
-
-const fileUpdateEvent = new EventEmitter();
-const filesService = new FilesService();
-
 export default function Home() {
-
+  const filesService = useFilesService();
   const [path, setPath] = useState<string>();
   const pathSplited = useMemo(() => path?.split("/").filter((path, key) => ((path == "") == (key == 0))), [path]);
 
@@ -54,7 +46,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('hashchange', updateHashHandler);
     }
-  }, []);
+  }, [filesService]);
 
   useEffect(() => {
     if (!path) {
@@ -95,7 +87,7 @@ export default function Home() {
     }).finally(() => {
       setLoading(false);
     })
-  }, [path])
+  }, [path, filesService])
 
   return (
     <div className="grid grid-cols-[0_auto] md:grid-cols-[14rem_auto] grid-rows-[64px_auto] h-screen bg-black bg-opacity-40 transition-all ease-in-out">
@@ -143,10 +135,10 @@ export default function Home() {
         </div>
       </aside>
       <main className="overflow-y-auto bg-zinc-800 bg-opacity-30">
-        <FileOpener filesEvent={fileUpdateEvent} />
+        <FileOpener />
         {!loading && errorMessage && <h1 className="text-xl font-bold text-center mt-1">{errorMessage}</h1>}
         {loading && <div className="m-2"><div className="bg-white h-2 animate-loading"></div></div>}
-        <FilesViewer filesEvent={fileUpdateEvent} hidden={loading || errorMessage != null} filter={filter} />
+        <FilesViewer hidden={loading || errorMessage != null} filter={filter} />
       </main>
       {loginRequired && <LoginFormModal />}
     </div>

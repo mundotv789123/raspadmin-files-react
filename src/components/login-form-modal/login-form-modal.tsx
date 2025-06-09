@@ -1,47 +1,55 @@
-import AuthService from "@/services/services/auth-service";
-import { FormEvent, useState } from "react";
+import { LoginRequest } from "@/services/models/auth-models";
+import useAuthService from "@/services/services/auth-service";
+import { useActionState, useState } from "react";
 
 export default function LoginFormModal() {
-  const loginService = new AuthService();
+  const loginService = useAuthService();
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  async function login(_status: string | null, payload: FormData) {
+    try {
+      const data = {
+        username: payload.get("username") as string,
+        password: payload.get("password") as string,
+      };
+      await loginService.login(data);
+      location.reload();
+    } catch (error) {
+      console.log(error);
+      const defaultMessage = "Ocorreu um erro ao enviar requisição";
+      if (error instanceof Error) {
+        return error.message ?? defaultMessage;
+      }
+      return defaultMessage;
+    }
 
-  function submit(event: FormEvent) {
-    event.preventDefault();
-
-    const form = event.target as HTMLFormElement;
-    const username = form.username.value;
-    const password = form.password.value;
-
-    setLoading(true);
-    setErrorMessage(null);
-    loginService
-      .login({
-        username: username,
-        password: password,
-      })
-      .then(() => {
-        location.reload();
-        setErrorMessage(null);
-      })
-      .catch((error) => {
-        setErrorMessage(error.message ?? "Erro genérico");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    return null;
   }
+
+  const [errorMessage, formAction, loading] = useActionState<
+    string | null,
+    FormData
+  >(login, null);
+  const [formState, setFormState] = useState<LoginRequest>({username: '', password: ''});
 
   return (
     <div className="fixed h-screen w-screen flex justify-center items-center p-5 bg-zinc-950">
       <div className="bg-zinc-700 p-6 rounded-xl w-screen md:max-w-80 max-w-64 animate-modal-down text-center">
         <h2 className="font-bold text-2xl mb-4">Login</h2>
-        <form className="max-w-sm mx-auto" onSubmit={submit}>
+        <form
+          className="max-w-sm mx-auto"
+          action={formAction}
+          onChange={(e) => {
+            setFormState({
+              username: e.currentTarget.username.value as string,
+              password: e.currentTarget.password.value as string,
+            });
+          }}
+        >
           <div className="mb-4">
             <input
               type="text"
-              id="username"
+              name="username"
+              defaultValue={formState.username}
               className="outline-none bg-zinc-700 border text-white border-gray-300  text-sm rounded-lg block w-full p-2 text-center"
               placeholder="username"
             />
@@ -49,7 +57,8 @@ export default function LoginFormModal() {
           <div className="mb-4">
             <input
               type="password"
-              id="password"
+              name="password"
+              defaultValue={formState.password}
               className="outline-none bg-zinc-700 text-white border border-gray-300 text-sm rounded-lg block w-full p-2 text-center"
               placeholder="password"
             />
