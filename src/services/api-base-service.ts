@@ -1,3 +1,9 @@
+export class ApiError extends Error {
+  constructor(message: string, public status: number) {
+    super(message)
+  }
+}
+
 export default class ApiBaseService {
   protected baseUri: string = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
@@ -26,9 +32,9 @@ export default class ApiBaseService {
       if (responseData) {
         return responseData as T;
       }
-      throw { message: "Ocorreu um erro ao deserializar json" };
+      throw new Error("Ocorreu um erro ao deserializar json")
     }
     
-    throw { message: responseData?.message ?? `Ocorreu um erro ao enviar requisição, status: ${response.status}`, status: response.status };
+    throw new ApiError(responseData?.message ?? `Ocorreu um erro ao enviar requisição, status: ${response.status}`, response.status )
   }
 }

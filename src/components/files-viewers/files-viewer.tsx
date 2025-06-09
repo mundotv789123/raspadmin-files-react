@@ -1,20 +1,18 @@
 import { FileDTO } from "@/services/models/files-model";
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
-import EventEmitter from "events";
 import Image from "next/image";
 import moment from "moment";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { useLocalStorage } from "@/hooks/local-storange-hook";
-import { FileOpenEvent } from "@/app/page";
 import { FileDownloadHelper } from "@/helpers/file-download-helper";
+import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 
 type PropsType = {
-  filesEvent: EventEmitter;
   hidden: boolean;
   filter?: string;
 };
 
-export default function FilesViewer({ filesEvent, hidden, filter }: PropsType) {
+export default function FilesViewer({ hidden, filter }: PropsType) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [fileSelected, setFileSelected] = useState<FileDTO | null>(null);
 
@@ -39,7 +37,7 @@ export default function FilesViewer({ filesEvent, hidden, filter }: PropsType) {
 
   function changeSortStrategy(sort: string) {
     setSortStrategyName(sort);
-    filesEvent.emit("change-sort", sort);
+    fileUpdateEvent.emit("change-sort", sort);
   }
 
   useEffect(() => {
@@ -47,14 +45,14 @@ export default function FilesViewer({ filesEvent, hidden, filter }: PropsType) {
       setFileListOrig(files);
     };
 
-    filesEvent.addListener("list", handler);
+    fileUpdateEvent.addListener("list", handler);
     document.addEventListener("click", hideDropDown);
 
     return () => {
-      filesEvent.removeListener("list", handler);
+      fileUpdateEvent.removeListener("list", handler);
       document.removeEventListener("click", hideDropDown);
     };
-  }, [filesEvent]);
+  }, []);
 
   function openFileHandler(
     event: MouseEvent<HTMLAnchorElement>,
@@ -69,7 +67,7 @@ export default function FilesViewer({ filesEvent, hidden, filter }: PropsType) {
       eventCalled: false,
       file: file,
     };
-    filesEvent.emit("open", fileOpenEvent);
+    fileUpdateEvent.emit("open", fileOpenEvent);
     if (!fileOpenEvent.eventCalled) {
       FileDownloadHelper.downloadFile(fileOpenEvent.file);
     }

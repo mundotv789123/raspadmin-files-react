@@ -18,20 +18,18 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Playlist from "../file-playlist";
-import EventEmitter from "events";
 import Image from "next/image";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
-import { FileOpenEvent } from "@/app/page";
+import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 
 const isAudio = (type: string) =>
   type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
 
 type PropsType = {
-  filesEvent: EventEmitter;
   filesList?: Array<FileDTO>;
 };
 
-export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
+export default function AudioPlayer({ filesList }: PropsType) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [file, setFile] = useState<FileDTO | null>(null);
@@ -103,16 +101,35 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
             : file!.icon,
       },
     ];
+    navigator.mediaSession.metadata.album = file?.parent ?? "";
+    navigator.mediaSession.setPositionState({
+      duration: audioRef.current!.duration
+    });
+
     navigator.mediaSession.setActionHandler("previoustrack", backSong);
     navigator.mediaSession.setActionHandler("nexttrack", nextSong);
+    navigator.mediaSession.setActionHandler("seekto", function (details) {
+      if (details.seekTime) {
+        audioRef.current!.currentTime = details.seekTime;
+      }
+    });
   }
 
   function handlerAudioTimeUpdate() {
+    const audioElement = audioRef.current;
+    if (!audioElement) {
+      return;
+    }
     setAudioProps((prev) => ({
       ...prev,
-      currentTime: audioRef.current!.currentTime,
-      playing: !audioRef.current!.paused,
+      currentTime: audioElement.currentTime,
+      playing: !audioElement.paused,
     }));
+    navigator.mediaSession.setPositionState({
+      duration: audioElement.duration,
+      playbackRate: audioElement.playbackRate,
+      position: audioElement.currentTime,
+    });
   }
 
   function handlerError() {
@@ -243,17 +260,27 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
       setPlaylist((playlist) => playlist && SortFactory(sort).sort(playlist));
     };
 
+    const handlerReloadPage = (event: BeforeUnloadEvent) => {
+      if (file) {
+        const message = "Você tem certeza que deseja atualizar a página?";
+        event.preventDefault();
+        return message;
+      }
+    };
+
     if (playlist == null && file != null && filesList != null) {
       setPlaylist(filesList.filter((file) => file.type && isAudio(file.type)));
     }
 
-    filesEvent.addListener("open", handerOpen);
-    filesEvent.addListener("change-sort", changeFileSort);
+    fileUpdateEvent.addListener("open", handerOpen);
+    fileUpdateEvent.addListener("change-sort", changeFileSort);
+    window.addEventListener("beforeunload", handlerReloadPage);
     return () => {
-      filesEvent.removeListener("open", handerOpen);
-      filesEvent.removeListener("change-sort", changeFileSort);
+      fileUpdateEvent.removeListener("open", handerOpen);
+      fileUpdateEvent.removeListener("change-sort", changeFileSort);
+      window.removeEventListener("beforeunload", handlerReloadPage);
     };
-  }, [playlist, file, filesEvent, filesList]);
+  }, [playlist, file, filesList]);
 
   useEffect(() => {
     if (!file) {
@@ -280,7 +307,10 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
         ];
       }
     }
-  }, [audioControls, audioProps.loading, file]);
+    navigator.mediaSession.playbackState = audioProps.playing
+      ? "playing"
+      : "paused";
+  }, [audioControls, audioProps.loading, audioProps.playing, file]);
 
   return (
     file && (
@@ -415,6 +445,7 @@ export default function AudioPlayer({ filesEvent, filesList }: PropsType) {
               src={file.src}
               ref={audioRef}
               className="hidden"
+              controls={false}
               onCanPlay={handlerAudioLoaded}
               onTimeUpdate={handlerAudioTimeUpdate}
               onEnded={nextSong}
