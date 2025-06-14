@@ -1,10 +1,7 @@
 name: Docker Image Deploy
 
 on:
-  workflow_run:
-    workflows: ["Docker Image CI"]
-    types:
-      - completed
+  workflow_call:
   workflow_dispatch:
     inputs:
       tag:
@@ -15,7 +12,7 @@ on:
 jobs:
   deploy-dev:
     runs-on: self-hosted
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'develop' }}
+    if: github.ref == 'refs/heads/develop'
     steps:
       - name: executing remote ssh commands
         uses: appleboy/ssh-action@v1
