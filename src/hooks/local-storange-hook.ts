@@ -6,11 +6,11 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, Dispatch<S
   const isClient = typeof window !== 'undefined';
 
   const [state, setState] = useState<T>(() => {
-    if (!isClient) 
+    if (!isClient)
       return initialValue;
-    
+
     const storedValue = localStorage.getItem(key);
-    return storedValue ? { ...initialValue, ...JSON.parse(storedValue) } : initialValue;
+    return storedValue ? JSON.parse(storedValue) : initialValue;
   });
 
   useEffect(() => {
