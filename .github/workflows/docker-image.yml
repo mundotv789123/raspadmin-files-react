@@ -59,6 +59,7 @@ jobs:
   deploy-dev:
     needs: docker-build
     uses: ./.github/workflows/deploy-docker.yml
+    if: github.ref == 'refs/heads/develop'
     secrets:
       SERVER_IP: ${{ secrets.SERVER_IP }}
       SERVER_KEY: ${{ secrets.SERVER_KEY }}
