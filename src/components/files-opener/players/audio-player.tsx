@@ -30,7 +30,7 @@ type PropsType = {
 };
 
 export default function AudioPlayer({ filesList }: PropsType) {
-  const audioRef = useRef(typeof window == 'undefined' ? null :new Audio());
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
@@ -103,7 +103,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
     ];
     navigator.mediaSession.metadata.album = file?.parent ?? "";
     navigator.mediaSession.setPositionState({
-      duration: audioRef.current!.duration,
+      duration: audioRef.current!.duration
     });
 
     navigator.mediaSession.setActionHandler("previoustrack", backSong);
@@ -312,18 +312,6 @@ export default function AudioPlayer({ filesList }: PropsType) {
       : "paused";
   }, [audioControls, audioProps.loading, audioProps.playing, file]);
 
-  useEffect(() => {
-    if (!audioRef.current)
-      return;
-    audioRef.current.autoplay = true;
-    audioRef.current.oncanplay = handlerAudioLoaded;
-    audioRef.current.ontimeupdate = handlerAudioTimeUpdate;
-    audioRef.current.onended = nextSong;
-    audioRef.current.onerror = handlerError
-    audioRef.current.src = file?.src ?? "";
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file, audioRef.current]);
-
   return (
     file && (
       <div
@@ -451,6 +439,17 @@ export default function AudioPlayer({ filesList }: PropsType) {
               className="w-full my-2"
               percent={audioTimePercent * 100}
               onChange={updateAudioPercent}
+            />
+            <audio
+              autoPlay
+              src={file.src}
+              ref={audioRef}
+              className="hidden"
+              controls={false}
+              onCanPlay={handlerAudioLoaded}
+              onTimeUpdate={handlerAudioTimeUpdate}
+              onEnded={nextSong}
+              onError={handlerError}
             />
           </div>
           <div>
