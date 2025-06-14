@@ -2,23 +2,23 @@ name: Docker Image Deploy
 
 on:
   workflow_call:
-  workflow_dispatch:
-    inputs:
-      tag:
-        default: 'develop'
+    secrets:
+      SERVER_IP:
         required: false
-        type: string
+      SERVER_KEY:
+        required: false
+
+  workflow_dispatch:
 
 jobs:
   deploy-dev:
     runs-on: self-hosted
-    if: github.ref == 'refs/heads/develop'
     steps:
       - name: executing remote ssh commands
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_IP }}
           username: root
+          host: ${{ secrets.SERVER_IP }}
           key: ${{ secrets.SERVER_KEY }}
           port: 22
           script: |
