@@ -34,6 +34,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
+  const [src, setSrc] = useState<string>();
 
   const [audioProps, setAudioProps] = useState<{
     duration: number;
@@ -284,9 +285,16 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   useEffect(() => {
     if (!file) {
+      setSrc('');
       setPlaylist(null);
       navigator.mediaSession.metadata = null;
       return;
+    }
+    if (src != file.src) {
+      setSrc('');
+      setTimeout(() => {
+        setSrc(file.src)
+      }, 100);
     }
     if (!audioRef.current) {
       return;
@@ -310,7 +318,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
     navigator.mediaSession.playbackState = audioProps.playing
       ? "playing"
       : "paused";
-  }, [audioControls, audioProps.loading, audioProps.playing, file]);
+  }, [audioControls, audioProps.loading, audioProps.playing, file, src]);
 
   return (
     file && (
@@ -442,7 +450,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
             />
             <audio
               autoPlay
-              src={file.src}
+              src={src}
               ref={audioRef}
               className="hidden"
               controls={false}
