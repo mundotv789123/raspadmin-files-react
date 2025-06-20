@@ -2,7 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "develop" ]
+  release:
+    types: [ "created" ]
 
 env:
   DOCKER_IMAGE_FILE: Dockerfile
@@ -11,7 +13,7 @@ env:
 
 jobs:
   docker-build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
