@@ -126,11 +126,13 @@ export default function AudioPlayer({ filesList }: PropsType) {
       currentTime: audioElement.currentTime,
       playing: !audioElement.paused,
     }));
-    navigator.mediaSession.setPositionState({
-      duration: audioElement.duration,
-      playbackRate: audioElement.playbackRate,
-      position: audioElement.currentTime,
-    });
+    if (audioElement.duration && audioElement.currentTime) {
+      navigator.mediaSession.setPositionState({
+        duration: audioElement.duration,
+        playbackRate: audioElement.playbackRate,
+        position: audioElement.currentTime,
+      });
+    }
   }
 
   function handlerError() {
