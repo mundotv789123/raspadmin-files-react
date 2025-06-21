@@ -126,13 +126,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
       currentTime: audioElement.currentTime,
       playing: !audioElement.paused,
     }));
-    if (audioElement.duration && audioElement.currentTime) {
-      navigator.mediaSession.setPositionState({
-        duration: audioElement.duration,
-        playbackRate: audioElement.playbackRate,
-        position: audioElement.currentTime,
-      });
-    }
+    updateMediaSessionTime();
   }
 
   function handlerError() {
@@ -151,6 +145,17 @@ export default function AudioPlayer({ filesList }: PropsType) {
     setFile(null);
   }
 
+  function updateMediaSessionTime() {
+    const audioElement = audioRef.current!;
+    if (audioElement.duration && audioElement.currentTime) {
+      navigator.mediaSession.setPositionState({
+        duration: audioElement.duration,
+        playbackRate: audioElement.playbackRate,
+        position: audioElement.currentTime,
+      });
+    }
+  }
+
   function togglePlayAudio() {
     if (!audioRef.current) {
       return;
@@ -164,6 +169,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
     if (audioRef.current.paused) {
       audioRef.current.play();
+      updateMediaSessionTime();
     } else {
       audioRef.current.pause();
     }
