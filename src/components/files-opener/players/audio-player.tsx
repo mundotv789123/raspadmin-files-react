@@ -345,9 +345,14 @@ export default function AudioPlayer({ filesList }: PropsType) {
             classList={audioControls.playlistOpened ? "" : "hidden"}
           />
         )}
-        <div className="grid grid-cols-[calc(100%_-2rem)_2rem] bg-black bg-opacity-45 border-1 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 ps-4 backdrop-blur-sm animate-transform-from-bottom">
-          <div className="w-full flex flex-col flex-grow">
-            <div className="w-full flex flex-col md:flex-row my-2 md:my-4">
+        <div className="grid bg-black bg-opacity-45 border-1 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 backdrop-blur-sm animate-transform-from-bottom">
+          <div className="flex justify-end">
+            <button onClick={handlerCloseFile} className="mb-auto">
+              <FontAwesomeIcon icon={faXmark} className="block my-1 mx-2 text-xl" />
+            </button>
+          </div>
+          <div className="w-full flex flex-col flex-grow px-4">
+            <div className="w-full flex flex-col md:flex-row mb-0 mt-0 md:mb-2">
               <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center md:mb-0 p-4 rounded-lg border-1 border-zinc-600 md:p-0 bg-stone-900 bg-opacity-40 md:bg-transparent md:border-none">
                 <div className="flex flex-col justify-center items-center w-14 h-14 md:w-12 md:h-12 overflow-hidden rounded-md">
                   <Image
@@ -364,7 +369,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 <div className="overflow-hidden md:text-left text-center">
                   <h1
                     className={`font-bold overflow-hidden text-nowrap text-ellipsis ${
-                      audioControls.hideTitle ? "blur-sm" : ""
+                      audioControls.hideTitle && !audioProps.error ? "blur-sm" : ""
                     } ${audioProps.error ? "text-red-400" : ""}`}
                   >
                     {audioProps.error ? audioProps.error : file.name}
@@ -453,6 +458,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
             </div>
             <Range
               className="w-full my-2"
+              step={0.01}
               percent={audioTimePercent * 100}
               progressMouseFoller={true}
               onChange={updateAudioPercent}
@@ -468,11 +474,6 @@ export default function AudioPlayer({ filesList }: PropsType) {
               onEnded={nextSong}
               onError={handlerError}
             />}
-          </div>
-          <div>
-            <button onClick={handlerCloseFile} className="mb-auto">
-              <FontAwesomeIcon icon={faXmark} className="block m-1 text-xl" />
-            </button>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ type PropsType = {
   percent?: number;
   className?: string;
   progressMouseFoller?: boolean
+  step?: number
   onChange?: (percent: number) => boolean;
   onMouseMove?: MouseEventHandler<HTMLInputElement>;
   onMouseEnter?: MouseEventHandler<HTMLInputElement>;
@@ -14,12 +15,14 @@ export default function Range({
   percent,
   className,
   progressMouseFoller,
+  step,
   onChange,
   onMouseMove,
   onMouseEnter,
   onMouseLeave,
 }: PropsType) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   const [percentState, setPercent] = useState(percent ?? 0);
   const [percentMouseFollower, setPercentMouseFollower] = useState(50);
@@ -40,7 +43,7 @@ export default function Range({
 
   function handlerMouseMove(e: MouseEvent<HTMLInputElement>) {
     if (progressMouseFoller) {
-      const rect = e.currentTarget.getBoundingClientRect();
+      const rect = progressRef.current!.getBoundingClientRect();
       const perc = ((e.clientX - rect.left) * 100 / (rect.right - rect.left));
       setPercentMouseFollower(perc < 0 ? 0 : perc > 100 ? 100 : perc);
     } else if (percentMouseFollower > 0) {
@@ -54,7 +57,7 @@ export default function Range({
       <div className="w-full relative">
         <div className="h-5 flex flex-col items-center group">
           <div className="flex w-full h-5 items-center absolute -z-0 px-2">
-            <div className="flex w-full h-1/3 bg-zinc-400 rounded-md shadow-md items-center">
+            <div className="flex w-full h-1/3 bg-zinc-400 shadow-md items-center rounded-md" ref={progressRef}>
               <div
                 className="bg-white h-full flex overflow-visible rounded-s-md"
                 style={{ width: `${percentState}%` }}
@@ -67,6 +70,7 @@ export default function Range({
             ref={inputRef}
             className="w-full opacity-0 h-full"
             type="range"
+            step={step}
             min={0}
             max={100}
             onChange={handlerChange}
