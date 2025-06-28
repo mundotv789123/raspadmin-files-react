@@ -14,7 +14,7 @@ export default function LoginFormModal() {
       await loginService.login(data);
       location.reload();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       const defaultMessage = "Ocorreu um erro ao enviar requisição";
       if (error instanceof Error) {
         return error.message ?? defaultMessage;

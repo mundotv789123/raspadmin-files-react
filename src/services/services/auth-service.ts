@@ -4,7 +4,7 @@ import { LoginRequest } from "../models/auth-models";
 
 class AuthService extends ApiBaseService {
   async login(request: LoginRequest) {
-    return await this.post('/auth/login', request);
+    return this.post('/auth/login', request);
   }
 }
 

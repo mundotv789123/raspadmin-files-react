@@ -46,9 +46,9 @@ export default function Playlist({
       className={`flex flex-grow justify-end overflow-hidden bg-zinc-700 bg-opacity-30 backdrop-blur-sm ${classList}`}
     >
       <div className="flex-grow" onClick={handlerClose} />
-      <div className="flex flex-col w-full max-w-xl bg-black bg-opacity-35 animate-transform-from-end">
-        <div className="bg-black bg-opacity-30 text-center flex py-1">
-          <p className="w-full text-lg">{title}</p>
+      <div className="flex flex-col w-full bg-black bg-opacity-45 animate-transform-from-end sm:max-w-xl">
+        <div className="bg-black bg-opacity-30 flex p-3 border-b-1 border-stone-600">
+          <p className="w-full text-xl font-bold">{title}</p>
           <button className="float-end end-0 mx-2 absolute text-lg">
             <FontAwesomeIcon icon={faClose} onClick={handlerClose} />
           </button>
@@ -58,7 +58,7 @@ export default function Playlist({
             <div
               key={key}
               onClick={() => handlerClick(file)}
-              className="grid grid-cols-[2.5rem_calc(100%_-_2.5rem)] cursor-pointer hover:underline gap-2"
+              className={`grid grid-cols-[2.5rem_calc(100%_-_2.5rem)] cursor-pointer gap-2 bg-opacity-50 p-2 rounded-md hover:bg-stone-600 hover:bg-opacity-50 border-1 ${file.src == playingState?.src ? 'border-emerald-400 bg-stone-600' : 'border-transparent'}` }
             >
               <div className="flex flex-col justify-center items-center w-10 h-10 overflow-hidden rounded-md">
                 <Image

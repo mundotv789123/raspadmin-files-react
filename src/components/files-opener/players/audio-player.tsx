@@ -2,11 +2,11 @@ import { useLocalStorage } from "@/hooks/local-storange-hook";
 import Range from "@/components/elements/range-element";
 import { FileDTO } from "@/services/models/files-model";
 import {
-  faBackwardFast,
+  faBackward,
   faBars,
   faEye,
   faEyeSlash,
-  faForwardFast,
+  faForward,
   faPause,
   faPlay,
   faRotateRight,
@@ -34,6 +34,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
+  const [src, setSrc] = useState<string>();
 
   const [audioProps, setAudioProps] = useState<{
     duration: number;
@@ -125,11 +126,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
       currentTime: audioElement.currentTime,
       playing: !audioElement.paused,
     }));
-    navigator.mediaSession.setPositionState({
-      duration: audioElement.duration,
-      playbackRate: audioElement.playbackRate,
-      position: audioElement.currentTime,
-    });
+    updateMediaSessionTime();
   }
 
   function handlerError() {
@@ -148,6 +145,17 @@ export default function AudioPlayer({ filesList }: PropsType) {
     setFile(null);
   }
 
+  function updateMediaSessionTime() {
+    const audioElement = audioRef.current!;
+    if (audioElement.duration && audioElement.currentTime) {
+      navigator.mediaSession.setPositionState({
+        duration: audioElement.duration,
+        playbackRate: audioElement.playbackRate,
+        position: audioElement.currentTime,
+      });
+    }
+  }
+
   function togglePlayAudio() {
     if (!audioRef.current) {
       return;
@@ -161,6 +169,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
     if (audioRef.current.paused) {
       audioRef.current.play();
+      updateMediaSessionTime();
     } else {
       audioRef.current.pause();
     }
@@ -284,9 +293,16 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   useEffect(() => {
     if (!file) {
+      setSrc('');
       setPlaylist(null);
       navigator.mediaSession.metadata = null;
       return;
+    }
+    if (src != file.src) {
+      setSrc('');
+      setTimeout(() => {
+        setSrc(file.src)
+      }, 100);
     }
     if (!audioRef.current) {
       return;
@@ -310,7 +326,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
     navigator.mediaSession.playbackState = audioProps.playing
       ? "playing"
       : "paused";
-  }, [audioControls, audioProps.loading, audioProps.playing, file]);
+  }, [audioControls, audioProps.loading, audioProps.playing, file, src]);
 
   return (
     file && (
@@ -329,10 +345,15 @@ export default function AudioPlayer({ filesList }: PropsType) {
             classList={audioControls.playlistOpened ? "" : "hidden"}
           />
         )}
-        <div className="grid grid-cols-[calc(100%_-2rem)_2rem] bg-black bg-opacity-45 border-2 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 ps-4 backdrop-blur-sm animate-transform-from-bottom">
-          <div className="w-full flex flex-col flex-grow">
-            <div className="w-full flex flex-col md:flex-row my-2 md:my-4">
-              <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center mb-3 md:mb-0">
+        <div className="grid bg-black bg-opacity-45 border-1 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 backdrop-blur-sm animate-transform-from-bottom">
+          <div className="flex justify-end">
+            <button onClick={handlerCloseFile} className="mb-auto">
+              <FontAwesomeIcon icon={faXmark} className="block my-1 mx-2 text-xl" />
+            </button>
+          </div>
+          <div className="w-full flex flex-col flex-grow px-4">
+            <div className="w-full flex flex-col md:flex-row mb-0 mt-0 md:mb-2">
+              <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center md:mb-0 p-4 rounded-lg border-1 border-zinc-600 md:p-0 bg-stone-900 bg-opacity-40 md:bg-transparent md:border-none">
                 <div className="flex flex-col justify-center items-center w-14 h-14 md:w-12 md:h-12 overflow-hidden rounded-md">
                   <Image
                     src={!file.icon ? "/img/icons/music.svg" : file.icon}
@@ -348,20 +369,20 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 <div className="overflow-hidden md:text-left text-center">
                   <h1
                     className={`font-bold overflow-hidden text-nowrap text-ellipsis ${
-                      audioControls.hideTitle ? "blur-sm" : ""
+                      audioControls.hideTitle && !audioProps.error ? "blur-sm" : ""
                     } ${audioProps.error ? "text-red-400" : ""}`}
                   >
                     {audioProps.error ? audioProps.error : file.name}
                   </h1>
                 </div>
               </div>
-              <div className="w-full flex md:w-2/3 md:justify-center">
+              <div className="w-full flex md:w-2/3 justify-center mt-2 md:mt-0">
                 <div className="md:w-1/2 flex justify-center gap-3 me-auto md:me-0">
-                  <button className="text-2xl w-8" onClick={backSong}>
-                    <FontAwesomeIcon icon={faBackwardFast} />
+                  <button className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75" onClick={backSong}>
+                    <FontAwesomeIcon icon={faBackward}/>
                   </button>
                   <button
-                    className="text-3xl w-8 h-12"
+                    className="text-3xl w-8 h-12 hover:text-stone-300 transition-colors delay-75"
                     onClick={togglePlayAudio}
                     disabled={audioProps.loading}
                   >
@@ -381,8 +402,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
                       />
                     )}
                   </button>
-                  <button className="text-2xl w-8" onClick={nextSong}>
-                    <FontAwesomeIcon icon={faForwardFast} />
+                  <button className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75" onClick={nextSong}>
+                    <FontAwesomeIcon icon={faForward}/>
                   </button>
                 </div>
                 <div className="md:w-1/2 flex gap-2 justify-end">
@@ -437,12 +458,14 @@ export default function AudioPlayer({ filesList }: PropsType) {
             </div>
             <Range
               className="w-full my-2"
+              step={0.01}
               percent={audioTimePercent * 100}
+              progressMouseFoller={true}
               onChange={updateAudioPercent}
             />
-            <audio
+            {src && <audio
               autoPlay
-              src={file.src}
+              src={src}
               ref={audioRef}
               className="hidden"
               controls={false}
@@ -450,12 +473,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
               onTimeUpdate={handlerAudioTimeUpdate}
               onEnded={nextSong}
               onError={handlerError}
-            />
-          </div>
-          <div>
-            <button onClick={handlerCloseFile} className="mb-auto">
-              <FontAwesomeIcon icon={faXmark} className="block m-1 text-xl" />
-            </button>
+            />}
           </div>
         </div>
       </div>
