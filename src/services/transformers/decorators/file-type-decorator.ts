@@ -9,7 +9,7 @@ export class FileTypeTransformer extends Decorator {
 
   public transform(): FileDTO {
     const file = super.transform();
-    if (!file.type) {
+    if (!file.type && !file.is_dir) {
       const mimeType = lookup(file.name);
       if (mimeType) {
         file.type = mimeType;

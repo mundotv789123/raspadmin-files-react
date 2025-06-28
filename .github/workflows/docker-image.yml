@@ -2,7 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "develop" ]
+  release:
+    types: [ "created" ]
 
 env:
   DOCKER_IMAGE_FILE: Dockerfile
@@ -10,7 +12,7 @@ env:
   DOCKER_USERNAME: mundotv789123
 
 jobs:
-  docker:
+  docker-build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -55,3 +57,11 @@ jobs:
           push: true
           tags: "${{ env.DOCKER_IMAGE_TAG }}"
           platforms: linux/amd64,linux/arm64
+
+  deploy-dev:
+    needs: docker-build
+    uses: ./.github/workflows/deploy-docker.yml
+    if: github.ref == 'refs/heads/develop'
+    secrets:
+      SERVER_IP: ${{ secrets.SERVER_IP }}
+      SERVER_KEY: ${{ secrets.SERVER_KEY }}
