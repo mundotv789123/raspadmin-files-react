@@ -306,6 +306,7 @@ export default function VideoPlayer({ filesList }: PropsType) {
             <div className="w-full">
               <Range
                 percent={videoProps.currentTime / videoProps.duration * 100}
+                progressMouseFoller={true}
                 onChange={updateVideoPercent}
                 onMouseLeave={handlerThumbMouseLeave}
                 onMouseMove={handlerThumbMouseMove}

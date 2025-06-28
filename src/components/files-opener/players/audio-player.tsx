@@ -2,11 +2,11 @@ import { useLocalStorage } from "@/hooks/local-storange-hook";
 import Range from "@/components/elements/range-element";
 import { FileDTO } from "@/services/models/files-model";
 import {
-  faBackwardFast,
+  faBackward,
   faBars,
   faEye,
   faEyeSlash,
-  faForwardFast,
+  faForward,
   faPause,
   faPlay,
   faRotateRight,
@@ -345,10 +345,10 @@ export default function AudioPlayer({ filesList }: PropsType) {
             classList={audioControls.playlistOpened ? "" : "hidden"}
           />
         )}
-        <div className="grid grid-cols-[calc(100%_-2rem)_2rem] bg-black bg-opacity-45 border-2 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 ps-4 backdrop-blur-sm animate-transform-from-bottom">
+        <div className="grid grid-cols-[calc(100%_-2rem)_2rem] bg-black bg-opacity-45 border-1 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 ps-4 backdrop-blur-sm animate-transform-from-bottom">
           <div className="w-full flex flex-col flex-grow">
             <div className="w-full flex flex-col md:flex-row my-2 md:my-4">
-              <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center mb-3 md:mb-0">
+              <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center md:mb-0 p-4 rounded-lg border-1 border-zinc-600 md:p-0 bg-stone-900 bg-opacity-40 md:bg-transparent md:border-none">
                 <div className="flex flex-col justify-center items-center w-14 h-14 md:w-12 md:h-12 overflow-hidden rounded-md">
                   <Image
                     src={!file.icon ? "/img/icons/music.svg" : file.icon}
@@ -371,13 +371,13 @@ export default function AudioPlayer({ filesList }: PropsType) {
                   </h1>
                 </div>
               </div>
-              <div className="w-full flex md:w-2/3 md:justify-center">
+              <div className="w-full flex md:w-2/3 justify-center mt-2 md:mt-0">
                 <div className="md:w-1/2 flex justify-center gap-3 me-auto md:me-0">
-                  <button className="text-2xl w-8" onClick={backSong}>
-                    <FontAwesomeIcon icon={faBackwardFast} />
+                  <button className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75" onClick={backSong}>
+                    <FontAwesomeIcon icon={faBackward}/>
                   </button>
                   <button
-                    className="text-3xl w-8 h-12"
+                    className="text-3xl w-8 h-12 hover:text-stone-300 transition-colors delay-75"
                     onClick={togglePlayAudio}
                     disabled={audioProps.loading}
                   >
@@ -397,8 +397,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
                       />
                     )}
                   </button>
-                  <button className="text-2xl w-8" onClick={nextSong}>
-                    <FontAwesomeIcon icon={faForwardFast} />
+                  <button className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75" onClick={nextSong}>
+                    <FontAwesomeIcon icon={faForward}/>
                   </button>
                 </div>
                 <div className="md:w-1/2 flex gap-2 justify-end">
@@ -454,9 +454,10 @@ export default function AudioPlayer({ filesList }: PropsType) {
             <Range
               className="w-full my-2"
               percent={audioTimePercent * 100}
+              progressMouseFoller={true}
               onChange={updateAudioPercent}
             />
-            <audio
+            {src && <audio
               autoPlay
               src={src}
               ref={audioRef}
@@ -466,7 +467,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
               onTimeUpdate={handlerAudioTimeUpdate}
               onEnded={nextSong}
               onError={handlerError}
-            />
+            />}
           </div>
           <div>
             <button onClick={handlerCloseFile} className="mb-auto">
