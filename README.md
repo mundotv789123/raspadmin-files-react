@@ -32,6 +32,6 @@ Esse projeto iniciou como uma estilização do famoso "indexof" do nginx/apache2
 ![video_player](_images/video_player.png)
 
 ### Reprodução de vídeo com playlist
-> Ao clicar no menu hambúrguer é possível ver a playlist que foi gerada com base a música clicada.
+> Ao clicar no menu hambúrguer é possível ver a playlist que foi gerada com base no vídeo clicado.
 
 ![video_player](_images/video_playlist.png)
