@@ -328,6 +328,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
       : "paused";
   }, [audioControls, audioProps.loading, audioProps.playing, file, src]);
 
+  const playIcon = audioProps.error ? faRotateRight : audioProps.playing ? faPause : faPlay;
+
   return (
     file && (
       <div
@@ -392,13 +394,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
                       </div>
                     ) : (
                       <FontAwesomeIcon
-                        icon={
-                          audioProps.error
-                            ? faRotateRight
-                            : audioProps.playing
-                            ? faPause
-                            : faPlay
-                        }
+                        icon={playIcon}
                       />
                     )}
                   </button>
