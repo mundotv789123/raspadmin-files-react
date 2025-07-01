@@ -5,7 +5,6 @@ type EventHandler<T> = { func(event: T): void }["func"];
 export type AudioProps = {
   onNextSong?: EventHandler<void>,
   onBackSong?: EventHandler<void>,
-  onError?: EventHandler<string | null>
 }
 
 export type AudioState = {
@@ -32,7 +31,7 @@ export const audioPropsDefaultValues: AudioState = {
   currentTime: 0
 }
 
-export default function useAudioPlayer({ onNextSong, onBackSong, onError }: AudioProps) {
+export default function useAudioPlayer({ onNextSong, onBackSong }: AudioProps) {
   const [audioInfo, setAudioInfo] = useState<AudioInfo>();
   const [audioState, setAudioState] = useState<AudioState>(audioPropsDefaultValues);
 
@@ -47,7 +46,7 @@ export default function useAudioPlayer({ onNextSong, onBackSong, onError }: Audi
       audioRef.current.src = audioInfo.src;
       audioRef.current.currentTime = 0;
       audioRef.current.load();
-      setAudioState(prev => ({ ...prev, isLoading: true }))
+      setAudioState(prev => ({ ...prev, isLoading: true, errorMessage: null }))
     }
 
     audioRef.current.volume = audioInfo.volume;
@@ -104,14 +103,30 @@ export default function useAudioPlayer({ onNextSong, onBackSong, onError }: Audi
       isPlaying: !audioRef.current.paused,
       currentTime: audioRef.current.currentTime,
     }));
+    const audioElement = audioRef.current!;
+    if (audioElement.duration && audioElement.currentTime) {
+      navigator.mediaSession.setPositionState({
+        duration: audioElement.duration,
+        playbackRate: audioElement.playbackRate,
+        position: audioElement.currentTime,
+      });
+    }
   }
 
   function handlerError() {
-    onError?.(audioRef.current.error?.message ?? null);
+    setAudioState(prev => ({ 
+      ...prev, 
+      message: audioRef.current.error?.message ?? "Ocorreu um erro ao reproduzir áudio"
+    }));
   }
 
   function handlerEnded() {
     onNextSong?.();
+  }
+
+  function reload() {
+    audioRef.current.load();
+    setAudioState(prev => ({ ...prev, isLoading: true, errorMessage: null }))
   }
 
   audioRef.current.autoplay = true;
@@ -124,6 +139,7 @@ export default function useAudioPlayer({ onNextSong, onBackSong, onError }: Audi
     setAudioInfo: setAudioInfo,
     play: audioRef.current.play,
     pause: audioRef.current.pause,
+    reload: reload,
     stop: () => {
       audioRef.current.pause();
       audioRef.current.src = '';
