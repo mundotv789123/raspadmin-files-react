@@ -2,7 +2,7 @@ import { FileDTO } from "@/services/models/files-model";
 import { faClose, faVolumeHigh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 type PropsType = {
   classList?: string;
@@ -13,7 +13,7 @@ type PropsType = {
   onClose?: VoidFunction;
 };
 
-export default function Playlist({
+function PlaylistElement({
   classList,
   title,
   playlist,
@@ -92,3 +92,5 @@ export default function Playlist({
     </div>
   );
 }
+
+export default memo(PlaylistElement)
