@@ -21,7 +21,7 @@ import Playlist from "../file-playlist";
 import Image from "next/image";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
-import useAuthService from "@/services/services/auth-service";
+import useFilesService from "@/services/services/files-service";
 
 const isAudio = (type: string) =>
   type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
@@ -31,7 +31,7 @@ type PropsType = {
 };
 
 export default function AudioPlayer({ filesList }: PropsType) {
-  const authService = useAuthService();
+  const filesService = useFilesService();
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [file, setFile] = useState<FileDTO | null>(null);
@@ -132,31 +132,24 @@ export default function AudioPlayer({ filesList }: PropsType) {
   }
 
   function handlerError() {
-    const message = audioRef.current?.error?.message;
-    if (audioRef.current?.error?.code === 401) {
-      const refreshToken = localStorage.getItem("token");
-      if (refreshToken) {
-        authService
-          .refresh({ token: refreshToken })
-          .then(() => {
-            audioRef.current?.load();
-            setAudioProps((prev) => ({ ...prev, error: null, loading: true }));
-          })
-          .catch(() => {
-            setAudioProps((prev) => ({
-              ...prev,
-              loading: false,
-              error: message ?? "Ocorreu um erro ao reproduzir áudio",
-            }));
-          });
-        return;
-      }
-    }
-    setAudioProps((prev) => ({
-      ...prev,
-      loading: false,
-      error: message ?? "Ocorreu um erro ao reproduzir áudio",
-    }));
+    filesService
+      .getFiles(file!.path)
+      .then(() => {
+        audioRef.current?.load();
+        setAudioProps((prev) => ({
+          ...prev,
+          error: null,
+          loading: true,
+        }));
+      })
+      .catch(() => {
+        const message = audioRef.current?.error?.message;
+        setAudioProps((prev) => ({
+          ...prev,
+          loading: false,
+          error: message ?? "Ocorreu um erro ao reproduzir áudio",
+        }));
+      });
   }
 
   function handlerCloseFile() {

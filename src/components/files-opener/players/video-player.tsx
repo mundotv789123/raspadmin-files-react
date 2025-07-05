@@ -9,6 +9,7 @@ import { useLocalStorage } from "@/hooks/local-storange-hook";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { ThumbGenerator } from "@/components/elements/thumb-generator";
 import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
+import useFilesService from "@/services/services/files-service";
 
 const isVideo = (type: string) => type.match(/video\/(mp4|webm|ogg|mkv)/);
 const speedsSelector = [0.25, 0.50, 0.75, 1, 1.25, 1.50, 1.75, 2];
@@ -23,10 +24,9 @@ type PropsType = {
   filesList?: Array<FileDTO>
 }
 
-/*
-  TODO implementar tratamento de erro, refresh token e animação loading
-*/
 export default function VideoPlayer({ filesList }: PropsType) {
+  const filesService = useFilesService();
+
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
 
@@ -150,6 +150,27 @@ export default function VideoPlayer({ filesList }: PropsType) {
     if (!dropdown)
       return;
     dropdown.classList.add("hidden");
+  }
+
+  function handlerError() {
+    filesService
+      .getFiles(file!.path)
+      .then(() => {
+        videoRef.current?.load();
+        setVideoProps((prev) => ({
+          ...prev,
+          error: null,
+          loading: true,
+        }));
+      })
+      .catch(() => {
+        const message = videoRef.current?.error?.message;
+        setVideoProps((prev) => ({
+          ...prev,
+          loading: false,
+          error: message ?? "Ocorreu um erro ao reproduzir áudio",
+        }));
+      });
   }
 
   function updateVideoPercent(percent: number) {
@@ -277,6 +298,7 @@ export default function VideoPlayer({ filesList }: PropsType) {
     file && <div className="fixed top-0 left-0 bottom-0 right-0 bg-black flex justify-center z-20" onMouseMove={resetCursorTimeout} ref={containerRef}>
       <video
         src={file.src}
+        onError={handlerError}
         onCanPlay={handlerCanPlay}
         onTimeUpdate={handlerUpdateTime}
         className="h-full w-full"
