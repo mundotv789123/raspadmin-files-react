@@ -9,10 +9,17 @@ const SRC_QUERY = process.env.NEXT_PUBLIC_SRC_QUERY ?? "?path={0}"
 class FilesService extends ApiBaseService {
   async getFiles(path: string): Promise<Array<FileDTO>> {
     const endpoint = API_QUERY.replace('{0}', encodeURIComponent(path).replace("%2F", "/"));
-    const response = await this.get<FilesResponse>(`/files${endpoint}`);
+    const response = await this.callRefreshToken<FilesResponse>(() =>
+      this.get<FilesResponse>(`/files${endpoint}`),
+      async () => {
+        const refreshToken = localStorage.getItem('token');
+        if (refreshToken) {
+          return this.post('/auth/login', { token: refreshToken, loginType: 'REFRESH_TOKEN' })
+        }
+      })
 
     const url = `${this.baseUri}/files/open${SRC_QUERY}`;
-    
+
     const responseTransforme = response.files.map(file => TranformeFileDTO(file, url));
     return responseTransforme;
   }
