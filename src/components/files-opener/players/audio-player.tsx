@@ -21,6 +21,7 @@ import Playlist from "../file-playlist";
 import Image from "next/image";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
+import useAuthService from "@/services/services/auth-service";
 
 const isAudio = (type: string) =>
   type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
@@ -30,6 +31,7 @@ type PropsType = {
 };
 
 export default function AudioPlayer({ filesList }: PropsType) {
+  const authService = useAuthService();
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [file, setFile] = useState<FileDTO | null>(null);
@@ -104,7 +106,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
     ];
     navigator.mediaSession.metadata.album = file?.parent ?? "";
     navigator.mediaSession.setPositionState({
-      duration: audioRef.current!.duration
+      duration: audioRef.current!.duration,
     });
 
     navigator.mediaSession.setActionHandler("previoustrack", backSong);
@@ -131,6 +133,25 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   function handlerError() {
     const message = audioRef.current?.error?.message;
+    if (audioRef.current?.error?.code === 401) {
+      const refreshToken = localStorage.getItem("token");
+      if (refreshToken) {
+        authService
+          .refresh({ token: refreshToken })
+          .then(() => {
+            audioRef.current?.load();
+            setAudioProps((prev) => ({ ...prev, error: null, loading: true }));
+          })
+          .catch(() => {
+            setAudioProps((prev) => ({
+              ...prev,
+              loading: false,
+              error: message ?? "Ocorreu um erro ao reproduzir áudio",
+            }));
+          });
+        return;
+      }
+    }
     setAudioProps((prev) => ({
       ...prev,
       loading: false,
@@ -293,15 +314,15 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   useEffect(() => {
     if (!file) {
-      setSrc('');
+      setSrc("");
       setPlaylist(null);
       navigator.mediaSession.metadata = null;
       return;
     }
     if (src != file.src) {
-      setSrc('');
+      setSrc("");
       setTimeout(() => {
-        setSrc(file.src)
+        setSrc(file.src);
       }, 100);
     }
     if (!audioRef.current) {
@@ -348,7 +369,10 @@ export default function AudioPlayer({ filesList }: PropsType) {
         <div className="grid bg-black bg-opacity-45 border-1 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 backdrop-blur-sm animate-transform-from-bottom">
           <div className="flex justify-end">
             <button onClick={handlerCloseFile} className="mb-auto">
-              <FontAwesomeIcon icon={faXmark} className="block my-1 mx-2 text-xl" />
+              <FontAwesomeIcon
+                icon={faXmark}
+                className="block my-1 mx-2 text-xl"
+              />
             </button>
           </div>
           <div className="w-full flex flex-col flex-grow px-4">
@@ -369,7 +393,9 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 <div className="overflow-hidden md:text-left text-center">
                   <h1
                     className={`font-bold overflow-hidden text-nowrap text-ellipsis ${
-                      audioControls.hideTitle && !audioProps.error ? "blur-sm" : ""
+                      audioControls.hideTitle && !audioProps.error
+                        ? "blur-sm"
+                        : ""
                     } ${audioProps.error ? "text-red-400" : ""}`}
                   >
                     {audioProps.error ? audioProps.error : file.name}
@@ -378,8 +404,11 @@ export default function AudioPlayer({ filesList }: PropsType) {
               </div>
               <div className="w-full flex md:w-2/3 justify-center mt-2 md:mt-0">
                 <div className="md:w-1/2 flex justify-center gap-3 me-auto md:me-0">
-                  <button className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75" onClick={backSong}>
-                    <FontAwesomeIcon icon={faBackward}/>
+                  <button
+                    className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75"
+                    onClick={backSong}
+                  >
+                    <FontAwesomeIcon icon={faBackward} />
                   </button>
                   <button
                     className="text-3xl w-8 h-12 hover:text-stone-300 transition-colors delay-75"
@@ -402,8 +431,11 @@ export default function AudioPlayer({ filesList }: PropsType) {
                       />
                     )}
                   </button>
-                  <button className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75" onClick={nextSong}>
-                    <FontAwesomeIcon icon={faForward}/>
+                  <button
+                    className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75"
+                    onClick={nextSong}
+                  >
+                    <FontAwesomeIcon icon={faForward} />
                   </button>
                 </div>
                 <div className="md:w-1/2 flex gap-2 justify-end">
@@ -463,17 +495,19 @@ export default function AudioPlayer({ filesList }: PropsType) {
               progressMouseFoller={true}
               onChange={updateAudioPercent}
             />
-            {src && <audio
-              autoPlay
-              src={src}
-              ref={audioRef}
-              className="hidden"
-              controls={false}
-              onCanPlay={handlerAudioLoaded}
-              onTimeUpdate={handlerAudioTimeUpdate}
-              onEnded={nextSong}
-              onError={handlerError}
-            />}
+            {src && (
+              <audio
+                autoPlay
+                src={src}
+                ref={audioRef}
+                className="hidden"
+                controls={false}
+                onCanPlay={handlerAudioLoaded}
+                onTimeUpdate={handlerAudioTimeUpdate}
+                onEnded={nextSong}
+                onError={handlerError}
+              />
+            )}
           </div>
         </div>
       </div>

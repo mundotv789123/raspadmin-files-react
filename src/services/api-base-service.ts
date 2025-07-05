@@ -19,7 +19,7 @@ export default class ApiBaseService {
     return this.handlerResponse<T>(response);
   }
 
-  protected async callRefreshToken<T>(callback: () => Promise<T>, refreshCallback: () => Promise<void>): Promise<T> {
+  protected async callRefreshToken<T>(callback: () => Promise<T>, refreshCallback: () => Promise<unknown>): Promise<T> {
     try {
       return await callback();
     } catch (error) {

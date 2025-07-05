@@ -23,6 +23,9 @@ type PropsType = {
   filesList?: Array<FileDTO>
 }
 
+/*
+  TODO implementar tratamento de erro, refresh token e animação loading
+*/
 export default function VideoPlayer({ filesList }: PropsType) {
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
