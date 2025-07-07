@@ -156,7 +156,8 @@ export default function VideoPlayer({ filesList }: PropsType) {
     filesService
       .getFiles(file!.path)
       .then(() => {
-        videoRef.current?.load();
+        videoRef.current!.currentTime = videoProps.currentTime;
+        videoRef.current!.load();
         setVideoProps((prev) => ({
           ...prev,
           error: null,

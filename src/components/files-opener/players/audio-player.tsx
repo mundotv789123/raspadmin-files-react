@@ -22,6 +22,7 @@ import Image from "next/image";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 import useFilesService from "@/services/services/files-service";
+import { formatSecondsToTime } from "@/helpers/time-formatter-helper";
 
 const isAudio = (type: string) =>
   type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
@@ -482,13 +483,17 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 </div>
               </div>
             </div>
-            <Range
-              className="w-full my-2"
-              step={0.01}
-              percent={audioTimePercent * 100}
-              progressMouseFoller={true}
-              onChange={updateAudioPercent}
-            />
+            <div className="flex items-center">
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.duration)}</span>
+              <Range
+                className="w-full my-2"
+                step={0.01}
+                percent={audioTimePercent * 100}
+                progressMouseFoller={true}
+                onChange={updateAudioPercent}
+              />
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.currentTime, audioProps.duration >= 3600)}</span>
+            </div>
             {src && (
               <audio
                 autoPlay
