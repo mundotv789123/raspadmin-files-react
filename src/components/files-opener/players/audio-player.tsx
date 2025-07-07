@@ -135,7 +135,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
     filesService
       .getFiles(file!.path)
       .then(() => {
-        audioRef.current?.load();
+        audioRef.current!.load();
+        audioRef.current!.currentTime = audioProps.currentTime;
         setAudioProps((prev) => ({
           ...prev,
           error: null,
