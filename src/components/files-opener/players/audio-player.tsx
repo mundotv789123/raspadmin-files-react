@@ -21,7 +21,6 @@ import Playlist from "../file-playlist";
 import Image from "next/image";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
-import useFilesService from "@/services/services/files-service";
 import { formatSecondsToTime } from "@/helpers/time-formatter-helper";
 
 const isAudio = (type: string) =>
@@ -32,7 +31,6 @@ type PropsType = {
 };
 
 export default function AudioPlayer({ filesList }: PropsType) {
-  const filesService = useFilesService();
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [file, setFile] = useState<FileDTO | null>(null);
@@ -133,25 +131,12 @@ export default function AudioPlayer({ filesList }: PropsType) {
   }
 
   function handlerError() {
-    filesService
-      .getFiles(file!.path)
-      .then(() => {
-        audioRef.current!.load();
-        audioRef.current!.currentTime = audioProps.currentTime;
-        setAudioProps((prev) => ({
-          ...prev,
-          error: null,
-          loading: true,
-        }));
-      })
-      .catch(() => {
-        const message = audioRef.current?.error?.message;
-        setAudioProps((prev) => ({
-          ...prev,
-          loading: false,
-          error: message ?? "Ocorreu um erro ao reproduzir áudio",
-        }));
-      });
+    const message = audioRef.current?.error?.message;
+    setAudioProps((prev) => ({
+      ...prev,
+      loading: false,
+      error: message ?? "Ocorreu um erro ao reproduzir áudio",
+    }));
   }
 
   function handlerCloseFile() {
@@ -347,9 +332,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
   return (
     file && (
       <div
-        className={`fixed bottom-0 left-0 right-0 flex flex-col z-20 ${
-          audioControls.playlistOpened ? "top-0" : ""
-        }`}
+        className={`fixed bottom-0 left-0 right-0 flex flex-col z-20 ${audioControls.playlistOpened ? "top-0" : ""
+          }`}
       >
         {playlist && (
           <Playlist
@@ -377,9 +361,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
                   <Image
                     src={!file.icon ? "/img/icons/music.svg" : file.icon}
                     alt={file.name}
-                    className={`h-full w-full top-0 left-0 object-cover ${
-                      audioControls.hideTitle ? "blur-sm" : ""
-                    }`}
+                    className={`h-full w-full top-0 left-0 object-cover ${audioControls.hideTitle ? "blur-sm" : ""
+                      }`}
                     width={512}
                     height={512}
                     unoptimized
@@ -387,11 +370,10 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 </div>
                 <div className="overflow-hidden md:text-left text-center">
                   <h1
-                    className={`font-bold overflow-hidden text-nowrap text-ellipsis ${
-                      audioControls.hideTitle && !audioProps.error
+                    className={`font-bold overflow-hidden text-nowrap text-ellipsis ${audioControls.hideTitle && !audioProps.error
                         ? "blur-sm"
                         : ""
-                    } ${audioProps.error ? "text-red-400" : ""}`}
+                      } ${audioProps.error ? "text-red-400" : ""}`}
                   >
                     {audioProps.error ? audioProps.error : file.name}
                   </h1>
@@ -420,8 +402,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
                           audioProps.error
                             ? faRotateRight
                             : audioProps.playing
-                            ? faPause
-                            : faPlay
+                              ? faPause
+                              : faPlay
                         }
                       />
                     )}

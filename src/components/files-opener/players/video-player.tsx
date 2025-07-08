@@ -9,7 +9,6 @@ import { useLocalStorage } from "@/hooks/local-storange-hook";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { ThumbGenerator } from "@/components/elements/thumb-generator";
 import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
-import useFilesService from "@/services/services/files-service";
 
 const isVideo = (type: string) => type.match(/video\/(mp4|webm|ogg|mkv)/);
 const speedsSelector = [0.25, 0.50, 0.75, 1, 1.25, 1.50, 1.75, 2];
@@ -25,8 +24,6 @@ type PropsType = {
 }
 
 export default function VideoPlayer({ filesList }: PropsType) {
-  const filesService = useFilesService();
-
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
 
@@ -153,25 +150,12 @@ export default function VideoPlayer({ filesList }: PropsType) {
   }
 
   function handlerError() {
-    filesService
-      .getFiles(file!.path)
-      .then(() => {
-        videoRef.current!.currentTime = videoProps.currentTime;
-        videoRef.current!.load();
-        setVideoProps((prev) => ({
-          ...prev,
-          error: null,
-          loading: true,
-        }));
-      })
-      .catch(() => {
-        const message = videoRef.current?.error?.message;
-        setVideoProps((prev) => ({
-          ...prev,
-          loading: false,
-          error: message ?? "Ocorreu um erro ao reproduzir áudio",
-        }));
-      });
+    const message = videoRef.current?.error?.message;
+    setVideoProps((prev) => ({
+      ...prev,
+      loading: false,
+      error: message ?? "Ocorreu um erro ao reproduzir áudio",
+    }));
   }
 
   function updateVideoPercent(percent: number) {
