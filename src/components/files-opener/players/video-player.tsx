@@ -372,7 +372,7 @@ export default function VideoPlayer({ filesList }: PropsType) {
           </div>
         </div>
       </div>
-      {playlist && <Playlist playlist={playlist} title="Lista de vídeos" onClick={setFile} playing={file} classList={`fixed w-full h-full ${videoControls.playlistOpened ? '' : 'hidden'}`} onClose={togglePlaylist} />}
+      {playlist && <Playlist playlist={playlist} title="Lista de vídeos" onClick={(file) => { setVideoProps(prev => ({ ...prev, loading: true })); setFile(file) }} playing={file} classList={`fixed w-full h-full ${videoControls.playlistOpened ? '' : 'hidden'}`} onClose={togglePlaylist} />}
     </div>
   )
 }

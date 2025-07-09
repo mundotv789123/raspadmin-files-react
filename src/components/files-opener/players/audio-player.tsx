@@ -206,7 +206,6 @@ export default function AudioPlayer({ filesList }: PropsType) {
     if (!file || !audioPlayList) {
       return;
     }
-    setAudioProps((prev) => ({ ...prev, loading: true }));
 
     let nextSong = 0;
 
@@ -231,8 +230,6 @@ export default function AudioPlayer({ filesList }: PropsType) {
       audioRef.current!.currentTime = 0;
       return;
     }
-
-    setAudioProps((prev) => ({ ...prev, loading: true }));
 
     let backSong = audioPlayList.indexOf(file);
     if (backSong <= 0) {
@@ -262,7 +259,6 @@ export default function AudioPlayer({ filesList }: PropsType) {
         );
       }
 
-      setAudioProps((prev) => ({ ...prev, loading: true }));
       setFile(event.file);
     };
 
@@ -302,6 +298,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
     if (src != file.src) {
       setSrc("");
       setTimeout(() => {
+        setAudioProps((prev) => ({ ...prev, loading: true }));
         setSrc(file.src);
       }, 100);
     }
