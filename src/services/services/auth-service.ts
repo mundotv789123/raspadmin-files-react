@@ -9,7 +9,7 @@ export class AuthService extends ApiBaseService {
     super();
     if (!AuthService.timeoutRefreshToken) {
       if (typeof window !== 'undefined' && window.localStorage) {
-        this.timeoutToRefreshToken()
+        this.timeoutToRefreshToken(1)
       }
     }
   }
@@ -44,12 +44,12 @@ export class AuthService extends ApiBaseService {
     }
   }
 
-  private timeoutToRefreshToken() {
+  private timeoutToRefreshToken(timePlus: number = 0) {
     const tokenExp = Number(localStorage.getItem('token_exp') ?? '0');
     const currentTime = Math.round(Date.now() / 1000);
 
     let time = tokenExp - currentTime;
-    time = time < 0 ? 0 : time * .9
+    time = (time < 0 ? 0 : time * .9) + timePlus
 
     if (AuthService.timeoutRefreshToken) {
       clearTimeout(AuthService.timeoutRefreshToken);
