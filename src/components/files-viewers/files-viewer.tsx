@@ -121,7 +121,7 @@ export default function FilesViewer({ hidden, filter }: PropsType) {
   return (
     <>
       <div
-        className="fixed z-20 bg-black bg-opacity-50 p-3 hidden backdrop-blur-sm shadow-sm border-gray-400 border w-96 max-w-full"
+        className="fixed z-20 bg-black bg-opacity-50 p-3 hidden shadow-sm border-gray-400 border w-96 max-w-full"
         ref={dropdownRef}
       >
         {fileSelected && (

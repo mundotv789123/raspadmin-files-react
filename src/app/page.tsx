@@ -116,7 +116,7 @@ export default function Home() {
           <input
             type="text"
             placeholder="pesquisar"
-            className="w-28 focus:w-44 transition-all ease-in-out outline-none bg-zinc-600 p-1 py-0.5 text-white bg-opacity-45 border border-white backdrop-blur-sm rounded-md"
+            className="w-28 focus:w-44 transition-all ease-in-out outline-none bg-zinc-600 p-1 py-0.5 text-white bg-opacity-45 border border-white rounded-md"
             onInput={(e) => setFilter(e.currentTarget.value)}
             ref={filterInputRef}
           />
@@ -128,7 +128,7 @@ export default function Home() {
             (<a href={file.href} className="text-lg font-bold hover:bg-white hover:bg-opacity-30 p-2" key={key}>{file.name}</a>)
           )}
         </div>
-        <div className={`fixed top-0 bottom-0 left-0 right-0 transform md:hidden bg-black bg-opacity-30 backdrop-blur-sm flex z-30 ${filesBar ? '' : 'hidden'}`}>
+        <div className={`fixed top-0 bottom-0 left-0 right-0 transform md:hidden bg-black bg-opacity-30 flex z-30 ${filesBar ? '' : 'hidden'}`}>
           <div className={`w-56 flex flex-col bg-black h-screen bg-opacity-40 ${filesBar ? 'animate-transform-from-start' : ''}`}>
             {filesTab?.map((file, key) =>
               (<a href={file.href} className="text-lg font-bold hover:bg-white hover:bg-opacity-30 p-2" key={key}>{file.name}</a>)
