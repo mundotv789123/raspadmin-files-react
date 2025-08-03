@@ -342,7 +342,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
             classList={audioControls.playlistOpened ? "" : "hidden"}
           />
         )}
-        <div className="grid bg-black bg-opacity-45 border-[1px] border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 animate-transform-from-bottom">
+        <div className="grid bg-black/45 border-[1px] border-zinc-400 bg-gradient-to-r from-zinc-800 to-zinc-900 animate-transform-from-bottom">
           <div className="flex justify-end">
             <button onClick={handlerCloseFile} className="mb-auto">
               <FontAwesomeIcon
@@ -353,7 +353,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
           </div>
           <div className="w-full flex flex-col flex-grow px-4">
             <div className="w-full flex flex-col md:flex-row mb-0 mt-0 md:mb-2">
-              <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center md:mb-0 p-4 rounded-lg border-[1px] border-zinc-600 md:p-0 bg-stone-900 bg-opacity-40 md:bg-transparent md:border-none">
+              <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center md:mb-0 p-4 rounded-lg border-[1px] border-zinc-600 md:p-0 bg-stone-900/40 md:bg-transparent md:border-none">
                 <div className="flex flex-col justify-center items-center w-14 h-14 md:w-12 md:h-12 overflow-hidden rounded-md">
                   <Image
                     src={!file.icon ? "/img/icons/music.svg" : file.icon}
