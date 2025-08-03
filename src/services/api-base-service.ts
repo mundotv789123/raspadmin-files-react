@@ -19,6 +19,18 @@ export default class ApiBaseService {
     return this.handlerResponse<T>(response);
   }
 
+  protected async callRefreshToken<T>(callback: () => Promise<T>, refreshCallback: () => Promise<unknown>): Promise<T> {
+    try {
+      return await callback();
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        await refreshCallback();
+        return callback();
+      }
+      throw error;
+    }
+  }
+
   private async handlerResponse<T>(response: Response) {
     let responseData;
 

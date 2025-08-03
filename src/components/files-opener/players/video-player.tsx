@@ -149,6 +149,15 @@ export default function VideoPlayer({ filesList }: PropsType) {
     dropdown.classList.add("hidden");
   }
 
+  function handlerError() {
+    const message = videoRef.current?.error?.message;
+    setVideoProps((prev) => ({
+      ...prev,
+      loading: false,
+      error: message ?? "Ocorreu um erro ao reproduzir áudio",
+    }));
+  }
+
   function updateVideoPercent(percent: number) {
     const time = videoProps.duration * (percent / 100);
     videoRef.current!.currentTime = time;
@@ -274,6 +283,7 @@ export default function VideoPlayer({ filesList }: PropsType) {
     file && <div className="fixed top-0 left-0 bottom-0 right-0 bg-black flex justify-center z-20" onMouseMove={resetCursorTimeout} ref={containerRef}>
       <video
         src={file.src}
+        onError={handlerError}
         onCanPlay={handlerCanPlay}
         onTimeUpdate={handlerUpdateTime}
         className="h-full w-full"
@@ -362,7 +372,7 @@ export default function VideoPlayer({ filesList }: PropsType) {
           </div>
         </div>
       </div>
-      {playlist && <Playlist playlist={playlist} title="Lista de vídeos" onClick={setFile} playing={file} classList={`fixed w-full h-full ${videoControls.playlistOpened ? '' : 'hidden'}`} onClose={togglePlaylist} />}
+      {playlist && <Playlist playlist={playlist} title="Lista de vídeos" onClick={(file) => { setVideoProps(prev => ({ ...prev, loading: true })); setFile(file) }} playing={file} classList={`fixed w-full h-full ${videoControls.playlistOpened ? '' : 'hidden'}`} onClose={togglePlaylist} />}
     </div>
   )
 }

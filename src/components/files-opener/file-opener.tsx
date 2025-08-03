@@ -1,3 +1,5 @@
+"use client"
+
 import { FileDTO } from "@/services/models/files-model";
 import { useEffect, useState } from "react";
 import AudioPlayer from "./players/audio-player";
@@ -6,8 +8,10 @@ import { SortFactory } from "@/services/strategies/order-by-strategies";
 import DocumentViewer from "./viewers/document-viewer";
 import ImageViewer from "./viewers/image-viewer";
 import fileUpdateEvent from "@/events/FileUpdateEvent";
+import { createPortal } from "react-dom";
 
 export default function FileOpener() {
+  const isClient = typeof window !== 'undefined';
   const [filesList, setFileList] = useState<Array<FileDTO>>();
 
   useEffect(() => {
@@ -25,12 +29,12 @@ export default function FileOpener() {
     };
   }, []);
 
-  return (
+  return isClient && createPortal((
     <>
       <DocumentViewer />
       <ImageViewer filesList={filesList} />
       <AudioPlayer filesList={filesList} />
       <VideoPlayer filesList={filesList} />
     </>
-  );
+  ), document.body);
 }

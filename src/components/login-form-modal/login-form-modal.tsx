@@ -7,7 +7,7 @@ export default function LoginFormModal() {
 
   async function login(_status: string | null, payload: FormData) {
     try {
-      const data = {
+      const data: LoginRequest = {
         username: payload.get("username") as string,
         password: payload.get("password") as string,
       };

@@ -21,6 +21,7 @@ import Playlist from "../file-playlist";
 import Image from "next/image";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
+import { formatSecondsToTime } from "@/helpers/time-formatter-helper";
 
 const isAudio = (type: string) =>
   type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
@@ -104,7 +105,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
     ];
     navigator.mediaSession.metadata.album = file?.parent ?? "";
     navigator.mediaSession.setPositionState({
-      duration: audioRef.current!.duration
+      duration: audioRef.current!.duration,
     });
 
     navigator.mediaSession.setActionHandler("previoustrack", backSong);
@@ -205,7 +206,6 @@ export default function AudioPlayer({ filesList }: PropsType) {
     if (!file || !audioPlayList) {
       return;
     }
-    setAudioProps((prev) => ({ ...prev, loading: true }));
 
     let nextSong = 0;
 
@@ -230,8 +230,6 @@ export default function AudioPlayer({ filesList }: PropsType) {
       audioRef.current!.currentTime = 0;
       return;
     }
-
-    setAudioProps((prev) => ({ ...prev, loading: true }));
 
     let backSong = audioPlayList.indexOf(file);
     if (backSong <= 0) {
@@ -261,7 +259,6 @@ export default function AudioPlayer({ filesList }: PropsType) {
         );
       }
 
-      setAudioProps((prev) => ({ ...prev, loading: true }));
       setFile(event.file);
     };
 
@@ -293,15 +290,16 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   useEffect(() => {
     if (!file) {
-      setSrc('');
+      setSrc("");
       setPlaylist(null);
       navigator.mediaSession.metadata = null;
       return;
     }
     if (src != file.src) {
-      setSrc('');
+      setSrc("");
       setTimeout(() => {
-        setSrc(file.src)
+        setAudioProps((prev) => ({ ...prev, loading: true }));
+        setSrc(file.src);
       }, 100);
     }
     if (!audioRef.current) {
@@ -331,9 +329,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
   return (
     file && (
       <div
-        className={`fixed bottom-0 left-0 right-0 flex flex-col z-20 ${
-          audioControls.playlistOpened ? "top-0" : ""
-        }`}
+        className={`fixed bottom-0 left-0 right-0 flex flex-col z-20 ${audioControls.playlistOpened ? "top-0" : ""
+          }`}
       >
         {playlist && (
           <Playlist
@@ -348,7 +345,10 @@ export default function AudioPlayer({ filesList }: PropsType) {
         <div className="grid bg-black bg-opacity-45 border-1 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 backdrop-blur-sm animate-transform-from-bottom">
           <div className="flex justify-end">
             <button onClick={handlerCloseFile} className="mb-auto">
-              <FontAwesomeIcon icon={faXmark} className="block my-1 mx-2 text-xl" />
+              <FontAwesomeIcon
+                icon={faXmark}
+                className="block my-1 mx-2 text-xl"
+              />
             </button>
           </div>
           <div className="w-full flex flex-col flex-grow px-4">
@@ -358,9 +358,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
                   <Image
                     src={!file.icon ? "/img/icons/music.svg" : file.icon}
                     alt={file.name}
-                    className={`h-full w-full top-0 left-0 object-cover ${
-                      audioControls.hideTitle ? "blur-sm" : ""
-                    }`}
+                    className={`h-full w-full top-0 left-0 object-cover ${audioControls.hideTitle ? "blur-sm" : ""
+                      }`}
                     width={512}
                     height={512}
                     unoptimized
@@ -368,9 +367,10 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 </div>
                 <div className="overflow-hidden md:text-left text-center">
                   <h1
-                    className={`font-bold overflow-hidden text-nowrap text-ellipsis ${
-                      audioControls.hideTitle && !audioProps.error ? "blur-sm" : ""
-                    } ${audioProps.error ? "text-red-400" : ""}`}
+                    className={`font-bold overflow-hidden text-nowrap text-ellipsis ${audioControls.hideTitle && !audioProps.error
+                        ? "blur-sm"
+                        : ""
+                      } ${audioProps.error ? "text-red-400" : ""}`}
                   >
                     {audioProps.error ? audioProps.error : file.name}
                   </h1>
@@ -378,8 +378,11 @@ export default function AudioPlayer({ filesList }: PropsType) {
               </div>
               <div className="w-full flex md:w-2/3 justify-center mt-2 md:mt-0">
                 <div className="md:w-1/2 flex justify-center gap-3 me-auto md:me-0">
-                  <button className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75" onClick={backSong}>
-                    <FontAwesomeIcon icon={faBackward}/>
+                  <button
+                    className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75"
+                    onClick={backSong}
+                  >
+                    <FontAwesomeIcon icon={faBackward} />
                   </button>
                   <button
                     className="text-3xl w-8 h-12 hover:text-stone-300 transition-colors delay-75"
@@ -396,14 +399,17 @@ export default function AudioPlayer({ filesList }: PropsType) {
                           audioProps.error
                             ? faRotateRight
                             : audioProps.playing
-                            ? faPause
-                            : faPlay
+                              ? faPause
+                              : faPlay
                         }
                       />
                     )}
                   </button>
-                  <button className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75" onClick={nextSong}>
-                    <FontAwesomeIcon icon={faForward}/>
+                  <button
+                    className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75"
+                    onClick={nextSong}
+                  >
+                    <FontAwesomeIcon icon={faForward} />
                   </button>
                 </div>
                 <div className="md:w-1/2 flex gap-2 justify-end">
@@ -456,24 +462,30 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 </div>
               </div>
             </div>
-            <Range
-              className="w-full my-2"
-              step={0.01}
-              percent={audioTimePercent * 100}
-              progressMouseFoller={true}
-              onChange={updateAudioPercent}
-            />
-            {src && <audio
-              autoPlay
-              src={src}
-              ref={audioRef}
-              className="hidden"
-              controls={false}
-              onCanPlay={handlerAudioLoaded}
-              onTimeUpdate={handlerAudioTimeUpdate}
-              onEnded={nextSong}
-              onError={handlerError}
-            />}
+            <div className="flex items-center">
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.duration)}</span>
+              <Range
+                className="w-full my-2"
+                step={0.01}
+                percent={audioTimePercent * 100}
+                progressMouseFoller={true}
+                onChange={updateAudioPercent}
+              />
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.currentTime, audioProps.duration >= 3600)}</span>
+            </div>
+            {src && (
+              <audio
+                autoPlay
+                src={src}
+                ref={audioRef}
+                className="hidden"
+                controls={false}
+                onCanPlay={handlerAudioLoaded}
+                onTimeUpdate={handlerAudioTimeUpdate}
+                onEnded={nextSong}
+                onError={handlerError}
+              />
+            )}
           </div>
         </div>
       </div>
