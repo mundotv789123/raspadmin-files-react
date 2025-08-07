@@ -9,6 +9,7 @@ type PropsType = {
   title: string;
   playlist: Array<FileDTO>;
   playing: FileDTO | null;
+  hidden?: boolean;
   onClick?: (file: FileDTO) => void;
   onClose?: VoidFunction;
 };
@@ -18,6 +19,7 @@ function PlaylistElement({
   title,
   playlist,
   playing,
+  hidden = false,
   onClick,
   onClose,
 }: PropsType) {
@@ -45,9 +47,9 @@ function PlaylistElement({
     <div
       className={`flex flex-grow justify-end overflow-hidden bg-zinc-900/50 ${classList}`}
     >
-      <div className="flex-grow" onClick={handlerClose} />
+      <div className="flex-grow backdrop-blur-sm" onClick={handlerClose} />
       <div className="flex flex-col w-full bg-zinc-900 animate-transform-from-end sm:max-w-xl sm:border-s-[1px] border-zinc-400">
-        <div className="bg-black/30 flex p-3 border-b-[1px] border-stone-900">
+        <div className="bg-black/30 flex p-3 border-b-[1px] border-zinc-400">
           <p className="w-full text-xl font-bold">{title}</p>
           <button className="float-end end-0 mx-2 absolute text-lg">
             <FontAwesomeIcon icon={faClose} onClick={handlerClose} />
@@ -64,7 +66,7 @@ function PlaylistElement({
                 <Image
                   src={file.icon ?? ""}
                   alt={file.name}
-                  className="h-full w-full top-0 left-0 object-cover"
+                  className={`h-full w-full top-0 left-0 object-cover ${hidden ? "blur-sm" : ""}`}
                   width={512}
                   height={512}
                   unoptimized
@@ -74,7 +76,7 @@ function PlaylistElement({
                 <a
                   href={file.href}
                   onClick={(e) => e.preventDefault()}
-                  className="overflow-hidden text-nowrap text-ellipsis"
+                  className={`overflow-hidden text-nowrap text-ellipsis ${hidden ? "blur-sm" : ""}`}
                 >
                   {file.name}
                 </a>

@@ -33,7 +33,7 @@ export default function LoginFormModal() {
 
   return (
     <div className="fixed h-screen w-screen flex justify-center items-center p-5 bg-zinc-950">
-      <div className="bg-zinc-700 p-6 rounded-xl w-screen md:w-64 animate-modal-down text-center">
+      <div className="bg-zinc-700 p-6 rounded-xl w-screen md:w-64 animate-modal-down text-center border-zinc-400 border-[1px]">
         <h2 className="font-bold text-2xl mb-4">Login</h2>
         <form
           className="max-w-sm mx-auto"
@@ -64,7 +64,7 @@ export default function LoginFormModal() {
             />
           </div>
           {errorMessage && (
-            <p className="text-red-400 mb-4 text-sm">{errorMessage}</p>
+            <p className="text-red-400 mb-4 text-sm break-words">{errorMessage}</p>
           )}
           {loading && <div className="bg-white h-1 animate-loading mb-4"></div>}
           <div className="text-center">

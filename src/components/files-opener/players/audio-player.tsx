@@ -335,11 +335,12 @@ export default function AudioPlayer({ filesList }: PropsType) {
         {playlist && (
           <Playlist
             playlist={playlist}
-            title="Lista de áudios"
+            title="Playlist"
             onClick={setFile}
             onClose={togglePlaylist}
             playing={file}
             classList={audioControls.playlistOpened ? "" : "hidden"}
+            hidden={audioControls.hideTitle}
           />
         )}
         <div className="grid bg-black/45 border-[1px] border-zinc-400 bg-gradient-to-r from-zinc-800 to-zinc-900 animate-transform-from-bottom">
@@ -358,8 +359,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
                   <Image
                     src={!file.icon ? "/img/icons/music.svg" : file.icon}
                     alt={file.name}
-                    className={`h-full w-full top-0 left-0 object-cover ${audioControls.hideTitle ? "blur-sm" : ""
-                      }`}
+                    className={`h-full w-full top-0 left-0 object-cover ${audioControls.hideTitle ? "blur-sm" : ""}`}
                     width={512}
                     height={512}
                     unoptimized
