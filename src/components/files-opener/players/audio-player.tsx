@@ -463,7 +463,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
               </div>
             </div>
             <div className="flex items-center">
-              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.duration)}</span>
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.currentTime, audioProps.duration >= 3600)}</span>
               <Range
                 className="w-full my-2"
                 step={0.01}
@@ -471,7 +471,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 progressMouseFoller={true}
                 onChange={updateAudioPercent}
               />
-              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.currentTime, audioProps.duration >= 3600)}</span>
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.duration)}</span>
             </div>
             {src && (
               <audio
