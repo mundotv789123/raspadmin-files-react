@@ -57,7 +57,7 @@ export default function Range({
       <div className="w-full relative">
         <div className="h-5 flex flex-col items-center group">
           <div className="flex w-full h-5 items-center absolute -z-0 px-2">
-            <div className="flex w-full h-1/3 bg-zinc-400 shadow-md items-center rounded-md" ref={progressRef}>
+            <div className="flex w-full h-1/3 bg-zinc-400 shadow-md items-center rounded-md overflow-hidden group-hover:overflow-visible" ref={progressRef}>
               <div
                 className="bg-white h-full flex overflow-visible rounded-s-md"
                 style={{ width: `${percentState}%` }}
@@ -74,9 +74,9 @@ export default function Range({
             min={0}
             max={100}
             onChange={handlerChange}
-            onMouseMove={handlerMouseMove}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
+            onPointerMove={handlerMouseMove}
+            onPointerEnter={onMouseEnter}
+            onPointerLeave={onMouseLeave}
           />
         </div>
       </div>

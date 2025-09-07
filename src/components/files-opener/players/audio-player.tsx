@@ -164,6 +164,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
     if (audioProps.error) {
       audioRef.current.load();
+      audioRef.current.currentTime = audioProps.currentTime;
       setAudioProps((prev) => ({ ...prev, error: null, loading: true }));
       return;
     }
@@ -335,14 +336,15 @@ export default function AudioPlayer({ filesList }: PropsType) {
         {playlist && (
           <Playlist
             playlist={playlist}
-            title="Lista de áudios"
+            title="Playlist"
             onClick={setFile}
             onClose={togglePlaylist}
             playing={file}
             classList={audioControls.playlistOpened ? "" : "hidden"}
+            hidden={audioControls.hideTitle}
           />
         )}
-        <div className="grid bg-black bg-opacity-45 border-1 border-zinc-400 bg-gradient-to-r from-zinc-500/25 to-zinc-900/25 backdrop-blur-sm animate-transform-from-bottom">
+        <div className="grid bg-black/45 border-[1px] border-zinc-400 bg-gradient-to-r from-zinc-800 to-zinc-900 animate-transform-from-bottom">
           <div className="flex justify-end">
             <button onClick={handlerCloseFile} className="mb-auto">
               <FontAwesomeIcon
@@ -353,13 +355,12 @@ export default function AudioPlayer({ filesList }: PropsType) {
           </div>
           <div className="w-full flex flex-col flex-grow px-4">
             <div className="w-full flex flex-col md:flex-row mb-0 mt-0 md:mb-2">
-              <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center md:mb-0 p-4 rounded-lg border-1 border-zinc-600 md:p-0 bg-stone-900 bg-opacity-40 md:bg-transparent md:border-none">
+              <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center md:mb-0 p-4 rounded-lg border-[1px] border-zinc-600 md:p-0 bg-stone-900/40 md:bg-transparent md:border-none">
                 <div className="flex flex-col justify-center items-center w-14 h-14 md:w-12 md:h-12 overflow-hidden rounded-md">
                   <Image
                     src={!file.icon ? "/img/icons/music.svg" : file.icon}
                     alt={file.name}
-                    className={`h-full w-full top-0 left-0 object-cover ${audioControls.hideTitle ? "blur-sm" : ""
-                      }`}
+                    className={`h-full w-full top-0 left-0 object-cover ${audioControls.hideTitle ? "blur-sm" : ""}`}
                     width={512}
                     height={512}
                     unoptimized
@@ -463,7 +464,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
               </div>
             </div>
             <div className="flex items-center">
-              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.duration)}</span>
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.currentTime, audioProps.duration >= 3600)}</span>
               <Range
                 className="w-full my-2"
                 step={0.01}
@@ -471,7 +472,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 progressMouseFoller={true}
                 onChange={updateAudioPercent}
               />
-              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.currentTime, audioProps.duration >= 3600)}</span>
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(audioProps.duration)}</span>
             </div>
             {src && (
               <audio
