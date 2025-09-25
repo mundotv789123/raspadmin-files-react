@@ -20,8 +20,10 @@ class SortByDateStrategy implements SortStrategy {
       if (!a.updated_at) return 1;
       if (!b.updated_at) return -1;
 
-      if (a.is_dir == b.is_dir)
+      if (a.is_dir == b.is_dir) {
+        if (a.updated_at === b.updated_at) return 0;
         return a.updated_at > b.updated_at ? 1 : -1;
+      }
       return a.is_dir ? -1 : 1;
     });
   }
