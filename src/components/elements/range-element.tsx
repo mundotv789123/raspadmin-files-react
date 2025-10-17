@@ -26,7 +26,7 @@ export default function Range({
 
   const [percentState, setPercent] = useState(percent ?? 0);
   const [percentMouseFollower, setPercentMouseFollower] = useState(50);
-  
+
   const percentMouseCalculated = useMemo(() => percentMouseFollower > percentState ? percentMouseFollower - percentState : 0, [percentState, percentMouseFollower]);
 
   useEffect(() => {

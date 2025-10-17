@@ -9,6 +9,7 @@ import { useLocalStorage } from "@/hooks/local-storange-hook";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
 import { ThumbGenerator } from "@/components/elements/thumb-generator";
 import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
+import { formatSecondsToTime } from "@/helpers/time-formatter-helper";
 
 const isVideo = (type: string) => type.match(/video\/(mp4|webm|ogg|mkv)/);
 const speedsSelector = [0.25, 0.50, 0.75, 1, 1.25, 1.50, 1.75, 2];
@@ -313,14 +314,17 @@ export default function VideoPlayer({ filesList }: PropsType) {
         <div className="flex flex-col px-4 justify-center bg-gradient-to-t from-black/70 to-transparent">
           <div className="w-full">
             <ThumbGenerator ref={videoThumbRef} src={file.src} time={videoProps.thumbTime} />
-            <div className="w-full">
+            <div className="w-full flex items-center">
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(videoProps.currentTime, videoProps.duration >= 3600)}</span>
               <Range
+                className="w-full"
                 percent={videoProps.currentTime / videoProps.duration * 100}
                 progressMouseFoller={true}
                 onChange={updateVideoPercent}
                 onMouseLeave={handlerThumbMouseLeave}
                 onMouseMove={handlerThumbMouseMove}
               />
+              <span className="text-gray-400 text-sm">{formatSecondsToTime(videoProps.duration)}</span>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 w-full px-2">
               <div className="hidden md:block"></div>
