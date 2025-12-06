@@ -24,7 +24,7 @@ export function ThumbGenerator({ ref, src, time }: PropsType) {
 
   return (
     <div
-      className="fixed bottom-24 bg-black bg-opacity-50 p-3 hidden backdrop-blur-sm shadow-sm border-gray-400 border"
+      className="fixed bottom-24 bg-black/50 p-3 hidden backdrop-blur-sm shadow-sm border-gray-400 border"
       ref={ref}
     >
       <video

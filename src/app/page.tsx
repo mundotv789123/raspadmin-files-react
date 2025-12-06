@@ -93,11 +93,11 @@ export default function Home() {
   }, [path, filesService])
 
   return (
-    <div className="grid grid-cols-[0_auto] md:grid-cols-[14rem_auto] grid-rows-[64px_auto] h-screen bg-black bg-opacity-40 transition-all ease-in-out">
-      <header className="flex items-center justify-center bg-black bg-opacity-50 overflow-hidden">
+    <div className="grid grid-cols-[0_auto] md:grid-cols-[14rem_auto] grid-rows-[64px_auto] h-screen bg-black/40 transition-all ease-in-out">
+      <header className="flex items-center justify-center bg-black/50 overflow-hidden">
         <a className="text-2xl text-center font-bold" href="#">RaspAdmin</a>
       </header>
-      <nav className="grid grid-cols-[1.75rem_calc(100%-8.75rem)_7rem] items-center px-8 bg-black bg-opacity-50 overflow-x-auto">
+      <nav className="grid grid-cols-[1.75rem_calc(100%-8.75rem)_7rem] items-center px-8 bg-black/50 overflow-x-auto">
         <div>
           <button onClick={() => setFilesBar(!filesBar)} className="text-lg me-2">
             <FontAwesomeIcon icon={faBars} className="md:hidden" />
@@ -116,28 +116,28 @@ export default function Home() {
           <input
             type="text"
             placeholder="pesquisar"
-            className="w-28 focus:w-44 transition-all ease-in-out outline-none bg-zinc-600 p-1 py-0.5 text-white bg-opacity-45 border border-white backdrop-blur-sm rounded-md"
+            className="w-28 focus:w-44 transition-all ease-in-out outline-none bg-zinc-600 p-1 py-0.5 text-white/45 border border-white rounded-md"
             onInput={(e) => setFilter(e.currentTarget.value)}
             ref={filterInputRef}
           />
         </div>
       </nav>
-      <aside className="bg-black bg-opacity-50 overflow-y-auto">
+      <aside className="bg-black/50 overflow-y-auto">
         <div className="flex flex-col">
           {filesTab?.map((file, key) =>
-            (<a href={file.href} className="text-lg font-bold hover:bg-white hover:bg-opacity-30 p-2" key={key}>{file.name}</a>)
+            (<a href={file.href} className="text-lg font-bold hover:bg-white/30 p-2" key={key}>{file.name}</a>)
           )}
         </div>
-        <div className={`fixed top-0 bottom-0 left-0 right-0 transform md:hidden bg-black bg-opacity-30 backdrop-blur-sm flex z-30 ${filesBar ? '' : 'hidden'}`}>
-          <div className={`w-56 flex flex-col bg-black h-screen bg-opacity-40 ${filesBar ? 'animate-transform-from-start' : ''}`}>
+        <div className={`fixed top-0 bottom-0 left-0 right-0 transform md:hidden bg-zinc-900/50 flex z-30 ${filesBar ? '' : 'hidden'}`}>
+          <div className={`w-56 flex flex-col bg-zinc-900 h-screen ${filesBar ? 'animate-transform-from-start' : ''}`}>
             {filesTab?.map((file, key) =>
-              (<a href={file.href} className="text-lg font-bold hover:bg-white hover:bg-opacity-30 p-2" key={key}>{file.name}</a>)
+              (<a href={file.href} className="text-lg font-bold hover:bg-white/30 p-2" key={key}>{file.name}</a>)
             )}
           </div>
           <div onClick={() => setFilesBar(false)} className="flex-grow" />
         </div>
       </aside>
-      <main className="overflow-y-auto bg-zinc-800 bg-opacity-30">
+      <main className="overflow-y-auto bg-zinc-800/30">
         <FileOpener />
         {!loading && errorMessage && <h1 className="text-xl font-bold text-center mt-1">{errorMessage}</h1>}
         {loading && <div className="m-2"><div className="bg-white h-2 animate-loading"></div></div>}

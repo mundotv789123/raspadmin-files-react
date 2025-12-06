@@ -121,7 +121,7 @@ export default function FilesViewer({ hidden, filter }: PropsType) {
   return (
     <>
       <div
-        className="fixed z-20 bg-black bg-opacity-50 p-3 hidden backdrop-blur-sm shadow-sm border-gray-400 border w-96 max-w-full"
+        className="fixed z-20 bg-black/50 p-3 hidden shadow-sm border-gray-400 border w-96 max-w-full"
         ref={dropdownRef}
       >
         {fileSelected && (
@@ -149,7 +149,7 @@ export default function FilesViewer({ hidden, filter }: PropsType) {
         </p>
         <div className="flex gap-1">
           <select
-            className="bg-black bg-opacity-25 p-1 rounded-sm w-full my-1 border-gray-400 border"
+            className="bg-black/25 p-1 rounded-sm w-full my-1 border-gray-400 border"
             onChange={(e) => changeSortStrategy(e.target.value)}
             value={sortStrategyName}
           >
@@ -159,7 +159,7 @@ export default function FilesViewer({ hidden, filter }: PropsType) {
         </div>
         {fileSelected && !fileSelected.is_dir && (
           <button
-            className="bg-black bg-opacity-25 w-full p-1 border-gray-400 border hover:bg-opacity-40"
+            className="bg-black/25 w-full p-1 border-gray-400 border hover:bg-black/40"
             onClick={() =>
               fileSelected && FileDownloadHelper.downloadFile(fileSelected)
             }
@@ -171,7 +171,7 @@ export default function FilesViewer({ hidden, filter }: PropsType) {
       <div className="grid grid-cols-2 lg:grid-cols-7 md:grid-cols-5 sm:grid-cols-3 gap-4 p-2">
         {(hidden ? [] : filesList).map((file, index) => (
           <a
-            className="p-2 hover:shadow-xl cursor-pointer hover:bg-white hover:bg-opacity-30 hover:z-10 transition-colors duration-300"
+            className="p-2 hover:shadow-xl cursor-pointer hover:bg-white/30 hover:z-10 transition-colors duration-300"
             key={index}
             href={file.href}
             onClick={(e) => openFileHandler(e, file)}

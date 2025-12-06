@@ -291,7 +291,7 @@ export default function VideoPlayer({ filesList }: PropsType) {
         ref={videoRef}
       />
       <div className="absolute w-full h-full grid grid-rows-[4rem_calc(100%_-10rem)_6rem]" ref={controlsRef}>
-        <div className="flex px-2 bg-opacity-30 items-center bg-gradient-to-t from-transparent to-black/70">
+        <div className="flex px-2 items-center bg-gradient-to-t from-transparent to-black/70">
           <button onClick={handlerCloseFile} className="text-2xl mx-2 absolute">
             <FontAwesomeIcon icon={faXmark} />
           </button>
@@ -299,18 +299,18 @@ export default function VideoPlayer({ filesList }: PropsType) {
         </div>
         <div className="flex justify-center items-center">
           {videoProps.loading ? <div className="w-24 h-24 border-8 rounded-full border-white border-t-transparent animate-spin" ></div> : <div className="text-2xl lg:text-5xl flex gap-8 items-center">
-            <button className="rounded-full bg-black bg-opacity-30 w-14 h-14 lg:w-20 lg:h-20" onClick={backward}>
+            <button className="rounded-full bg-black/30 w-14 h-14 lg:w-20 lg:h-20" onClick={backward}>
               <FontAwesomeIcon icon={faRotateBack} />
             </button>
-            <button className="text-6xl lg:text-8xl rounded-full bg-black bg-opacity-30 w-24 h-24 lg:w-32 lg:h-32" onClick={togglePlay}>
+            <button className="text-6xl lg:text-8xl rounded-full bg-black/30 w-24 h-24 lg:w-32 lg:h-32" onClick={togglePlay}>
               <FontAwesomeIcon icon={videoProps.playing ? faPause : faPlay} />
             </button>
-            <button className="rounded-full bg-black bg-opacity-30 w-14 h-14 lg:w-20 lg:h-20" onClick={forward}>
+            <button className="rounded-full bg-black/30 w-14 h-14 lg:w-20 lg:h-20" onClick={forward}>
               <FontAwesomeIcon icon={faRotateForward} />
             </button>
           </div>}
         </div>
-        <div className="bg-opacity-30 flex flex-col px-4 justify-center bg-gradient-to-t from-black/70 to-transparent">
+        <div className="flex flex-col px-4 justify-center bg-gradient-to-t from-black/70 to-transparent">
           <div className="w-full">
             <ThumbGenerator ref={videoThumbRef} src={file.src} time={videoProps.thumbTime} />
             <div className="w-full">
