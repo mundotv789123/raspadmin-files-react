@@ -8,9 +8,9 @@ const API_QUERY = process.env.NEXT_PUBLIC_API_QUERY ?? "?path={0}"
 const SRC_QUERY = process.env.NEXT_PUBLIC_SRC_QUERY ?? "?path={0}"
 
 class FilesService extends ApiBaseService {
-  
+
   constructor(private authService: AuthService) { super() }
-  
+
   async getFiles(path: string): Promise<Array<FileDTO>> {
     const endpoint = API_QUERY.replace('{0}', encodeURIComponent(path).replace("%2F", "/"));
     const response = await this.callRefreshToken<FilesResponse>(() =>
@@ -18,7 +18,7 @@ class FilesService extends ApiBaseService {
       async () => {
         const refreshToken = localStorage.getItem('token');
         if (refreshToken) {
-          return this.authService.refresh({token: refreshToken});
+          return this.authService.refresh({ token: refreshToken });
         }
       })
 

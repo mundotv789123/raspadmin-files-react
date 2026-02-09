@@ -3,14 +3,12 @@ import ApiBaseService, { ApiError } from "../api-base-service";
 import { LoginRequest, LoginResponse, RefreshTokenRequest } from "../models/auth-models";
 
 export class AuthService extends ApiBaseService {
-  private static timeoutRefreshToken: NodeJS.Timeout | null = null;
+  private timeoutRefreshToken: NodeJS.Timeout | null = null;
 
   constructor() {
     super();
-    if (!AuthService.timeoutRefreshToken) {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        this.timeoutToRefreshToken(1)
-      }
+    if (typeof window !== 'undefined' && window.localStorage) {
+      this.timeoutToRefreshToken(1)
     }
   }
 
@@ -20,6 +18,8 @@ export class AuthService extends ApiBaseService {
 
     const tokenData = this.decodeJwtToken(response.token);
     localStorage.setItem('token_exp', tokenData!.exp.toString());
+
+    this.timeoutToRefreshToken();
 
     return response;
   }
@@ -51,10 +51,10 @@ export class AuthService extends ApiBaseService {
     let time = tokenExp - currentTime;
     time = (time < 0 ? 0 : time * .9) + timePlus
 
-    if (AuthService.timeoutRefreshToken) {
-      clearTimeout(AuthService.timeoutRefreshToken);
+    if (this.timeoutRefreshToken) {
+      clearTimeout(this.timeoutRefreshToken);
     }
-    AuthService.timeoutRefreshToken = setTimeout(() => {
+    this.timeoutRefreshToken = setTimeout(() => {
       const refreshToken = localStorage.getItem('token');
       if (refreshToken) {
         this.refresh({ token: refreshToken })
@@ -77,6 +77,8 @@ export class AuthService extends ApiBaseService {
   }
 }
 
-export default function useFilesService() {
-  return useMemo(() => new AuthService(), []);
+const authService = new AuthService();
+
+export default function useAuthService() {
+  return useMemo(() => authService, []);
 }
