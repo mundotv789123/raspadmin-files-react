@@ -4,7 +4,7 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
 
-const isDocument = (type: string) => type.match(/application\/(pdf)/);
+const isDocument = (type: string) => new RegExp(/application\/(pdf)/).exec(type);
 
 export default function DocumentViewer() {
   const [file, setFile] = useState<FileDTO | null>(null);

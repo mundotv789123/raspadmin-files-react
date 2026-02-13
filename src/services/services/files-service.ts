@@ -9,7 +9,7 @@ const SRC_QUERY = process.env.NEXT_PUBLIC_SRC_QUERY ?? "?path={0}"
 
 class FilesService extends ApiBaseService {
 
-  constructor(private authService: AuthService) { super() }
+  constructor(private readonly authService: AuthService) { super() }
 
   async getFiles(path: string): Promise<Array<FileDTO>> {
     const endpoint = API_QUERY.replace('{0}', encodeURIComponent(path).replace("%2F", "/"));

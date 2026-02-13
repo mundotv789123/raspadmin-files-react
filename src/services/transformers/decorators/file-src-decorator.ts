@@ -2,7 +2,7 @@ import { FileDTO } from "@/services/models/files-model";
 import { Component, Decorator } from "../files-transformers-base";
 
 export class FileSrcTransformer extends Decorator {
-  constructor(compoment: Component, private apiUrl: string) {
+  constructor(compoment: Component, private readonly apiUrl: string) {
     super(compoment);
   }
 

@@ -7,7 +7,7 @@ export class AuthService extends ApiBaseService {
 
   constructor() {
     super();
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (globalThis.window !== undefined && globalThis.localStorage) {
       this.timeoutToRefreshToken(1)
     }
   }

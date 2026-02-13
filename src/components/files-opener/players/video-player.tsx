@@ -11,8 +11,8 @@ import { ThumbGenerator } from "@/components/elements/thumb-generator";
 import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 import { formatSecondsToTime } from "@/helpers/time-formatter-helper";
 
-const isVideo = (type: string) => type.match(/video\/(mp4|webm|ogg|mkv)/);
-const speedsSelector = [0.25, 0.50, 0.75, 1, 1.25, 1.50, 1.75, 2];
+const isVideo = (type: string) => new RegExp(/video\/(mp4|webm|ogg|mkv)/).exec(type);
+const speedsSelector = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
 let cursorTimeout = 0;
 
@@ -75,7 +75,7 @@ export default function VideoPlayer({ filesList }: PropsType) {
         cursorTimeoutExec();
         return;
       }
-      if (!videoRef.current || videoRef.current!.paused)
+      if (!videoRef.current || videoRef.current.paused)
         return;
       controlsRef.current!.classList.add('hidden');
     }, 1000);
@@ -98,9 +98,9 @@ export default function VideoPlayer({ filesList }: PropsType) {
     setVideoProps({
       loading: false,
       speedOpen: false,
-      playing: !videoRef.current!.paused,
-      duration: videoRef.current!.duration,
-      currentTime: videoRef.current!.currentTime,
+      playing: !videoRef.current.paused,
+      duration: videoRef.current.duration,
+      currentTime: videoRef.current.currentTime,
     });
   }
 
@@ -182,13 +182,13 @@ export default function VideoPlayer({ filesList }: PropsType) {
       return;
     }
     const orientation = screen.orientation as VideoScreenOrientation;
-    if (!document.fullscreenElement) {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+      orientation.unlock();
+    } else {
       containerRef.current.requestFullscreen();
       if (orientation.lock)
         orientation.lock('landscape');
-    } else {
-      document.exitFullscreen();
-      orientation.unlock();
     }
   }
 
@@ -345,10 +345,10 @@ export default function VideoPlayer({ filesList }: PropsType) {
                 <div className="flex text-2xl gap-2">
                   <div className="flex flex-col justify-center items-center">
                     {videoProps.speedOpen && <div className="absolute bg-zinc-700 p-2 text-sm flex flex-col font-bold bottom-20 rounded-lg gap-1">
-                      {speedsSelector.map((sp, key) =>
+                      {speedsSelector.map((sp) =>
                         <button
                           className={`px-8 py-1 hover:bg-zinc-400 rounded ${videoControls.speed == sp ? 'bg-slate-500' : ''}`}
-                          key={key}
+                          key={sp}
                           onClick={() => setVideoControls(prev => ({ ...prev, speed: sp }))}>
                           {sp.toLocaleString()}x
                         </button>

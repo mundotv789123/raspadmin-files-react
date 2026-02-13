@@ -6,7 +6,7 @@ type PropsType = {
   time?: number;
 };
 
-export function ThumbGenerator({ ref, src, time }: PropsType) {
+export function ThumbGenerator({ ref, src, time }: Readonly<PropsType>) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {

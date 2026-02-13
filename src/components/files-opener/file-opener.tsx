@@ -11,8 +11,8 @@ import fileUpdateEvent from "@/events/FileUpdateEvent";
 import { createPortal } from "react-dom";
 
 export default function FileOpener() {
-  const isClient = typeof window !== 'undefined';
-  const [filesList, setFileList] = useState<Array<FileDTO>>();
+  const isClient = globalThis.window !== undefined;
+  const [filesList, setFilesList] = useState<Array<FileDTO>>();
 
   useEffect(() => {
     const handler = (files: Array<FileDTO>) => {
@@ -20,7 +20,7 @@ export default function FileOpener() {
         ? JSON.parse(localStorage.getItem("sort_by")!)
         : "name";
       const newPlaylist = SortFactory(orderBy).sort(files);
-      setFileList(newPlaylist);
+      setFilesList(newPlaylist);
     };
 
     fileUpdateEvent.addListener("list", handler);

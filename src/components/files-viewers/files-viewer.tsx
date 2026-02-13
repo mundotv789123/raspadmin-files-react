@@ -12,11 +12,11 @@ type PropsType = {
   filter?: string;
 };
 
-export default function FilesViewer({ hidden, filter }: PropsType) {
+export default function FilesViewer({ hidden, filter }: Readonly<PropsType>) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [fileSelected, setFileSelected] = useState<FileDTO | null>(null);
 
-  const [filesListOrig, setFileListOrig] = useState<Array<FileDTO>>();
+  const [filesListOrig, setFilesListOrig] = useState<Array<FileDTO>>();
   const [sortStrategyName, setSortStrategyName] = useLocalStorage<string>(
     "sort_by",
     "name"
@@ -42,7 +42,7 @@ export default function FilesViewer({ hidden, filter }: PropsType) {
 
   useEffect(() => {
     const handler = (files: Array<FileDTO>) => {
-      setFileListOrig(files);
+      setFilesListOrig(files);
     };
 
     fileUpdateEvent.addListener("list", handler);
@@ -100,7 +100,7 @@ export default function FilesViewer({ hidden, filter }: PropsType) {
       posY = posY - dropdownHeight;
     }
 
-    dropdown.style.left = (posX < 0 ? 0 : posX) + "px";
+    dropdown.style.left = (Math.max(posX, 0)) + "px";
     dropdown.style.top = posY + "px";
   }
 
@@ -169,10 +169,10 @@ export default function FilesViewer({ hidden, filter }: PropsType) {
         )}
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-7 md:grid-cols-5 sm:grid-cols-3 gap-4 p-2">
-        {(hidden ? [] : filesList).map((file, index) => (
+        {(hidden ? [] : filesList).map((file) => (
           <a
             className="p-2 hover:shadow-xl cursor-pointer hover:bg-white/30 hover:z-10 transition-colors duration-300"
-            key={index}
+            key={file.path}
             href={file.href}
             onClick={(e) => openFileHandler(e, file)}
             onContextMenu={(e) => showDropDown(e, file)}

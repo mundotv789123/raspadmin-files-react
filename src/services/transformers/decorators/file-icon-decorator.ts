@@ -4,7 +4,7 @@ import { Component, Decorator } from "../files-transformers-base";
 const iconsPath = "/img/icons/";
 
 export class FileIconTransformer extends Decorator {
-  constructor(compoment: Component, private apiUrl: string) {
+  constructor(compoment: Component, private readonly apiUrl: string) {
     super(compoment);
   }
 

@@ -24,7 +24,7 @@ import fileUpdateEvent, { FileOpenEvent } from "@/events/FileUpdateEvent";
 import { formatSecondsToTime } from "@/helpers/time-formatter-helper";
 
 const isAudio = (type: string) =>
-  type.match(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/);
+  new RegExp(/audio\/(mpeg|mp3|ogg|(x-(pn-)?)?wav)/).exec(type);
 
 type PropsType = {
   filesList?: Array<FileDTO>;
@@ -89,9 +89,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
       duration: audioRef.current!.duration,
     }));
 
-    if (!navigator.mediaSession.metadata) {
-      navigator.mediaSession.metadata = new MediaMetadata();
-    }
+    navigator.mediaSession.metadata ??= new MediaMetadata();
     navigator.mediaSession.metadata.title = audioControls.hideTitle
       ? "Raspadmin Music Player"
       : file!.name;
@@ -358,7 +356,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
               <div className="w-full md:w-1/3 md:grid-cols-[3rem_calc(100%_-_3rem)] grid grid-cols-[3.5rem_calc(100%_-_3rem)]  gap-2 items-center md:mb-0 p-4 rounded-lg border-[1px] border-zinc-600 md:p-0 bg-stone-900/40 md:bg-transparent md:border-none">
                 <div className="flex flex-col justify-center items-center w-14 h-14 md:w-12 md:h-12 overflow-hidden rounded-md">
                   <Image
-                    src={!file.icon ? "/img/icons/music.svg" : file.icon}
+                    src={file.icon ? file.icon : "/img/icons/music.svg"}
                     alt={file.name}
                     className={`h-full w-full top-0 left-0 object-cover ${audioControls.hideTitle ? "blur-sm" : ""}`}
                     width={512}

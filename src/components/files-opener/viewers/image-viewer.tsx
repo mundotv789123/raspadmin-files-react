@@ -7,7 +7,7 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons/faXmark";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
 
-const isImage = (type: string) => type.match(/image\/([a-z]{1,4})/);
+const isImage = (type: string) => new RegExp(/image\/([a-z]{1,4})/).exec(type);
 
 type PropsType = {
   filesList?: Array<FileDTO>;

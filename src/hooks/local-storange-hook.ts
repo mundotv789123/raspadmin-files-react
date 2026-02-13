@@ -3,7 +3,7 @@
 import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, Dispatch<SetStateAction<T>>] {
-  const isClient = typeof window !== 'undefined';
+  const isClient = globalThis.window !== undefined;
 
   const [state, setState] = useState<T>(() => {
     if (!isClient)

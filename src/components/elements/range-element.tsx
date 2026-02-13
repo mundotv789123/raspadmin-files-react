@@ -20,17 +20,17 @@ export default function Range({
   onMouseMove,
   onMouseEnter,
   onMouseLeave,
-}: PropsType) {
+}: Readonly<PropsType>) {
   const inputRef = useRef<HTMLInputElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
 
-  const [percentState, setPercent] = useState(percent ?? 0);
+  const [percentState, setPercentState] = useState(percent ?? 0);
   const [percentMouseFollower, setPercentMouseFollower] = useState(50);
 
   const percentMouseCalculated = useMemo(() => percentMouseFollower > percentState ? percentMouseFollower - percentState : 0, [percentState, percentMouseFollower]);
 
   useEffect(() => {
-    setPercent(percent ?? 0);
+    setPercentState(percent ?? 0);
   }, [percent]);
 
   function handlerChange() {
@@ -38,14 +38,14 @@ export default function Range({
     if (onChange && !onChange(newValue)) {
       return;
     }
-    setPercent(newValue);
+    setPercentState(newValue);
   }
 
   function handlerMouseMove(e: MouseEvent<HTMLInputElement>) {
     if (progressMouseFoller) {
       const rect = progressRef.current!.getBoundingClientRect();
       const perc = ((e.clientX - rect.left) * 100 / (rect.right - rect.left));
-      setPercentMouseFollower(perc < 0 ? 0 : perc > 100 ? 100 : perc);
+      setPercentMouseFollower(perc < 0 ? 0 : Math.max(perc, 100));
     } else if (percentMouseFollower > 0) {
       setPercentMouseFollower(0);
     }

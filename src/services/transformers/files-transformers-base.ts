@@ -5,7 +5,7 @@ export interface Component {
 }
 
 export class FileTransformerComponent implements Component {
-  constructor(private file: FileDTO) { }
+  constructor(private readonly file: FileDTO) { }
 
   transform(): FileDTO {
     return this.file;
@@ -13,7 +13,7 @@ export class FileTransformerComponent implements Component {
 }
 
 export class Decorator implements Component {
-  constructor(private component: Component) { }
+  constructor(private readonly component: Component) { }
 
   public transform(): FileDTO {
     return this.component.transform();

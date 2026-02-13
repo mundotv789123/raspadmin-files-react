@@ -22,13 +22,13 @@ function PlaylistElement({
   hidden = false,
   onClick,
   onClose,
-}: PropsType) {
-  const [playlistState, setPlaylist] = useState(playlist);
-  const [playingState, setPlaying] = useState(playing);
+}: Readonly<PropsType>) {
+  const [playlistState, setPlaylistState] = useState(playlist);
+  const [playingState, setPlayingState] = useState(playing);
 
   useEffect(() => {
-    setPlaylist(playlist);
-    setPlaying(playing);
+    setPlaylistState(playlist);
+    setPlayingState(playing);
   }, [playlist, playing]);
 
   function handlerClick(file: FileDTO) {
