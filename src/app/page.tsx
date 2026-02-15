@@ -32,20 +32,15 @@ export default function Home() {
   }
 
   useEffect(() => {
-    setTimeout(() => {
-      filesService.getFiles("/").then(files => {
-        setFilesTab(SortFactory().sort(files));
-      }).catch(error => {
-        if (error.status == 401) {
-          setLoginRequired(true);
-        }
-      });
-
-      updateHashHandler();
-    }, 500);
+    filesService.getFiles("/").then(files => {
+      setFilesTab(SortFactory().sort(files));
+    }).catch(error => {
+      if (error.status == 401) {
+        setLoginRequired(true);
+      }
+    }).finally(updateHashHandler);
 
     globalThis.addEventListener('hashchange', updateHashHandler);
-
     return () => {
       globalThis.removeEventListener('hashchange', updateHashHandler);
     }
