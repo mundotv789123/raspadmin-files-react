@@ -10,10 +10,11 @@ export class FileIconTransformer extends Decorator {
 
   public transform(): FileDTO {
     const file = super.transform();
+    file.fallback_icon = `${iconsPath}${this.getFileIcon(file.is_dir, file.type)}`;
     if (file.icon) {
       file.icon = `${this.apiUrl.replace("{0}", encodeURIComponent(file.icon))}`;
     } else {
-      file.icon = `${iconsPath}${this.getFileIcon(file.is_dir, file.type)}`;
+      file.icon = file.fallback_icon;
     }
     return file;
   }

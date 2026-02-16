@@ -4,6 +4,7 @@ export interface FileDTO {
   is_dir: boolean,
   type: string | null,
   icon: string | null,
+  fallback_icon: string,
   path: string,
   created_at?: Date,
   updated_at?: Date,

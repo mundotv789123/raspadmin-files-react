@@ -186,6 +186,7 @@ export default function FilesViewer({ hidden, filter }: Readonly<PropsType>) {
                   unoptimized
                   width={512}
                   height={512}
+                  onError={(e) => e.currentTarget.src = file.fallback_icon}
                 />
               </div>
               <p

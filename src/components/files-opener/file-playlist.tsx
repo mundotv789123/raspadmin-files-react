@@ -69,6 +69,7 @@ function PlaylistElement({
                   className={`h-full w-full top-0 left-0 object-cover ${hidden ? "blur-sm" : ""}`}
                   width={512}
                   height={512}
+                  onError={(e) => e.currentTarget.src = file.fallback_icon}
                   unoptimized
                 />
               </div>
