@@ -45,7 +45,7 @@ export default function Range({
     if (progressMouseFoller) {
       const rect = progressRef.current!.getBoundingClientRect();
       const perc = ((e.clientX - rect.left) * 100 / (rect.right - rect.left));
-      setPercentMouseFollower(perc < 0 ? 0 : Math.max(perc, 100));
+      setPercentMouseFollower(perc < 0 ? 0 : Math.min(perc, 100));
     } else if (percentMouseFollower > 0) {
       setPercentMouseFollower(0);
     }
