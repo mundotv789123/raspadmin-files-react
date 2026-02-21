@@ -19,8 +19,7 @@ jobs:
   build-node:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Set up environment docker tag
         id: set_env
@@ -48,6 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-node
     steps:
+      - uses: actions/checkout@v6
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -73,6 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-node
     steps:
+      - uses: actions/checkout@v6
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
