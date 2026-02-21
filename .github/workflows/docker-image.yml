@@ -21,17 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Set up environment docker tag
-        id: set_env
-        run: |
-          if [[ "${{ github.ref_name }}" == "develop" ]]; then
-            echo "DOCKER_IMAGE_FILE=Dockerfile.dev" >> $GITHUB_ENV
-            echo "DOCKER_IMAGE_TAG=${{ env.DOCKER_IMAGE_TAG }}:dev" >> $GITHUB_ENV
-
-            echo "DOCKER_GOLANG_FILE=Dockerfile.golang.dev" >> $GITHUB_ENV
-            echo "DOCKER_GOLANG_TAG=${{ env.DOCKER_GOLANG_TAG }}_dev" >> $GITHUB_ENV
-          fi
-
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -54,6 +43,17 @@ jobs:
     needs: build-node
     steps:
       - uses: actions/checkout@v6
+
+      - name: Set up environment docker tag
+        id: set_env
+        run: |
+          if [[ "${{ github.ref_name }}" == "develop" ]]; then
+            echo "DOCKER_IMAGE_FILE=Dockerfile.dev" >> $GITHUB_ENV
+            echo "DOCKER_IMAGE_TAG=${{ env.DOCKER_IMAGE_TAG }}:dev" >> $GITHUB_ENV
+
+            echo "DOCKER_GOLANG_FILE=Dockerfile.golang.dev" >> $GITHUB_ENV
+            echo "DOCKER_GOLANG_TAG=${{ env.DOCKER_GOLANG_TAG }}_dev" >> $GITHUB_ENV
+          fi
 
       - name: Download out folder
         uses: actions/download-artifact@v4
@@ -87,6 +87,17 @@ jobs:
     needs: build-node
     steps:
       - uses: actions/checkout@v6
+
+      - name: Set up environment docker tag
+        id: set_env
+        run: |
+          if [[ "${{ github.ref_name }}" == "develop" ]]; then
+            echo "DOCKER_IMAGE_FILE=Dockerfile.dev" >> $GITHUB_ENV
+            echo "DOCKER_IMAGE_TAG=${{ env.DOCKER_IMAGE_TAG }}:dev" >> $GITHUB_ENV
+
+            echo "DOCKER_GOLANG_FILE=Dockerfile.golang.dev" >> $GITHUB_ENV
+            echo "DOCKER_GOLANG_TAG=${{ env.DOCKER_GOLANG_TAG }}_dev" >> $GITHUB_ENV
+          fi
 
       - name: Download out folder
         uses: actions/download-artifact@v4
