@@ -43,11 +43,24 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Upload out folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: out
+          path: out/
+
   docker-build:
     runs-on: ubuntu-latest
     needs: build-node
     steps:
       - uses: actions/checkout@v6
+
+      - name: Download out folder
+        uses: actions/download-artifact@v4
+        with:
+          name: out
+          path: out/
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -74,6 +87,13 @@ jobs:
     needs: build-node
     steps:
       - uses: actions/checkout@v6
+
+      - name: Download out folder
+        uses: actions/download-artifact@v4
+        with:
+          name: out
+          path: out/
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
