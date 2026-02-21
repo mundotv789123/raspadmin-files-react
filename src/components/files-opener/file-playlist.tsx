@@ -56,9 +56,9 @@ function PlaylistElement({
           </button>
         </div>
         <div className="flex flex-col p-2 overflow-y-auto gap-2">
-          {playlistState.map((file, key) => (
+          {playlistState.map((file) => (
             <div
-              key={key}
+              key={file.name}
               onClick={() => handlerClick(file)}
               className={`grid grid-cols-[2.5rem_calc(100%_-_2.5rem)] cursor-pointer gap-2 p-2 rounded-md hover:bg-stone-600/50 border-[1px] ${file.src == playingState?.src ? 'border-emerald-400 bg-stone-600' : 'border-transparent'}` }
             >

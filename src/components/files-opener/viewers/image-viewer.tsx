@@ -88,9 +88,9 @@ export default function ImageViewer({ filesList }: PropsType) {
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
           <div className="flex gap-2 px-2 py-1 overflow-hidden" ref={imagesRef}>
-            {imagesList?.map((image, index) => (
+            {imagesList?.map((image) => (
               <img
-                key={index}
+                key={image.name}
                 alt={file.name}
                 src={image.src}
                 className={`h-full ${

@@ -77,6 +77,16 @@ export default function AudioPlayer({ filesList }: PropsType) {
     [playlist, audioControls.random]
   );
 
+  const buttonPlayIcon = useMemo(() => {
+    if (audioProps.error) {
+      return faRotateRight;
+    }
+    if (audioProps.playing) {
+      return faPause;
+    }
+    return faPlay;
+  }, [audioProps.error, audioProps.playing])
+
   function handlerAudioLoaded() {
     if (!audioProps.loading) {
       return;
@@ -395,13 +405,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
                       </div>
                     ) : (
                       <FontAwesomeIcon
-                        icon={
-                          audioProps.error
-                            ? faRotateRight
-                            : audioProps.playing
-                              ? faPause
-                              : faPlay
-                        }
+                        icon={buttonPlayIcon}
                       />
                     )}
                   </button>

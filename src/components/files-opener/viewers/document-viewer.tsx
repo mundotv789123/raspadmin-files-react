@@ -44,6 +44,7 @@ export default function DocumentViewer() {
           src={file.src}
           className="w-full h-full"
           ref={documentRef}
+          title={file.name}
         ></iframe>
       </div>
     )
