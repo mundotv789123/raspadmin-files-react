@@ -12,6 +12,9 @@ env:
   DOCKER_IMAGE_TAG: mundotv789123/raspadmin
   DOCKER_USERNAME: mundotv789123
 
+  DOCKER_GOLANG_FILE: Dockerfile.golang
+  DOCKER_GOLANG_TAG: mundotv789123/raspadmin:go
+
 jobs:
   docker-build:
     runs-on: ubuntu-latest
@@ -25,6 +28,9 @@ jobs:
           if [[ "${{ github.ref_name }}" == "develop" ]]; then
             echo "DOCKER_IMAGE_FILE=Dockerfile.dev" >> $GITHUB_ENV
             echo "DOCKER_IMAGE_TAG=${{ env.DOCKER_IMAGE_TAG }}:dev" >> $GITHUB_ENV
+
+            echo "DOCKER_GOLANG_FILE=Dockerfile.golang.dev" >> $GITHUB_ENV
+            echo "DOCKER_GOLANG_TAG=${{ env.DOCKER_GOLANG_TAG }}_dev" >> $GITHUB_ENV
           fi
 
       - name: Set up Node.js
@@ -57,6 +63,15 @@ jobs:
           context: .
           push: true
           tags: "${{ env.DOCKER_IMAGE_TAG }}"
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push golang
+        uses: docker/build-push-action@v5
+        with:
+          file: "${{ env.DOCKER_GOLANG_FILE }}"
+          context: .
+          push: true
+          tags: "${{ env.DOCKER_GOLANG_TAG }}"
           platforms: linux/amd64,linux/arm64
 
   deploy-dev:
