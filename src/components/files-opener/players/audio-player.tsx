@@ -77,15 +77,22 @@ export default function AudioPlayer({ filesList }: PropsType) {
     [playlist, audioControls.random]
   );
 
-  const buttonPlayIcon = useMemo(() => {
+  const ButtonPlayIcon = useMemo(() => {
+    if (audioProps.loading) {
+      return (
+        <div className="flex w-full h-full items-center justify-center">
+          <div className="w-6 h-6 border-4 border-b-transparent border-white rounded-full animate-spin"></div>
+        </div>
+      )
+    }
     if (audioProps.error) {
-      return faRotateRight;
+      return <FontAwesomeIcon icon={faRotateRight} />
     }
     if (audioProps.playing) {
-      return faPause;
+      return <FontAwesomeIcon icon={faPause} />
     }
-    return faPlay;
-  }, [audioProps.error, audioProps.playing])
+    return <FontAwesomeIcon icon={faPlay} />;
+  }, [audioProps.error, audioProps.playing, audioProps.loading])
 
   function handlerAudioLoaded() {
     if (!audioProps.loading) {
@@ -378,8 +385,8 @@ export default function AudioPlayer({ filesList }: PropsType) {
                 <div className="overflow-hidden md:text-left text-center">
                   <h1
                     className={`font-bold overflow-hidden text-nowrap text-ellipsis ${audioControls.hideTitle && !audioProps.error
-                        ? "blur-sm"
-                        : ""
+                      ? "blur-sm"
+                      : ""
                       } ${audioProps.error ? "text-red-400" : ""}`}
                   >
                     {audioProps.error ? audioProps.error : file.name}
@@ -399,15 +406,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
                     onClick={togglePlayAudio}
                     disabled={audioProps.loading}
                   >
-                    {audioProps.loading ? (
-                      <div className="flex w-full h-full items-center justify-center">
-                        <div className="w-6 h-6 border-4 border-b-transparent border-white rounded-full animate-spin"></div>
-                      </div>
-                    ) : (
-                      <FontAwesomeIcon
-                        icon={buttonPlayIcon}
-                      />
-                    )}
+                    {ButtonPlayIcon}
                   </button>
                   <button
                     className="text-2xl w-8 hover:text-stone-300 transition-colors delay-75"
