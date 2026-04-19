@@ -98,14 +98,19 @@ export default function AudioPlayer({ filesList }: PropsType) {
     if (!audioProps.loading) {
       return;
     }
-    setAudioProps((prev) => ({
-      ...prev,
-      loading: false,
-      playing: true,
-      error: null,
-      duration: audioRef.current!.duration,
-    }));
+    
+    setTimeout(() => {
+      setAudioProps((prev) => ({
+        ...prev,
+        loading: false,
+        playing: true,
+        error: null,
+        duration: audioRef.current!.duration,
+      }));
+      audioRef.current?.play();
+    }, 10);
 
+    audioRef.current!.volume = audioControls.muted ? 0 : audioControls.volume;
     navigator.mediaSession.metadata ??= new MediaMetadata();
     navigator.mediaSession.metadata.title = audioControls.hideTitle
       ? "Raspadmin Music Player"
@@ -478,7 +483,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
             </div>
             {src && (
               <audio
-                autoPlay
+                autoPlay={false}
                 src={src}
                 ref={audioRef}
                 className="hidden"

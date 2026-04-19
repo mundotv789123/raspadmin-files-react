@@ -95,13 +95,15 @@ export default function VideoPlayer({ filesList }: PropsType) {
     }
     videoRef.current.playbackRate = videoControls.speed ?? 1;
     videoRef.current.volume = videoControls.muted ? 0 : videoControls.volume;
-    setVideoProps({
-      loading: false,
-      speedOpen: false,
-      playing: !videoRef.current.paused,
-      duration: videoRef.current.duration,
-      currentTime: videoRef.current.currentTime,
-    });
+    setTimeout(() => {
+      setVideoProps({
+        loading: false,
+        speedOpen: false,
+        playing: !videoRef.current!.paused,
+        duration: videoRef.current!.duration,
+        currentTime: videoRef.current!.currentTime,
+      });
+    }, 10);
   }
 
   function handlerUpdateTime() {
