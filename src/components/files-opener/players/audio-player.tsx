@@ -30,8 +30,12 @@ type PropsType = {
   filesList?: Array<FileDTO>;
 };
 
+const MAX_RETRIES = 3;
+
 export default function AudioPlayer({ filesList }: PropsType) {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const retryCountRef = useRef<number>(0);
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [file, setFile] = useState<FileDTO | null>(null);
   const [playlist, setPlaylist] = useState<Array<FileDTO> | null>(null);
@@ -65,8 +69,23 @@ export default function AudioPlayer({ filesList }: PropsType) {
     volume: 0.5,
   });
 
+  const resetTrackState = () => {
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+    retryCountRef.current = 0;
+    setAudioProps({
+      duration: 0,
+      currentTime: 0,
+      playing: false,
+      loading: true,
+      error: null,
+    });
+  };
+
   const audioTimePercent = useMemo(
-    () => audioProps.currentTime / audioProps.duration,
+    () => (audioProps.duration > 0 ? audioProps.currentTime / audioProps.duration : 0),
     [audioProps.duration, audioProps.currentTime]
   );
   const audioPlayList = useMemo(
@@ -95,6 +114,12 @@ export default function AudioPlayer({ filesList }: PropsType) {
   }, [audioProps.error, audioProps.playing, audioProps.loading])
 
   function handlerAudioLoaded() {
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+    retryCountRef.current = 0;
+
     if (!audioProps.loading) {
       return;
     }
@@ -105,34 +130,42 @@ export default function AudioPlayer({ filesList }: PropsType) {
         loading: false,
         playing: true,
         error: null,
-        duration: audioRef.current!.duration,
+        duration: audioRef.current?.duration || 0,
       }));
-      audioRef.current?.play();
+      audioRef.current?.play().catch(() => {});
     }, 10);
 
-    audioRef.current!.volume = audioControls.muted ? 0 : audioControls.volume;
-    navigator.mediaSession.metadata ??= new MediaMetadata();
-    navigator.mediaSession.metadata.title = audioControls.hideTitle
-      ? "Raspadmin Music Player"
-      : file!.name;
-    navigator.mediaSession.metadata.artwork = [
-      {
-        src:
-          !file!.icon || audioControls.hideTitle
-            ? "/img/icons/music.svg"
-            : file!.icon,
-      },
-    ];
-    navigator.mediaSession.metadata.album = file?.parent ?? "";
-    navigator.mediaSession.setPositionState({
-      duration: audioRef.current!.duration,
-    });
+    if (audioRef.current) {
+      audioRef.current.volume = audioControls.muted ? 0 : audioControls.volume;
+    }
+
+    if (file) {
+      navigator.mediaSession.metadata ??= new MediaMetadata();
+      navigator.mediaSession.metadata.title = audioControls.hideTitle
+        ? "Raspadmin Music Player"
+        : file.name;
+      navigator.mediaSession.metadata.artwork = [
+        {
+          src:
+            !file.icon || audioControls.hideTitle
+              ? "/img/icons/music.svg"
+              : file.icon,
+        },
+      ];
+      navigator.mediaSession.metadata.album = file.parent ?? "";
+    }
+
+    if (audioRef.current?.duration) {
+      navigator.mediaSession.setPositionState({
+        duration: audioRef.current.duration,
+      });
+    }
 
     navigator.mediaSession.setActionHandler("previoustrack", backSong);
     navigator.mediaSession.setActionHandler("nexttrack", nextSong);
     navigator.mediaSession.setActionHandler("seekto", function (details) {
-      if (details.seekTime) {
-        audioRef.current!.currentTime = details.seekTime;
+      if (details.seekTime && audioRef.current) {
+        audioRef.current.currentTime = details.seekTime;
       }
     });
   }
@@ -152,6 +185,28 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   function handlerError() {
     const message = audioRef.current?.error?.message;
+
+    if (retryCountRef.current < MAX_RETRIES) {
+      retryCountRef.current += 1;
+
+      setAudioProps((prev) => ({
+        ...prev,
+        loading: true,
+        error: null,
+      }));
+
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+
+      retryTimeoutRef.current = setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.load();
+        }
+      }, 1000);
+      return;
+    }
+
     setAudioProps((prev) => ({
       ...prev,
       loading: false,
@@ -160,15 +215,27 @@ export default function AudioPlayer({ filesList }: PropsType) {
   }
 
   function handlerCloseFile() {
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+    retryCountRef.current = 0;
     if (audioRef.current) {
       audioRef.current.src = "";
     }
+    setAudioProps({
+      duration: 0,
+      currentTime: 0,
+      playing: false,
+      loading: false,
+      error: null,
+    });
     setFile(null);
   }
 
   function updateMediaSessionTime() {
-    const audioElement = audioRef.current!;
-    if (audioElement.duration && audioElement.currentTime) {
+    const audioElement = audioRef.current;
+    if (audioElement && audioElement.duration && audioElement.currentTime) {
       navigator.mediaSession.setPositionState({
         duration: audioElement.duration,
         playbackRate: audioElement.playbackRate,
@@ -183,14 +250,14 @@ export default function AudioPlayer({ filesList }: PropsType) {
     }
 
     if (audioProps.error) {
+      resetTrackState();
+      audioRef.current.currentTime = 0;
       audioRef.current.load();
-      audioRef.current.currentTime = audioProps.currentTime;
-      setAudioProps((prev) => ({ ...prev, error: null, loading: true }));
       return;
     }
 
     if (audioRef.current.paused) {
-      audioRef.current.play();
+      audioRef.current.play().catch(() => {});
       updateMediaSessionTime();
     } else {
       audioRef.current.pause();
@@ -219,7 +286,9 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   function updateAudioPercent(percent: number) {
     const time = audioProps.duration * (percent / 100);
-    audioRef.current!.currentTime = time;
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+    }
     return true;
   }
 
@@ -228,19 +297,20 @@ export default function AudioPlayer({ filesList }: PropsType) {
       return;
     }
 
-    let nextSong = 0;
+    let nextSongIndex = 0;
 
     const fileE = audioPlayList.filter((f) => f.src == file.src);
     if (fileE.length == 1) {
-      nextSong = audioPlayList.indexOf(fileE[0]);
-      if (nextSong + 1 >= audioPlayList.length) {
-        nextSong = 0;
+      nextSongIndex = audioPlayList.indexOf(fileE[0]);
+      if (nextSongIndex + 1 >= audioPlayList.length) {
+        nextSongIndex = 0;
       } else {
-        nextSong++;
+        nextSongIndex++;
       }
     }
 
-    setFile(audioPlayList[nextSong]);
+    resetTrackState();
+    setFile(audioPlayList[nextSongIndex]);
   }
 
   function backSong() {
@@ -248,17 +318,21 @@ export default function AudioPlayer({ filesList }: PropsType) {
       return;
     }
     if (audioProps.currentTime >= 3) {
-      audioRef.current!.currentTime = 0;
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+      }
+      setAudioProps((prev) => ({ ...prev, currentTime: 0 }));
       return;
     }
 
-    let backSong = audioPlayList.indexOf(file);
-    if (backSong <= 0) {
-      backSong = audioPlayList.length - 1;
+    let backSongIndex = audioPlayList.indexOf(file);
+    if (backSongIndex <= 0) {
+      backSongIndex = audioPlayList.length - 1;
     } else {
-      backSong--;
+      backSongIndex--;
     }
-    setFile(audioPlayList[backSong]);
+    resetTrackState();
+    setFile(audioPlayList[backSongIndex]);
   }
 
   useEffect(() => {
@@ -270,7 +344,22 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
       event.eventCalled = true;
       if (event.file.src == file?.src) {
-        audioRef.current!.currentTime = 0;
+        if (retryTimeoutRef.current) {
+          clearTimeout(retryTimeoutRef.current);
+          retryTimeoutRef.current = null;
+        }
+        retryCountRef.current = 0;
+        if (audioRef.current) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.load();
+        }
+        setAudioProps({
+          duration: 0,
+          currentTime: 0,
+          playing: false,
+          loading: true,
+          error: null,
+        });
         return;
       }
 
@@ -280,6 +369,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
         );
       }
 
+      resetTrackState();
       setFile(event.file);
     };
 
@@ -311,15 +401,31 @@ export default function AudioPlayer({ filesList }: PropsType) {
 
   useEffect(() => {
     if (!file) {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      retryCountRef.current = 0;
       setSrc("");
       setPlaylist(null);
       navigator.mediaSession.metadata = null;
       return;
     }
     if (src != file.src) {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      retryCountRef.current = 0;
       setSrc("");
+      setAudioProps({
+        duration: 0,
+        currentTime: 0,
+        playing: false,
+        loading: true,
+        error: null,
+      });
       setTimeout(() => {
-        setAudioProps((prev) => ({ ...prev, loading: true }));
         setSrc(file.src);
       }, 100);
     }
@@ -346,6 +452,14 @@ export default function AudioPlayer({ filesList }: PropsType) {
       ? "playing"
       : "paused";
   }, [audioControls, audioProps.loading, audioProps.playing, file, src]);
+
+  useEffect(() => {
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     file && (
