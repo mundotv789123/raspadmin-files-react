@@ -16,7 +16,7 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Playlist from "../file-playlist";
 import Image from "next/image";
 import { SortFactory } from "@/services/strategies/order-by-strategies";
@@ -102,16 +102,65 @@ export default function AudioPlayer({ filesList }: PropsType) {
         <div className="flex w-full h-full items-center justify-center">
           <div className="w-6 h-6 border-4 border-b-transparent border-white rounded-full animate-spin"></div>
         </div>
-      )
+      );
     }
     if (audioProps.error) {
-      return <FontAwesomeIcon icon={faRotateRight} />
+      return <FontAwesomeIcon icon={faRotateRight} />;
     }
     if (audioProps.playing) {
-      return <FontAwesomeIcon icon={faPause} />
+      return <FontAwesomeIcon icon={faPause} />;
     }
     return <FontAwesomeIcon icon={faPlay} />;
-  }, [audioProps.error, audioProps.playing, audioProps.loading])
+  }, [audioProps.error, audioProps.playing, audioProps.loading]);
+
+  const nextSongRef = useRef<() => void>(() => {});
+  const backSongRef = useRef<() => void>(() => {});
+  const togglePlayAudioRef = useRef<() => void>(() => {});
+
+  function updateMediaSessionTime() {
+    if (typeof window === "undefined" || !("mediaSession" in navigator)) {
+      return;
+    }
+    const audioElement = audioRef.current;
+    if (
+      audioElement &&
+      audioElement.duration &&
+      !isNaN(audioElement.duration) &&
+      isFinite(audioElement.duration) &&
+      audioElement.currentTime !== undefined
+    ) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: audioElement.duration,
+          playbackRate: audioElement.playbackRate || 1,
+          position: audioElement.currentTime,
+        });
+      } catch {
+        // ignore positionState error
+      }
+    }
+  }
+
+  const updateMediaSessionMetadata = useCallback(() => {
+    if (typeof window === "undefined" || !("mediaSession" in navigator) || !file) {
+      return;
+    }
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: audioControls.hideTitle ? "Raspadmin Music Player" : file.name,
+      artwork: [
+        {
+          src:
+            !file.icon || audioControls.hideTitle
+              ? "/img/icons/music.svg"
+              : file.icon,
+        },
+      ],
+      album: file.parent ?? "",
+    });
+
+    updateMediaSessionTime();
+  }, [audioControls.hideTitle, file]);
 
   function handlerAudioLoaded() {
     if (retryTimeoutRef.current) {
@@ -123,51 +172,21 @@ export default function AudioPlayer({ filesList }: PropsType) {
     if (!audioProps.loading) {
       return;
     }
-    
-    setTimeout(() => {
-      setAudioProps((prev) => ({
-        ...prev,
-        loading: false,
-        playing: true,
-        error: null,
-        duration: audioRef.current?.duration || 0,
-      }));
-      audioRef.current?.play().catch(() => {});
-    }, 10);
+
+    setAudioProps((prev) => ({
+      ...prev,
+      loading: false,
+      playing: true,
+      error: null,
+      duration: audioRef.current?.duration || 0,
+    }));
 
     if (audioRef.current) {
       audioRef.current.volume = audioControls.muted ? 0 : audioControls.volume;
+      audioRef.current.play().catch(() => {});
     }
 
-    if (file) {
-      navigator.mediaSession.metadata ??= new MediaMetadata();
-      navigator.mediaSession.metadata.title = audioControls.hideTitle
-        ? "Raspadmin Music Player"
-        : file.name;
-      navigator.mediaSession.metadata.artwork = [
-        {
-          src:
-            !file.icon || audioControls.hideTitle
-              ? "/img/icons/music.svg"
-              : file.icon,
-        },
-      ];
-      navigator.mediaSession.metadata.album = file.parent ?? "";
-    }
-
-    if (audioRef.current?.duration) {
-      navigator.mediaSession.setPositionState({
-        duration: audioRef.current.duration,
-      });
-    }
-
-    navigator.mediaSession.setActionHandler("previoustrack", backSong);
-    navigator.mediaSession.setActionHandler("nexttrack", nextSong);
-    navigator.mediaSession.setActionHandler("seekto", function (details) {
-      if (details.seekTime && audioRef.current) {
-        audioRef.current.currentTime = details.seekTime;
-      }
-    });
+    updateMediaSessionMetadata();
   }
 
   function handlerAudioTimeUpdate() {
@@ -221,6 +240,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
     }
     retryCountRef.current = 0;
     if (audioRef.current) {
+      audioRef.current.pause();
       audioRef.current.src = "";
     }
     setAudioProps({
@@ -230,17 +250,10 @@ export default function AudioPlayer({ filesList }: PropsType) {
       loading: false,
       error: null,
     });
+    setSrc("");
     setFile(null);
-  }
-
-  function updateMediaSessionTime() {
-    const audioElement = audioRef.current;
-    if (audioElement && audioElement.duration && audioElement.currentTime) {
-      navigator.mediaSession.setPositionState({
-        duration: audioElement.duration,
-        playbackRate: audioElement.playbackRate,
-        position: audioElement.currentTime,
-      });
+    if (typeof window !== "undefined" && "mediaSession" in navigator) {
+      navigator.mediaSession.metadata = null;
     }
   }
 
@@ -336,6 +349,37 @@ export default function AudioPlayer({ filesList }: PropsType) {
   }
 
   useEffect(() => {
+    nextSongRef.current = nextSong;
+    backSongRef.current = backSong;
+    togglePlayAudioRef.current = togglePlayAudio;
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("mediaSession" in navigator)) {
+      return;
+    }
+
+    navigator.mediaSession.setActionHandler("play", () => {
+      togglePlayAudioRef.current();
+    });
+    navigator.mediaSession.setActionHandler("pause", () => {
+      togglePlayAudioRef.current();
+    });
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      backSongRef.current();
+    });
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+      nextSongRef.current();
+    });
+    navigator.mediaSession.setActionHandler("seekto", (details) => {
+      if (details.seekTime && audioRef.current) {
+        audioRef.current.currentTime = details.seekTime;
+        updateMediaSessionTime();
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     const handerOpen = (event: FileOpenEvent) => {
       if (!event.file.type || !isAudio(event.file.type)) {
         setFile(null);
@@ -408,16 +452,19 @@ export default function AudioPlayer({ filesList }: PropsType) {
       retryCountRef.current = 0;
       setSrc("");
       setPlaylist(null);
-      navigator.mediaSession.metadata = null;
+      if (typeof window !== "undefined" && "mediaSession" in navigator) {
+        navigator.mediaSession.metadata = null;
+      }
       return;
     }
-    if (src != file.src) {
+
+    if (src !== file.src) {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
         retryTimeoutRef.current = null;
       }
       retryCountRef.current = 0;
-      setSrc("");
+      setSrc(file.src);
       setAudioProps({
         duration: 0,
         currentTime: 0,
@@ -425,33 +472,30 @@ export default function AudioPlayer({ filesList }: PropsType) {
         loading: true,
         error: null,
       });
-      setTimeout(() => {
-        setSrc(file.src);
-      }, 100);
     }
+
     if (!audioRef.current) {
       return;
     }
+
     if (!audioProps.loading) {
       audioRef.current.volume = audioControls.muted ? 0 : audioControls.volume;
-      if (navigator.mediaSession.metadata) {
-        navigator.mediaSession.metadata.title = audioControls.hideTitle
-          ? "Raspadmin Music Player"
-          : file.name;
-        navigator.mediaSession.metadata.artwork = [
-          {
-            src:
-              !file.icon || audioControls.hideTitle
-                ? "/img/icons/music.svg"
-                : file.icon,
-          },
-        ];
-      }
+      updateMediaSessionMetadata();
     }
-    navigator.mediaSession.playbackState = audioProps.playing
-      ? "playing"
-      : "paused";
-  }, [audioControls, audioProps.loading, audioProps.playing, file, src]);
+
+    if (typeof window !== "undefined" && "mediaSession" in navigator) {
+      navigator.mediaSession.playbackState = audioProps.playing
+        ? "playing"
+        : "paused";
+    }
+  }, [
+    audioControls,
+    audioProps.loading,
+    audioProps.playing,
+    file,
+    src,
+    updateMediaSessionMetadata,
+  ]);
 
   useEffect(() => {
     return () => {
