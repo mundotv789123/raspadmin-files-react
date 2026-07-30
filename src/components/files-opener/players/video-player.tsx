@@ -157,7 +157,7 @@ export default function VideoPlayer({ filesList }: PropsType) {
     setVideoProps((prev) => ({
       ...prev,
       loading: false,
-      error: message ?? "Ocorreu um erro ao reproduzir áudio",
+      error: message || "Ocorreu um erro ao reproduzir vídeo",
     }));
   }
 
@@ -226,11 +226,15 @@ export default function VideoPlayer({ filesList }: PropsType) {
 
     setVideoProps(prev => ({ ...prev, loading: true }));
 
-    let backVideo = playlist.indexOf(file);
-    if (backVideo <= 0) {
-      backVideo = playlist.length - 1;
-    } else {
-      backVideo--;
+    let backVideo = 0;
+    const fileE = playlist.filter((f) => f.src == file.src);
+    if (fileE.length == 1) {
+      backVideo = playlist.indexOf(fileE[0]);
+      if (backVideo <= 0) {
+        backVideo = playlist.length - 1;
+      } else {
+        backVideo--;
+      }
     }
     setFile(playlist[backVideo]);
   }

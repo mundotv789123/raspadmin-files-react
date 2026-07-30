@@ -229,7 +229,7 @@ export default function AudioPlayer({ filesList }: PropsType) {
     setAudioProps((prev) => ({
       ...prev,
       loading: false,
-      error: message ?? "Ocorreu um erro ao reproduzir áudio",
+      error: message || "Ocorreu um erro ao reproduzir áudio",
     }));
   }
 
@@ -338,11 +338,15 @@ export default function AudioPlayer({ filesList }: PropsType) {
       return;
     }
 
-    let backSongIndex = audioPlayList.indexOf(file);
-    if (backSongIndex <= 0) {
-      backSongIndex = audioPlayList.length - 1;
-    } else {
-      backSongIndex--;
+    let backSongIndex = 0;
+    const fileE = audioPlayList.filter((f) => f.src == file.src);
+    if (fileE.length == 1) {
+      backSongIndex = audioPlayList.indexOf(fileE[0]);
+      if (backSongIndex <= 0) {
+        backSongIndex = audioPlayList.length - 1;
+      } else {
+        backSongIndex--;
+      }
     }
     resetTrackState();
     setFile(audioPlayList[backSongIndex]);
